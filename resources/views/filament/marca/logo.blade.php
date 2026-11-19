@@ -1,5 +1,2 @@
-{{-- Logo provisional de Velia: símbolo «Seguido» + nombre en Albert Sans. Inline para que use la fuente del panel. --}}
-<span class="velia-logo" style="display:inline-flex;align-items:center;gap:.5rem;color:#141413" role="img" aria-label="Velia">
-    <svg width="28" height="28" viewBox="0 0 100 100" aria-hidden="true"><path d="M16 28 C26 58 36 80 49 80 C60 80 66 64 72 50" fill="none" stroke="#3B5BA9" stroke-width="17" stroke-linecap="round"/><circle cx="83" cy="28" r="10" fill="#3B5BA9"/></svg>
-    <span aria-hidden="true" style="font-family:'Albert Sans',sans-serif;font-weight:500;font-size:1.6rem;letter-spacing:-.01em;line-height:1">velia</span>
-</span>
+{{-- Logo de Velia (provisional, 19/11/2026): logotipo monolínea «Ajuste óptico». La v es el isotipo: trazo + punto cobalto. --}}
+<svg class="velia-logo" height="32" viewBox="0 -60 394 160" role="img" aria-label="Velia" style="height:2rem;width:auto"><g fill="none" stroke="#141413" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"><path d="M11 11 C20 48 32 89 47 89 C60 89 67 72 73 55"/><path d="M120 52 H192 C192 28 176 12 156 12 C134 12 118 30 118 51 C118 74 135 90 157 90 C170 90 180 85 186 77"/><path d="M222 -38 V70 C222 83 228 89 239 88"/><path d="M270 12 V89"/><path d="M339 51 m-38 0 a38 39 0 1 0 76 0 a38 39 0 1 0 -76 0 M377 51 V89"/></g><circle cx="88" cy="17" r="11" fill="#3B5BA9"/><circle cx="270" cy="-24" r="11" fill="#141413"/></svg>

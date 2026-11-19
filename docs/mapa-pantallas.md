@@ -37,7 +37,7 @@ Cómo se trabaja: un comentario en Figma sobre un wireframe → se cambia el arc
 ## Marca y estilos (Design System v2)
 - Colores para Filament (cobalto suave, neutros): `app/Support/TemaVelia.php`
 - Estilos propios (píldoras, tarjetas, menú): `resources/css/filament/velia.css`, compilado por `resources/css/filament/{direccion,turno}/theme.css` con `npm run build`
-- Logo «Seguido» en la cabecera: `resources/views/filament/marca/logo.blade.php` · símbolo y favicon en `public/`
+- Logo (logotipo monolínea «Ajuste óptico», la v es el isotipo): `resources/views/filament/marca/logo.blade.php` · `public/images/velia-logo.svg`, negativo, símbolo y `public/favicon.svg`
 - Tipografía: Albert Sans en los dos paneles; Atkinson Hyperlegible Next solo en el PIN y los números (`resources/views/filament/turno/partials/estilos.blade.php`)
 
 ## Lógica compartida
