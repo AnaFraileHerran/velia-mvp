@@ -9,7 +9,7 @@ if [ ! -f artisan ]; then
   echo "→ Creando el esqueleto de Laravel 11…"
   composer create-project laravel/laravel:^11.0 .skeleton --no-interaction
   # Copia solo lo que no existe en el repo (no pisa el código de Velia)
-  cp -rn .skeleton/. .
+  cp -Rn .skeleton/. . || true   # macOS devuelve error al saltar archivos que ya existen
   rm -rf .skeleton
 fi
 
