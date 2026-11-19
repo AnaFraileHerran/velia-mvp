@@ -34,6 +34,12 @@ Cómo se trabaja: un comentario en Figma sobre un wireframe → se cambia el arc
 | 5 · Familias › Ocupación | Residencia y ocupación (120:401) | `app/Filament/Direccion/Pages/Ocupacion.php` · `resources/views/filament/direccion/pages/ocupacion.blade.php` |
 | 6 · Mi residencia | Mi residencia (116:1334) | `app/Filament/Direccion/Pages/MiResidencia.php` · `resources/views/filament/direccion/pages/mi-residencia.blade.php` |
 
+## Marca y estilos (Design System v2)
+- Colores para Filament (cobalto suave, neutros): `app/Support/TemaVelia.php`
+- Estilos propios (píldoras, tarjetas, menú): `resources/css/filament/velia.css`, compilado por `resources/css/filament/{direccion,turno}/theme.css` con `npm run build`
+- Logo «Seguido» en la cabecera: `resources/views/filament/marca/logo.blade.php` · símbolo y favicon en `public/`
+- Tipografía: Albert Sans en los dos paneles; Atkinson Hyperlegible Next solo en el PIN y los números (`resources/views/filament/turno/partials/estilos.blade.php`)
+
 ## Lógica compartida
 - Estado del turno (qué está registrado, novedades, preguntas): `app/Support/TurnoActual.php`
 - Móvil vinculado a una auxiliar: `app/Support/Dispositivo.php`

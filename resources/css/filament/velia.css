@@ -1,0 +1,44 @@
+/*
+ * Velia · dirección visual v2 (Design System v2).
+ * Sencilla y con contraste: fondo claro, tarjetas blancas con borde fino, botones en píldora, un solo color de acción.
+ */
+
+/* Tarjetas: blancas, borde fino y esquinas amplias */
+.fi-section,
+.fi-ta-ctn,
+.fi-wi-stats-overview-stat,
+.fi-fo-repeater-item,
+.fi-in-section {
+    border-radius: 1.25rem;
+    box-shadow: none;
+    --tw-ring-color: rgba(var(--gray-200), 1);
+}
+
+.fi-modal-window {
+    border-radius: 1.25rem;
+}
+
+/* Botones, badges y menú en píldora */
+.fi-btn,
+.fi-badge,
+.fi-sidebar-item-button,
+.fi-tabs-item,
+.fi-dropdown-list-item {
+    border-radius: 9999px;
+}
+
+/* Menú lateral en blanco, como una tarjeta más */
+.fi-sidebar {
+    background-color: #fff;
+}
+
+/* Sección activa del menú: tinte cobalto y texto cobalto */
+.fi-sidebar-item-active .fi-sidebar-item-button {
+    background-color: rgba(var(--primary-50), 1);
+}
+
+/* Títulos grandes y ligeros */
+.fi-header-heading {
+    font-weight: 400;
+    letter-spacing: -0.02em;
+}

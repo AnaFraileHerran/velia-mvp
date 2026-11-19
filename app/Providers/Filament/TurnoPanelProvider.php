@@ -32,8 +32,9 @@ class TurnoPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        // Tema compilado: las vistas de la auxiliar usan clases de Tailwind propias (teclado, grabar, barra inferior).
-        // Solo se activa si se ha compilado (npm run build); si no, el panel no se rompe pero se verá sin esos estilos.
+
+        // Tema compilado (resources/css/filament/turno): píldoras, tarjetas y clases propias de las vistas.
+        // Solo se activa si se ha compilado con npm run build; sin él el panel funciona con el aspecto base de Filament.
         if (file_exists(public_path('build/manifest.json'))) {
             $panel->viteTheme('resources/css/filament/turno/theme.css');
         }
@@ -45,9 +46,9 @@ class TurnoPanelProvider extends PanelProvider
             ->brandName('Velia')
             ->colors(TemaVelia::colores())
             ->darkMode(false)
-            // Instrument Sans en todo; Atkinson Hyperlegible Next solo en PIN y números (ver partials/estilos).
-            ->font('Instrument Sans', provider: GoogleFontProvider::class)
-            ->brandLogo(asset('images/velia-logo.svg'))
+            // Albert Sans en todo; Atkinson Hyperlegible Next solo en PIN y números (ver partials/estilos).
+            ->font('Albert Sans', provider: GoogleFontProvider::class)
+            ->brandLogo(fn () => view('filament.marca.logo'))
             ->brandLogoHeight('2rem')
             ->favicon(asset('favicon.svg'))
             ->navigation(false)

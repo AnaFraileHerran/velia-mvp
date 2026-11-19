@@ -24,6 +24,12 @@ class DireccionPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        // Tema compilado (resources/css/filament/direccion): píldoras, tarjetas y clases propias de las vistas.
+        // Solo se activa si se ha compilado con npm run build; sin él el panel funciona con el aspecto base de Filament.
+        if (file_exists(public_path('build/manifest.json'))) {
+            $panel->viteTheme('resources/css/filament/direccion/theme.css');
+        }
+
         return $panel
             ->default()
             ->id('direccion')
@@ -33,8 +39,8 @@ class DireccionPanelProvider extends PanelProvider
             ->brandName('Velia')
             ->colors(TemaVelia::colores())
             ->darkMode(false)
-            ->font('Instrument Sans', provider: GoogleFontProvider::class)
-            ->brandLogo(asset('images/velia-logo.svg'))
+            ->font('Albert Sans', provider: GoogleFontProvider::class)
+            ->brandLogo(fn () => view('filament.marca.logo'))
             ->brandLogoHeight('2rem')
             ->favicon(asset('favicon.svg'))
             ->maxContentWidth('7xl')
