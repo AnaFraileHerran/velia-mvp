@@ -26,6 +26,17 @@ foreach (["App\\Providers\\Filament\\DireccionPanelProvider::class", "App\\Provi
 file_put_contents($f, $c);
 '
 
+echo "→ Tema de la app de la auxiliar (estilos de Velia)…"
+if command -v npm >/dev/null 2>&1; then
+  [ -f resources/css/filament/turno/theme.css ] || php artisan make:filament-theme turno --pm=npm --no-interaction || true
+  if [ -f vite.config.js ] && ! grep -q "filament/turno/theme.css" vite.config.js; then
+    sed -i.bak "s#'resources/js/app.js'#'resources/js/app.js', 'resources/css/filament/turno/theme.css'#" vite.config.js && rm -f vite.config.js.bak
+  fi
+  npm install --silent && npm run build || echo "⚠︎ No se pudo compilar el tema: la app de la auxiliar se verá sin sus estilos."
+else
+  echo "⚠︎ No hay Node/npm: la app de la auxiliar se verá sin sus estilos propios. Instala Node (nodejs.org) y vuelve a lanzar el script."
+fi
+
 [ -f .env ] || cp .env.example .env
 php artisan key:generate --force
 sed -i.bak 's/^APP_NAME=.*/APP_NAME=Velia/; s/^APP_LOCALE=.*/APP_LOCALE=es/; s/^APP_FALLBACK_LOCALE=.*/APP_FALLBACK_LOCALE=es/' .env && rm -f .env.bak

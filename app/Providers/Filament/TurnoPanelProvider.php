@@ -12,7 +12,8 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
+use App\Support\TemaVelia;
+use Filament\FontProviders\GoogleFontProvider;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -31,13 +32,24 @@ class TurnoPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        // Tema compilado: las vistas de la auxiliar usan clases de Tailwind propias (teclado, grabar, barra inferior).
+        // Solo se activa si se ha compilado (npm run build); si no, el panel no se rompe pero se verá sin esos estilos.
+        if (file_exists(public_path('build/manifest.json'))) {
+            $panel->viteTheme('resources/css/filament/turno/theme.css');
+        }
+
         return $panel
             ->id('turno')
             ->path('turno')
             ->login(PinLogin::class)
             ->brandName('Velia')
-            ->colors(['primary' => Color::Amber])
-            ->font('Inter')
+            ->colors(TemaVelia::colores())
+            ->darkMode(false)
+            // Atkinson Hyperlegible Next: hecha para baja visión; distingue 0/O y 1/l (PIN, habitaciones).
+            ->font('Atkinson Hyperlegible Next', provider: GoogleFontProvider::class)
+            ->brandLogo(asset('images/velia-logo.svg'))
+            ->brandLogoHeight('2rem')
+            ->favicon(asset('favicon.svg'))
             ->navigation(false)
             ->topbar(false)
             ->maxContentWidth('3xl')

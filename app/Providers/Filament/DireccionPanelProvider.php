@@ -10,7 +10,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
+use App\Support\TemaVelia;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -30,8 +30,12 @@ class DireccionPanelProvider extends PanelProvider
             ->login()
             ->passwordReset()
             ->brandName('Velia')
-            ->colors(['primary' => Color::Amber])
-            ->font('Inter')
+            ->colors(TemaVelia::colores())
+            ->darkMode(false)
+            ->font('Figtree')
+            ->brandLogo(asset('images/velia-logo.svg'))
+            ->brandLogoHeight('2rem')
+            ->favicon(asset('favicon.svg'))
             ->maxContentWidth('7xl')
             ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Direccion/Resources'), for: 'App\\Filament\\Direccion\\Resources')
