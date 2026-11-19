@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Filament\Direccion\Resources\AusenciaResource\Pages;
+
+use App\Filament\Direccion\Resources\AusenciaResource;
+use App\Models\Ausencia;
+use Filament\Actions\CreateAction;
+use Filament\Resources\Components\Tab;
+use Filament\Resources\Pages\ManageRecords;
+
+class ManageAusencias extends ManageRecords
+{
+    protected static string $resource = AusenciaResource::class;
+
+    protected ?string $subheading = 'Quién está fuera y cuándo vuelve. Las auxiliares lo ven en su relevo.';
+
+    /** Wireframe: «Fuera ahora · 3» y «Salidas previstas · 1». */
+    public function getTabs(): array
+    {
+        $fuera = fn ($q) => $q->where('ha_vuelto', false)->whereDate('sale', '<=', today());
+        $previstas = fn ($q) => $q->where('ha_vuelto', false)->whereDate('sale', '>', today());
+
+        return [
+            'fuera' => Tab::make('Fuera ahora')->modifyQueryUsing($fuera)->badge($fuera(Ausencia::query())->count()),
+            'previstas' => Tab::make('Salidas previstas')->modifyQueryUsing($previstas)->badge($previstas(Ausencia::query())->count()),
+            'vueltas' => Tab::make('Han vuelto')->modifyQueryUsing(fn ($q) => $q->where('ha_vuelto', true)),
+        ];
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            CreateAction::make()->label('Registrar ausencia')
+                ->mutateFormDataUsing(fn (array $data) => [...$data, 'registrada_por' => auth()->id()])
+                ->after(fn (Ausencia $record) => $record->residente->update(['estado' => 'fuera'])),
+        ];
+    }
+}

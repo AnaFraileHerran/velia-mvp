@@ -1,0 +1,80 @@
+<?php
+
+namespace App\Filament\Turno\Pages;
+
+use App\Filament\Turno\Concerns\ComoAtender;
+use App\Models\Residente;
+use App\Support\Dispositivo;
+use App\Support\TurnoActual;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Pages\Page;
+use Livewire\Attributes\Url;
+
+/**
+ * A2 · Residentes (lista 116:804 · plano 116:841 · móvil 118:433).
+ * «Por registrar» arriba y abierto; registrados y fuera, plegados (comentario de Antonio en Figma).
+ * En móvil no hay plano: la lista es la vista por defecto.
+ */
+class Residentes extends Page implements HasActions
+{
+    use ComoAtender;
+    use InteractsWithActions;
+
+    protected static ?string $title = 'Residentes';
+
+    protected static ?string $slug = 'residentes';
+
+    protected static string $view = 'filament.turno.pages.residentes';
+
+    #[Url]
+    public string $vista = 'lista';
+
+    public string $buscar = '';
+
+    public bool $esMovil = false;
+
+    public function mount(): void
+    {
+        $this->esMovil = Dispositivo::esMovil();
+        if ($this->esMovil) {
+            $this->vista = 'lista';
+        }
+    }
+
+    public function getSubheading(): ?string
+    {
+        $t = TurnoActual::make();
+        $g = $t->agrupados();
+        $total = $g['por_registrar']->count() + $g['registrados']->count();
+
+        return (auth()->user()->planta?->nombre ?? 'Todas las plantas').' · '.$g['registrados']->count().' de '.$total.' registrados';
+    }
+
+    public static function lineaEstado(Residente $r, string $estado): string
+    {
+        if ($estado === 'borrador') {
+            return 'Borrador sin confirmar';
+        }
+        $ultimo = $r->registros->first();
+        if (! $ultimo || $ultimo->created_at->lt(now()->subDay())) {
+            return 'Sin registros en 24 h';
+        }
+
+        return 'Último registro: '.($ultimo->created_at->isToday() ? 'hoy' : 'ayer').' '.$ultimo->created_at->format('H:i');
+    }
+
+    protected function getViewData(): array
+    {
+        $t = TurnoActual::make();
+        $g = $t->agrupados();
+        if ($this->buscar !== '') {
+            $q = mb_strtolower($this->buscar);
+            foreach ($g as $k => $lista) {
+                $g[$k] = $lista->filter(fn ($r) => str_contains(mb_strtolower($r->nombre), $q) || str_contains((string) $r->habitacion, $q));
+            }
+        }
+
+        return ['t' => $t, 'g' => $g];
+    }
+}
