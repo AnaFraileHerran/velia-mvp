@@ -11,6 +11,7 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use App\Support\TemaVelia;
+use Filament\FontProviders\GoogleFontProvider;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -32,7 +33,7 @@ class DireccionPanelProvider extends PanelProvider
             ->brandName('Velia')
             ->colors(TemaVelia::colores())
             ->darkMode(false)
-            ->font('Figtree')
+            ->font('Instrument Sans', provider: GoogleFontProvider::class)
             ->brandLogo(asset('images/velia-logo.svg'))
             ->brandLogoHeight('2rem')
             ->favicon(asset('favicon.svg'))

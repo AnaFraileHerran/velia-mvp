@@ -45,8 +45,8 @@ class TurnoPanelProvider extends PanelProvider
             ->brandName('Velia')
             ->colors(TemaVelia::colores())
             ->darkMode(false)
-            // Atkinson Hyperlegible Next: hecha para baja visión; distingue 0/O y 1/l (PIN, habitaciones).
-            ->font('Atkinson Hyperlegible Next', provider: GoogleFontProvider::class)
+            // Instrument Sans en todo; Atkinson Hyperlegible Next solo en PIN y números (ver partials/estilos).
+            ->font('Instrument Sans', provider: GoogleFontProvider::class)
             ->brandLogo(asset('images/velia-logo.svg'))
             ->brandLogoHeight('2rem')
             ->favicon(asset('favicon.svg'))
