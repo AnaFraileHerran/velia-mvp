@@ -27,9 +27,12 @@
                 </p>
                 @forelse ($companeras as $c)
                     <div class="flex items-center justify-between gap-3 border-t border-gray-100 py-2.5 first:border-t-0 dark:border-white/10">
-                        <div class="min-w-0">
+                        <div class="flex min-w-0 items-center gap-3">
+                            <img src="{{ \App\Support\Avatar::url($c['user']->foto, $c['user']->name) }}" alt="" style="width:40px;height:40px;border-radius:9999px;object-fit:cover;flex-shrink:0">
+                            <div class="min-w-0">
                             <p class="truncate font-medium text-gray-950 dark:text-white">{{ $c['user']->name }}</p>
                             <p class="text-sm text-gray-500">{{ $c['user']->planta?->nombre ?? 'Todas las plantas' }}@if ($c['user']->responsable_turno) · Responsable de turno @endif</p>
+                            </div>
                         </div>
                         @if ($c['enTurno'])
                             <x-filament::badge color="success">En turno</x-filament::badge>
@@ -47,9 +50,12 @@
                     <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Equipo sanitario y de apoyo</p>
                     @foreach ($equipo as $p)
                         <div class="flex items-center justify-between gap-3 border-t border-gray-100 py-2.5 first:border-t-0 dark:border-white/10">
-                            <div class="min-w-0">
+                            <div class="flex min-w-0 items-center gap-3">
+                                <img src="{{ $p['foto'] }}" alt="" style="width:40px;height:40px;border-radius:9999px;object-fit:cover;flex-shrink:0">
+                                <div class="min-w-0">
                                 <p class="truncate font-medium text-gray-950 dark:text-white">{{ $p['nombre'] }} <span class="font-normal text-gray-500">· {{ $p['puesto'] }}</span></p>
                                 <p @class(['text-sm', 'font-medium text-success-700' => $p['estado'] === 'aqui', 'text-gray-500' => $p['estado'] !== 'aqui'])>{{ $p['texto'] }}</p>
+                                </div>
                             </div>
                             @if ($p['contacto'] && $p['estado'] === 'aqui')
                                 <span class="shrink-0 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700 dark:bg-white/10 dark:text-gray-200">{{ $p['contacto'] }}</span>

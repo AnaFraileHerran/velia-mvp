@@ -10,12 +10,25 @@ use Illuminate\Support\Str;
 /** Al añadir una auxiliar, el panel genera su PIN provisional y un código para vincular su móvil. */
 class CreateAuxiliar extends CreateRecord
 {
+    use \App\Filament\Direccion\Concerns\MigasDePan;
+
+    protected function migas(): array
+    {
+        return [\App\Filament\Direccion\Resources\AuxiliarResource::getUrl() => 'Equipo'];
+    }
+
     protected static string $resource = AuxiliarResource::class;
 
-    protected static ?string $title = 'Añadir auxiliar';
+    public function getTitle(): string
+    {
+        return request()->query('rol') === 'sanitario' || ($this->data['rol'] ?? null) === 'sanitario' ? 'Añadir enfermería o medicina' : 'Añadir auxiliar';
+    }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        if (($data['rol'] ?? null) === 'sanitario') {
+            return $data; // no entra en la app: sin PIN ni código
+        }
         $data['rol'] = 'auxiliar';
         $data['codigo_invitacion'] = Str::upper(Str::random(3)).random_int(100, 999);
 
@@ -24,6 +37,11 @@ class CreateAuxiliar extends CreateRecord
 
     protected function afterCreate(): void
     {
+        if ($this->record->rol === 'sanitario') {
+            Notification::make()->title("{$this->record->name} ya aparece en «Mi turno» de las auxiliares.")->success()->send();
+
+            return;
+        }
         $pin = $this->record->generarPinProvisional(\Filament\Facades\Filament::auth()->user());
         Notification::make()
             ->title("PIN provisional de {$this->record->name}: {$pin}")
@@ -38,6 +56,6 @@ class CreateAuxiliar extends CreateRecord
 
     protected function getRedirectUrl(): string
     {
-        return static::getResource()::getUrl('index');
+        return static::getResource()::getUrl('index', $this->record->rol === 'sanitario' ? ['activeTab' => 'sanitarios'] : []);
     }
 }

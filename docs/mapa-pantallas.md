@@ -16,7 +16,7 @@ Cómo se trabaja: un comentario en Figma sobre un wireframe → se cambia el arc
 | A1 · Cómo atender | A1 Cómo atender (117:359 · 117:467) | `app/Filament/Turno/Concerns/ComoAtender.php` · `resources/views/filament/turno/partials/como-atender.blade.php` |
 | A2 · Registrar | A2 Residentes lista y plano (116:804, 116:841 · 118:433) | `app/Filament/Turno/Pages/Residentes.php` · `resources/views/filament/turno/pages/residentes.blade.php` · `.../partials/fila-residente.blade.php` |
 | A2 · Registrar | A2 Grabar, sin micrófono y Revisar (117:274, 116:887, 117:312 · 117:384, 116:912, 117:422) | `app/Filament/Turno/Pages/Registrar.php` · `resources/views/filament/turno/pages/registrar.blade.php` |
-| A3 · Cerrar el turno | A3 Mi turno (116:937 · 118:465) | `app/Filament/Turno/Pages/MiTurno.php` · `resources/views/filament/turno/pages/mi-turno.blade.php` · «Hoy contigo»: `TurnoActual::companeras()` y `Residencia::equipoHoy()` (el equipo se edita en Mi residencia) |
+| A3 · Cerrar el turno | A3 Mi turno (116:937 · 118:465) | `app/Filament/Turno/Pages/MiTurno.php` · `resources/views/filament/turno/pages/mi-turno.blade.php` · «Hoy contigo»: `TurnoActual::companeras()` y `Residencia::equipoHoy()` (enfermería y medicina se editan en Equipo, pestaña «Enfermería y medicina») |
 | A3 · Cerrar el turno | A3 Cerrar el turno (116:970 · 116:1016) | `app/Filament/Turno/Pages/CerrarTurno.php` · `resources/views/filament/turno/pages/cerrar-turno.blade.php` |
 | — | Barra inferior de 3 pestañas y bloqueo a los 5 min | `resources/views/filament/turno/partials/barra-inferior.blade.php` |
 | — | Teclado de PIN (compartido) | `resources/views/filament/turno/partials/teclado.blade.php` |
@@ -33,6 +33,10 @@ Cómo se trabaja: un comentario en Figma sobre un wireframe → se cambia el arc
 | 5 · Familias | Resúmenes (120:342), Enviar (116:1569) | `app/Filament/Direccion/Resources/ResumenResource.php` · `resources/views/filament/direccion/resumen-envio.blade.php` |
 | 5 · Familias › Ocupación | Residencia y ocupación (120:401) | `app/Filament/Direccion/Pages/Ocupacion.php` · `resources/views/filament/direccion/pages/ocupacion.blade.php` |
 | 6 · Mi residencia | Mi residencia (116:1334) | `app/Filament/Direccion/Pages/MiResidencia.php` · `resources/views/filament/direccion/pages/mi-residencia.blade.php` |
+| 7 · Ayuda | — (nueva, sin wireframe) | `app/Filament/Direccion/Pages/Ayuda.php` · `resources/views/filament/direccion/pages/ayuda.blade.php` |
+| Inicio · Cómo va la semana | (antes en Calidad) | `app/Filament/Direccion/Widgets/ComoVaLaSemana.php` · `app/Support/Semana.php` |
+| Migas de pan (dirección) | — | `app/Filament/Direccion/Concerns/MigasDePan.php` |
+| Avatares (foto o iniciales) | — | `app/Support/Avatar.php` |
 
 ## Marca y estilos (Design System v2)
 - Colores para Filament (cobalto suave, neutros): `app/Support/TemaVelia.php`

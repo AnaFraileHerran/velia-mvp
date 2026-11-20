@@ -18,7 +18,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Actions\Action as InfolistAction;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Split;
+use App\Support\Avatar;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
@@ -78,6 +82,8 @@ class ResidenteResource extends Resource
                 Textarea::make('notas')->label('Notas')->rows(3),
             ],
             'Datos y ubicación' => [
+                FileUpload::make('foto')->label('Foto')->avatar()->image()->imageEditor()->directory('fotos')
+                    ->helperText('Con su consentimiento o el de su representante. Ayuda a una auxiliar nueva a reconocerle.')->columnSpanFull(),
                 TextInput::make('dni')->label('DNI / NIE'),
                 DatePicker::make('fecha_nacimiento')->label('Fecha de nacimiento'),
                 DatePicker::make('fecha_ingreso')->label('Fecha de ingreso'),
@@ -122,6 +128,8 @@ class ResidenteResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('foto')->label('')->circular()->size(40)->grow(false)
+                    ->defaultImageUrl(fn (Residente $r) => Avatar::iniciales($r->nombre)),
                 TextColumn::make('nombre')->label('Residente')->searchable()->weight('semibold')
                     ->description(fn (Residente $r) => ($r->planta?->nombre ?? '—').' · Hab. '.$r->habitacion),
                 TextColumn::make('estado')->label('Estado')->badge()
@@ -171,7 +179,9 @@ class ResidenteResource extends Resource
 
         $sections = [
             Section::make()
-                ->schema([
+                ->schema([Split::make([
+                    ImageEntry::make('foto')->hiddenLabel()->circular()->height(64)->grow(false)
+                        ->defaultImageUrl(fn (Residente $r) => Avatar::iniciales($r->nombre)),
                     TextEntry::make('emergencia')->hiddenLabel()->weight('semibold')
                         ->state(function (Residente $r) {
                             $c = $r->contactoEmergencia();
@@ -179,7 +189,7 @@ class ResidenteResource extends Resource
 
                             return $linea.' · Alergia: '.($r->alergias ?: 'ninguna conocida');
                         }),
-                ])->compact(),
+                ])->verticallyAlignCenter()])->compact(),
         ];
         foreach ($ficha as $titulo => $entries) {
             $sections[] = Section::make($titulo)

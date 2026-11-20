@@ -22,7 +22,6 @@
             <ul class="flex flex-col gap-2 text-sm text-gray-700 dark:text-gray-300">
                 <li>En turno: {{ $enTurno->isEmpty() ? 'nadie ha abierto turno todavía' : $enTurno->map(fn ($t) => $t->user->name)->join(', ') }}</li>
                 <li>Fuera: {{ $fuera }}@if ($vuelvenHoy->isNotEmpty()) · vuelve hoy: {{ $vuelvenHoy->map(fn ($a) => $a->residente->nombre)->join(', ') }}@endif</li>
-                <li><x-filament::link :href="\App\Filament\Direccion\Pages\Calidad::getUrl()">Cómo va la semana → Calidad y auditoría</x-filament::link></li>
             </ul>
         </x-filament::section>
     </div>

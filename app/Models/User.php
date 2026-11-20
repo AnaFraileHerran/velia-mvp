@@ -21,6 +21,7 @@ class User extends Authenticatable implements FilamentUser, HasName
         'name', 'email', 'password', 'rol', 'pin', 'pin_provisional', 'codigo_invitacion',
         'planta_id', 'turno_habitual', 'responsable_turno', 'activo', 'baja_motivo',
         'pin_restablecido_at', 'pin_restablecido_por',
+        'foto', 'puesto', 'dias', 'desde', 'hasta', 'contacto',
     ];
 
     protected $hidden = ['password', 'pin', 'remember_token'];
@@ -33,6 +34,7 @@ class User extends Authenticatable implements FilamentUser, HasName
             'responsable_turno' => 'boolean',
             'activo' => 'boolean',
             'pin_restablecido_at' => 'datetime',
+            'dias' => 'array',
         ];
     }
 
@@ -67,6 +69,31 @@ class User extends Authenticatable implements FilamentUser, HasName
     public function turnoAbierto(): ?Turno
     {
         return $this->turnos()->whereNull('fin')->latest('inicio')->first();
+    }
+
+    /** Enfermería, medicina y otros profesionales: están en Equipo pero no entran en la app. */
+    public function scopeSanitarios(Builder $query): Builder
+    {
+        return $query->where('rol', 'sanitario');
+    }
+
+    public function etiquetaPuesto(): string
+    {
+        return Residencia::PUESTOS[$this->puesto] ?? 'Equipo sanitario';
+    }
+
+    /** «L–V · 08:00–15:00» */
+    public function etiquetaHorario(): string
+    {
+        $dias = collect($this->dias ?? [])->map(fn ($d) => (int) $d)->sort()->values();
+        if ($dias->isEmpty()) {
+            return 'Sin horario fijo';
+        }
+        $letras = [1 => 'L', 2 => 'M', 3 => 'X', 4 => 'J', 5 => 'V', 6 => 'S', 7 => 'D'];
+        $seguidos = $dias->count() > 2 && $dias->last() - $dias->first() === $dias->count() - 1;
+        $texto = $seguidos ? $letras[$dias->first()].'–'.$letras[$dias->last()] : $dias->map(fn ($d) => $letras[$d])->join(', ');
+
+        return $texto.($this->desde && $this->hasta ? ' · '.$this->desde.'–'.$this->hasta : '');
     }
 
     public function scopeAuxiliares(Builder $query): Builder

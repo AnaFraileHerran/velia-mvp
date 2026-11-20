@@ -30,10 +30,6 @@ class DatabaseSeeder extends Seeder
             'plazas_autorizadas' => 20,
             'proxima_auditoria' => now()->addDays(100),
             'piloto_hasta' => now()->addMonths(2),
-            'equipo' => [
-                ['nombre' => 'Elena Vidal', 'puesto' => 'enfermeria', 'dias' => [1, 2, 3, 4, 5], 'desde' => '08:00', 'hasta' => '15:00', 'contacto' => 'Ext. 210'],
-                ['nombre' => 'Javier Molina', 'puesto' => 'medicina', 'dias' => [2, 4], 'desde' => '10:00', 'hasta' => '13:00', 'contacto' => 'Ext. 215'],
-            ],
         ]);
 
         $p1 = Planta::create(['nombre' => 'Planta 1']);
@@ -51,6 +47,15 @@ class DatabaseSeeder extends Seeder
         $lucia = $aux('Lucía Martín', $p1, 'manana', '1234');
         $ana = $aux('Ana Torres', null, 'manana', '2468', true);
         $aux('Sonia Prieto', $p1, 'manana', '5310');
+
+        // Enfermería y medicina: en Equipo y en «Mi turno» de las auxiliares; no entran en la app.
+        foreach ([
+            ['Elena Vidal', 'enfermeria', [1, 2, 3, 4, 5], '08:00', '15:00', 'Ext. 210'],
+            ['Lucas Herrero', 'enfermeria', [1, 2, 3, 4, 5], '15:00', '22:00', 'Ext. 210'],
+            ['Javier Molina', 'medicina', [2, 4], '10:00', '13:00', 'Ext. 215'],
+        ] as [$n, $puesto, $dias, $desde, $hasta, $contacto]) {
+            User::create(['name' => $n, 'rol' => 'sanitario', 'puesto' => $puesto, 'dias' => $dias, 'desde' => $desde, 'hasta' => $hasta, 'contacto' => $contacto]);
+        }
         $rosa = $aux('Rosa Delgado', $p2, 'noche', '1357', true);
         $jorge = $aux('Jorge Sanz', $p1, 'noche', '9753');
         $aux('Marisol Vega', $p2, 'tarde', '8642', true);

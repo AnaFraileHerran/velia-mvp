@@ -10,6 +10,13 @@ use Filament\Resources\Pages\ManageRecords;
 
 class ManageAusencias extends ManageRecords
 {
+    use \App\Filament\Direccion\Concerns\MigasDePan;
+
+    protected function migas(): array
+    {
+        return [\App\Filament\Direccion\Resources\ResidenteResource::getUrl() => 'Residentes'];
+    }
+
     protected static string $resource = AusenciaResource::class;
 
     protected ?string $subheading = 'Quién está fuera y cuándo vuelve. Las auxiliares lo ven en su relevo.';

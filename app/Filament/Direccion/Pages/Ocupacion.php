@@ -13,6 +13,13 @@ use Filament\Pages\Page;
 /** 5 · Familias › Residencia y ocupación (wireframe «V2 · Familias · residencia y ocupación»). */
 class Ocupacion extends Page
 {
+    use \App\Filament\Direccion\Concerns\MigasDePan;
+
+    protected function migas(): array
+    {
+        return [\App\Filament\Direccion\Resources\ResumenResource::getUrl() => 'Familias'];
+    }
+
     protected static ?string $title = 'Familias';
 
     protected static ?string $slug = 'familias/ocupacion';

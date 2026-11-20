@@ -40,6 +40,7 @@ php artisan key:generate --force
 sed -i.bak 's/^APP_NAME=.*/APP_NAME=Velia/; s/^APP_LOCALE=.*/APP_LOCALE=es/; s/^APP_FALLBACK_LOCALE=.*/APP_FALLBACK_LOCALE=es/' .env && rm -f .env.bak
 touch database/database.sqlite
 php artisan migrate:fresh --seed --force
+php artisan storage:link --force >/dev/null 2>&1 || true   # fotos de residentes, equipo y residencia
 php artisan filament:assets
 
 echo ""

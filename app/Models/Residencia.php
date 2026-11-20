@@ -37,10 +37,10 @@ class Residencia extends Model
         $hoy = $ahora->isoWeekday();
         $hora = $ahora->format('H:i');
 
-        return collect($this->equipo ?? [])->map(function (array $p) use ($hoy, $hora, $ahora) {
-            $dias = array_map('intval', $p['dias'] ?? []);
-            $desde = $p['desde'] ?? null;
-            $hasta = $p['hasta'] ?? null;
+        return User::sanitarios()->where('activo', true)->orderBy('name')->get()->map(function (User $p) use ($hoy, $hora, $ahora) {
+            $dias = array_map('intval', $p->dias ?? []);
+            $desde = $p->desde;
+            $hasta = $p->hasta;
             $viene = in_array($hoy, $dias, true);
 
             if ($viene && $desde && $hasta && $hora >= $desde && $hora < $hasta) {
@@ -52,9 +52,10 @@ class Residencia extends Model
             }
 
             return [
-                'nombre' => $p['nombre'] ?? '',
-                'puesto' => self::PUESTOS[$p['puesto'] ?? 'otro'] ?? 'Otro',
-                'contacto' => $p['contacto'] ?? null,
+                'nombre' => $p->name,
+                'puesto' => $p->etiquetaPuesto(),
+                'contacto' => $p->contacto,
+                'foto' => \App\Support\Avatar::url($p->foto, $p->name),
                 'estado' => $estado,
                 'texto' => $texto,
                 'orden' => $orden,

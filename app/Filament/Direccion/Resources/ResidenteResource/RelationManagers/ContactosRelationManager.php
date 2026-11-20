@@ -20,10 +20,16 @@ class ContactosRelationManager extends RelationManager
 
     protected static ?string $title = 'Autorizados de la familia';
 
+    // En la ficha (página «ver») Filament deja las pestañas en solo lectura: aquí sí se añaden contactos.
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
+
     public function form(Form $form): Form
     {
         return $form->schema([
-            TextInput::make('nombre')->required(),
+            TextInput::make('nombre')->label('Nombre')->required(),
             TextInput::make('relacion')->label('Relación')->required(),
             TextInput::make('telefono')->label('Teléfono')->tel(),
             TextInput::make('email')->email(),
@@ -44,7 +50,7 @@ class ContactosRelationManager extends RelationManager
                 IconColumn::make('emergencia')->boolean(),
                 IconColumn::make('recibe_resumen')->label('Resumen')->boolean(),
             ])
-            ->headerActions([CreateAction::make()->label('Añadir contacto')])
+            ->headerActions([CreateAction::make()->label('Añadir contacto')->modalHeading('Añadir contacto')->createAnother(false)])
             ->actions([EditAction::make()]);
     }
 }

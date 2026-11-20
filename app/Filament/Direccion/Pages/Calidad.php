@@ -15,10 +15,12 @@ use Filament\Pages\Page;
 /**
  * 4 · Calidad y auditoría (wireframe «V2 · Calidad y auditoría»).
  * Jerarquía para la dirección: 1) cuánto falta para la auditoría, 2) qué apartado
- * necesita algo de ella hoy (con la acción al lado), 3) cómo va la semana, 4) indicadores (Ejemplo, H2).
+ * necesita algo de ella hoy (con la acción al lado), 3) indicadores («Cómo va la semana» está en Inicio) (Ejemplo, H2).
  */
 class Calidad extends Page
 {
+    use \App\Filament\Direccion\Concerns\MigasDePan;
+
     protected static ?string $navigationLabel = 'Calidad y auditoría';
 
     protected static ?string $title = 'Calidad y auditoría';
@@ -80,26 +82,5 @@ class Calidad extends Page
         usort($lista, fn ($a, $b) => $a['ok'] <=> $b['ok']);
 
         return $lista;
-    }
-
-    public function semana(): array
-    {
-        $desde = now()->subDays(7);
-        $turnos = Turno::where('fin', '>=', $desde)->get();
-        $conPendientes = $turnos->whereNotNull('motivo_cierre');
-        $motivo = $conPendientes->countBy('motivo_cierre')->sortDesc()->keys()->first();
-        $inc = Registro::where('incidencia_destacada', true)->where('created_at', '>=', $desde)->count();
-        $incAnterior = Registro::where('incidencia_destacada', true)->whereBetween('created_at', [now()->subDays(14), $desde])->count();
-        $residentes = Residente::activos()->where('estado', 'en_centro')->count();
-        $registrados = Registro::where('created_at', '>=', now()->startOfDay())->distinct('residente_id')->count('residente_id');
-
-        return [
-            'cobertura' => $residentes ? round($registrados / $residentes * 100) : 0,
-            'turnos' => $turnos->count(),
-            'con_pendientes' => $conPendientes->count(),
-            'motivo' => $motivo ? (Turno::MOTIVOS_CIERRE[$motivo] ?? $motivo) : null,
-            'incidencias' => $inc,
-            'diferencia' => $inc - $incAnterior,
-        ];
     }
 }

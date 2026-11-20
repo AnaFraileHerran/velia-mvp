@@ -16,6 +16,18 @@ use Filament\Resources\Pages\ViewRecord;
 /** Ficha del residente. «Dar de baja» está solo en «… Más», con motivo y confirmación (regla 6). */
 class ViewResidente extends ViewRecord
 {
+    use \App\Filament\Direccion\Concerns\MigasDePan;
+
+    protected function migas(): array
+    {
+        return [\App\Filament\Direccion\Resources\ResidenteResource::getUrl() => 'Residentes'];
+    }
+
+    protected function migaActual(): string
+    {
+        return $this->getRecord()->nombre;
+    }
+
     protected static string $resource = ResidenteResource::class;
 
     public function getSubheading(): ?string

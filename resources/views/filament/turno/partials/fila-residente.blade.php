@@ -2,10 +2,13 @@
 <li class="flex items-stretch">
     <a href="{{ \App\Filament\Turno\Pages\Registrar::getUrl(['residente' => $r->id]) }}"
        class="flex min-w-0 flex-1 items-center justify-between gap-3 px-4 py-3 active:bg-gray-50 dark:active:bg-white/5">
-        <span class="min-w-0">
+        <span class="flex min-w-0 items-center gap-3">
+            <img src="{{ \App\Support\Avatar::url($r->foto, $r->nombre) }}" alt="" style="width:44px;height:44px;border-radius:9999px;object-fit:cover;flex-shrink:0">
+            <span class="min-w-0">
             <span class="block font-semibold text-gray-950 dark:text-white">{{ $r->nombre }} · Hab. {{ $r->habitacion }}</span>
             <span @class(['block text-sm', 'text-warning-700 font-medium' => $estado === 'borrador', 'text-gray-500' => $estado !== 'borrador'])>
                 {{ $estado === 'fuera' ? $r->etiquetaEstado() : \App\Filament\Turno\Pages\Residentes::lineaEstado($r, $estado) }}
+            </span>
             </span>
         </span>
         <span aria-hidden="true" class="text-gray-400">›</span>

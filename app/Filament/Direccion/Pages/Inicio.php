@@ -2,6 +2,7 @@
 
 namespace App\Filament\Direccion\Pages;
 
+use App\Filament\Direccion\Widgets\ComoVaLaSemana;
 use App\Filament\Direccion\Widgets\EstaSemana;
 use App\Filament\Direccion\Widgets\HoyNecesitaTuDecision;
 use App\Models\Residencia;
@@ -51,7 +52,7 @@ class Inicio extends Dashboard
 
     public function getWidgets(): array
     {
-        return [HoyNecesitaTuDecision::class, EstaSemana::class];
+        return [HoyNecesitaTuDecision::class, EstaSemana::class, ComoVaLaSemana::class];
     }
 
     public function getColumns(): int|string|array

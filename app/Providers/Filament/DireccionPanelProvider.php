@@ -10,6 +10,9 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Facades\FilamentIcon;
+use Filament\View\PanelsRenderHook;
+use Illuminate\Support\Facades\Blade;
 use App\Support\TemaVelia;
 use Filament\FontProviders\GoogleFontProvider;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -19,7 +22,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-/** Web de la dirección. Menú: Inicio, Equipo, Residentes, Calidad y auditoría, Familias, Mi residencia. */
+/** Web de la dirección. Menú: Inicio, Equipo, Residentes, Calidad y auditoría, Familias, Mi residencia, Ayuda. */
 class DireccionPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -64,6 +67,20 @@ class DireccionPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            ->renderHook(PanelsRenderHook::HEAD_END, fn () => Blade::render("@include('filament.marca.ajustes-finos')"))
             ->authMiddleware([Authenticate::class]);
+    }
+
+    public function boot(): void
+    {
+        // Iconos de borrar y quitar en trazo fino (outline), no macizos: menos peso visual en acciones destructivas.
+        FilamentIcon::register([
+            'forms::components.repeater.actions.delete' => 'heroicon-o-trash',
+            'forms::components.builder.actions.delete' => 'heroicon-o-trash',
+            'forms::components.key-value.actions.delete' => 'heroicon-o-trash',
+            'actions::delete-action' => 'heroicon-o-trash',
+            'actions::delete-action.modal' => 'heroicon-o-trash',
+            'tables::actions.delete' => 'heroicon-o-trash',
+        ]);
     }
 }
