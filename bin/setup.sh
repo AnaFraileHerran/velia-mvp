@@ -6,15 +6,17 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 if [ ! -f artisan ]; then
-  echo "→ Creando el esqueleto de Laravel 11…"
-  composer create-project laravel/laravel:^11.0 .skeleton --no-interaction
+  echo "→ Creando el esqueleto de Laravel 12…"
+  rm -rf .skeleton
+  # Laravel 11 ya no se instala: Composer bloquea sus versiones por avisos de seguridad.
+  composer create-project laravel/laravel:^12.0 .skeleton --no-interaction
   # Copia solo lo que no existe en el repo (no pisa el código de Velia)
   cp -Rn .skeleton/. . || true   # macOS devuelve error al saltar archivos que ya existen
   rm -rf .skeleton
 fi
 
 echo "→ Instalando Filament 3…"
-composer require filament/filament:"^3.2" -W --no-interaction
+composer require filament/filament:"^3.3" -W --no-interaction
 
 echo "→ Registrando los paneles de Velia…"
 php -r '

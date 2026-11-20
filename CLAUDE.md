@@ -10,7 +10,7 @@ Este repositorio es la fuente de los wireframes funcionales: cada pantalla de «
 - Estilos: Filament v3 (https://filamentphp.com). Usa sus componentes y su tema; no inventes CSS si Filament ya lo resuelve.
 
 ## Stack
-- Laravel 11, PHP 8.3, Filament 3.2, Livewire 3, SQLite en local.
+- Laravel 12, PHP 8.3, Filament 3.3, Livewire 3, SQLite en local.
 - Dos paneles de Filament:
   - `direccion` en `/direccion`: web de la dirección, entra con email y contraseña.
   - `turno` en `/turno`: app de las auxiliares para tablet compartida o móvil, entra con PIN.
