@@ -45,7 +45,7 @@ class Calidad extends Page
     public function apartados(): array
     {
         $ingresos = Residente::activos()->where('fecha_ingreso', '>=', now()->subMonths(3))->get();
-        $ingresosCompletos = $ingresos->filter(fn ($r) => $r->alergias !== null && $r->contactos()->exists() && $r->plan_proxima_revision)->count();
+        $ingresosCompletos = $ingresos->filter(fn ($record) => $record->alergias !== null && $record->contactos()->exists() && $record->plan_proxima_revision)->count();
         $turnos = Turno::whereNotNull('fin')->where('fin', '>=', now()->subDays(30));
         $turnosTotal = (clone $turnos)->count();
         $turnosCompletos = (clone $turnos)->whereNull('motivo_cierre')->count();

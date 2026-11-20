@@ -46,7 +46,7 @@ class MiTurno extends Page
     {
         $t = TurnoActual::make();
         $g = $t->agrupados();
-        $estados = $g['por_registrar']->map(fn ($r) => $t->estado($r));
+        $estados = $g['por_registrar']->map(fn ($record) => $t->estado($record));
 
         return [
             'registrados' => $g['registrados']->count(),

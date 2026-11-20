@@ -71,7 +71,7 @@ class Residentes extends Page implements HasActions
         if ($this->buscar !== '') {
             $q = mb_strtolower($this->buscar);
             foreach ($g as $k => $lista) {
-                $g[$k] = $lista->filter(fn ($r) => str_contains(mb_strtolower($r->nombre), $q) || str_contains((string) $r->habitacion, $q));
+                $g[$k] = $lista->filter(fn ($record) => str_contains(mb_strtolower($record->nombre), $q) || str_contains((string) $record->habitacion, $q));
             }
         }
 

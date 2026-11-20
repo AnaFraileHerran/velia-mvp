@@ -39,7 +39,7 @@ class CerrarTurno extends Page
     {
         $t = TurnoActual::make();
 
-        return $t->agrupados()['por_registrar']->map(fn ($r) => ['r' => $r, 'estado' => $t->estado($r)]);
+        return $t->agrupados()['por_registrar']->map(fn ($record) => ['r' => $record, 'estado' => $t->estado($record)]);
     }
 
     public function relevo()
@@ -66,7 +66,7 @@ class CerrarTurno extends Page
             'motivoTexto.required' => 'Cuéntalo en pocas palabras.',
         ]);
 
-        $lineas = $this->relevo()->map(fn ($r) => $r->residente->nombre.' · '.$r->resumenCorto())->all();
+        $lineas = $this->relevo()->map(fn ($record) => $record->residente->nombre.' · '.$record->resumenCorto())->all();
         if (trim($this->nota) !== '') {
             $lineas[] = trim($this->nota);
         }

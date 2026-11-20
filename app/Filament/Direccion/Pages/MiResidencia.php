@@ -77,8 +77,8 @@ class MiResidencia extends Page implements HasForms
     public function plantas()
     {
         return Planta::withCount([
-            'residentes' => fn ($q) => $q->where('estado', '!=', 'baja'),
-            'auxiliares' => fn ($q) => $q->where('activo', true),
+            'residentes' => fn ($query) => $query->where('estado', '!=', 'baja'),
+            'auxiliares' => fn ($query) => $query->where('activo', true),
         ])->get();
     }
 }

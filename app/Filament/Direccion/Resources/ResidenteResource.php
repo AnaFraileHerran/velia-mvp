@@ -147,7 +147,7 @@ class ResidenteResource extends Resource
             'Cuidados' => [
                 TextEntry::make('riesgos')->label('Riesgos')->placeholder('—'),
                 TextEntry::make('movilidad')->label('Movilidad')->placeholder('—'),
-                TextEntry::make('sujecion')->label('Sujeción')->formatStateUsing(fn ($s) => $s ? 'Sí, registrar cada uso' : 'No indicada'),
+                TextEntry::make('sujecion')->label('Sujeción')->formatStateUsing(fn ($state) => $state ? 'Sí, registrar cada uso' : 'No indicada'),
                 TextEntry::make('como_tratarle')->label('Cómo tratarle')->placeholder('—')->columnSpanFull(),
             ],
             'Dieta' => [TextEntry::make('dieta')->hiddenLabel()->placeholder('—')],
@@ -159,7 +159,7 @@ class ResidenteResource extends Resource
             ],
             'Informes' => [
                 TextEntry::make('informes')->hiddenLabel()->placeholder('Sin informes')->listWithLineBreaks()
-                    ->formatStateUsing(fn ($s) => basename((string) $s)),
+                    ->formatStateUsing(fn ($state) => basename((string) $state)),
             ],
             'Notas' => [TextEntry::make('notas')->hiddenLabel()->placeholder('Sin notas')->columnSpanFull()],
             'Datos y ubicación' => [

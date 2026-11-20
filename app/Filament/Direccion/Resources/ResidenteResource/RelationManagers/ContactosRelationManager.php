@@ -37,10 +37,10 @@ class ContactosRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                TextColumn::make('nombre')->description(fn ($r) => $r->relacion),
+                TextColumn::make('nombre')->description(fn ($record) => $record->relacion),
                 TextColumn::make('telefono')->label('Teléfono'),
                 TextColumn::make('email'),
-                TextColumn::make('canal')->badge()->formatStateUsing(fn ($s) => $s === 'whatsapp' ? 'WhatsApp' : 'Email'),
+                TextColumn::make('canal')->badge()->formatStateUsing(fn ($state) => $state === 'whatsapp' ? 'WhatsApp' : 'Email'),
                 IconColumn::make('emergencia')->boolean(),
                 IconColumn::make('recibe_resumen')->label('Resumen')->boolean(),
             ])
