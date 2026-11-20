@@ -54,6 +54,8 @@ class MiTurno extends Page
             'borradores' => $estados->filter(fn ($e) => $e === 'borrador')->count(),
             'pendientes' => $estados->filter(fn ($e) => $e === 'pendiente')->count(),
             'fuera' => $g['fuera']->count(),
+            'companeras' => $t->companeras(),
+            'equipo' => \App\Models\Residencia::actual()->equipoHoy(),
         ];
     }
 }

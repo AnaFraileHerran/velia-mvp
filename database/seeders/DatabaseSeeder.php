@@ -30,6 +30,10 @@ class DatabaseSeeder extends Seeder
             'plazas_autorizadas' => 20,
             'proxima_auditoria' => now()->addDays(100),
             'piloto_hasta' => now()->addMonths(2),
+            'equipo' => [
+                ['nombre' => 'Elena Vidal', 'puesto' => 'enfermeria', 'dias' => [1, 2, 3, 4, 5], 'desde' => '08:00', 'hasta' => '15:00', 'contacto' => 'Ext. 210'],
+                ['nombre' => 'Javier Molina', 'puesto' => 'medicina', 'dias' => [2, 4], 'desde' => '10:00', 'hasta' => '13:00', 'contacto' => 'Ext. 215'],
+            ],
         ]);
 
         $p1 = Planta::create(['nombre' => 'Planta 1']);
@@ -46,6 +50,7 @@ class DatabaseSeeder extends Seeder
         };
         $lucia = $aux('Lucía Martín', $p1, 'manana', '1234');
         $ana = $aux('Ana Torres', null, 'manana', '2468', true);
+        $aux('Sonia Prieto', $p1, 'manana', '5310');
         $rosa = $aux('Rosa Delgado', $p2, 'noche', '1357', true);
         $jorge = $aux('Jorge Sanz', $p1, 'noche', '9753');
         $aux('Marisol Vega', $p2, 'tarde', '8642', true);

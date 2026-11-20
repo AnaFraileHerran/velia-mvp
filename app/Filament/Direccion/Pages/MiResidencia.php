@@ -5,7 +5,11 @@ namespace App\Filament\Direccion\Pages;
 use App\Models\Planta;
 use App\Models\Residencia;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -60,6 +64,24 @@ class MiResidencia extends Page implements HasForms
             Section::make('Auditoría')
                 ->description('Se muestra en Inicio y en Calidad para llegar con todo listo.')
                 ->schema([DatePicker::make('proxima_auditoria')->label('Próxima auditoría o inspección')]),
+            Section::make('Equipo sanitario y de apoyo')
+                ->description('Las auxiliares ven en «Mi turno» quién está en la residencia y cómo localizarle.')
+                ->schema([
+                    Repeater::make('equipo')->label('')
+                        ->addActionLabel('Añadir persona')
+                        ->itemLabel(fn (array $state): ?string => trim(($state['nombre'] ?? '').' · '.(Residencia::PUESTOS[$state['puesto'] ?? ''] ?? ''), ' ·') ?: null)
+                        ->collapsible()
+                        ->schema([
+                            TextInput::make('nombre')->label('Nombre')->required(),
+                            Select::make('puesto')->label('Puesto')->options(Residencia::PUESTOS)->required(),
+                            CheckboxList::make('dias')->label('Días que viene')
+                                ->options([1 => 'L', 2 => 'M', 3 => 'X', 4 => 'J', 5 => 'V', 6 => 'S', 7 => 'D'])
+                                ->columns(7)->gridDirection('row')->columnSpanFull(),
+                            TimePicker::make('desde')->label('Desde')->seconds(false),
+                            TimePicker::make('hasta')->label('Hasta')->seconds(false),
+                            TextInput::make('contacto')->label('Cómo localizarle')->placeholder('Ext. 210 o teléfono')->columnSpanFull(),
+                        ])->columns(2),
+                ])->collapsible(),
             Section::make('Pantalla de acceso')
                 ->description('Fotos de la residencia que ven las auxiliares al entrar.')
                 ->schema([
