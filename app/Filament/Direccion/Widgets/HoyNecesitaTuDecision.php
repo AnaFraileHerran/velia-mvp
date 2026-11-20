@@ -80,7 +80,7 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
             ->requiresConfirmation()
             ->modalDescription('Queda como evidencia para la UNE 158101, con tu nombre y la fecha.')
             ->action(function (array $arguments) {
-                Aviso::findOrFail($arguments['aviso'])->update(['estado' => 'revisado', 'revisado_por' => auth()->id(), 'revisado_at' => now()]);
+                Aviso::findOrFail($arguments['aviso'])->update(['estado' => 'revisado', 'revisado_por' => \Filament\Facades\Filament::auth()->id(), 'revisado_at' => now()]);
                 Notification::make()->title('Revisado con fecha y nombre.')->success()->send();
             });
     }

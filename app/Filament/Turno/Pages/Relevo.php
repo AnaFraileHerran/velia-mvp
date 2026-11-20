@@ -40,12 +40,12 @@ class Relevo extends Page implements HasActions
         $h = (int) now()->format('G');
         $saludo = $h < 14 ? 'Buenos días' : ($h < 21 ? 'Buenas tardes' : 'Buenas noches');
 
-        return $saludo.', '.strtok(auth()->user()->name, ' ');
+        return $saludo.', '.strtok(\Filament\Facades\Filament::auth()->user()->name, ' ');
     }
 
     public function getSubheading(): ?string
     {
-        $u = auth()->user();
+        $u = \Filament\Facades\Filament::auth()->user();
 
         return ($u->planta?->nombre ?? 'Todas las plantas').' · Turno de '.mb_strtolower($u->etiquetaTurno()).' · '.now()->locale('es')->isoFormat('ddd D MMM');
     }
@@ -56,7 +56,7 @@ class Relevo extends Page implements HasActions
         if ($texto === '') {
             return;
         }
-        Pregunta::findOrFail($id)->update(['respuesta' => $texto, 'respondida_por' => auth()->id()]);
+        Pregunta::findOrFail($id)->update(['respuesta' => $texto, 'respondida_por' => \Filament\Facades\Filament::auth()->id()]);
         unset($this->respuestas[$id]);
         Notification::make()->title('Respuesta enviada a la dirección.')->success()->send();
     }

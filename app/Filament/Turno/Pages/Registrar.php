@@ -44,7 +44,7 @@ class Registrar extends Page
     {
         abort_unless($this->residente && $this->r(), 404);
         // Si dejó un borrador en este turno, se retoma en «Revisar».
-        $b = Registro::where('residente_id', $this->residente)->where('turno_id', auth()->user()->turnoAbierto()?->id)
+        $b = Registro::where('residente_id', $this->residente)->where('turno_id', \Filament\Facades\Filament::auth()->user()->turnoAbierto()?->id)
             ->where('estado', 'borrador')->latest()->first();
         if ($b) {
             $this->registroId = $b->id;
@@ -108,10 +108,10 @@ class Registrar extends Page
 
     private function guardar(string $estado)
     {
-        $turno = auth()->user()->turnoAbierto();
+        $turno = \Filament\Facades\Filament::auth()->user()->turnoAbierto();
         $datos = [
             'residente_id' => $this->residente,
-            'user_id' => auth()->id(),
+            'user_id' => \Filament\Facades\Filament::auth()->id(),
             'turno_id' => $turno?->id,
             'texto_original' => $estado === 'sin_novedad' ? null : $this->texto,
             'categorias' => $estado === 'sin_novedad' ? [] : array_filter($this->categorias, fn ($v) => trim($v) !== ''),

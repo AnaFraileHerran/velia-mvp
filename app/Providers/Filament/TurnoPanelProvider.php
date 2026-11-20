@@ -39,8 +39,12 @@ class TurnoPanelProvider extends PanelProvider
             $panel->viteTheme('resources/css/filament/turno/theme.css');
         }
 
+        // Cada panel con su propia sesión: entrar con PIN en la tablet no cierra la sesión de dirección (ni al revés).
+        config()->set('auth.guards.turno', ['driver' => 'session', 'provider' => 'users']);
+
         return $panel
             ->id('turno')
+            ->authGuard('turno')
             ->path('turno')
             ->login(PinLogin::class)
             ->brandName('Velia')
@@ -60,7 +64,7 @@ class TurnoPanelProvider extends PanelProvider
                 Route::get('/primer-acceso', PrimerAcceso::class)->name('primer-acceso');
                 Route::get('/restablecer-pin', RestablecerPin::class)->name('restablecer-pin');
             })
-            ->renderHook(PanelsRenderHook::BODY_END, fn () => auth()->check() ? Blade::render("@include('filament.turno.partials.barra-inferior')") : '')
+            ->renderHook(PanelsRenderHook::BODY_END, fn () => \Filament\Facades\Filament::auth()->check() ? Blade::render("@include('filament.turno.partials.barra-inferior')") : '')
             // Botones y textos más grandes: se usa de pie, con prisa y a veces con guantes.
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => Blade::render("@include('filament.turno.partials.estilos')"))
             ->middleware([

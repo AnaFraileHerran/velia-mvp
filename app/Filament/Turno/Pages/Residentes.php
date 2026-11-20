@@ -48,7 +48,7 @@ class Residentes extends Page implements HasActions
         $g = $t->agrupados();
         $total = $g['por_registrar']->count() + $g['registrados']->count();
 
-        return (auth()->user()->planta?->nombre ?? 'Todas las plantas').' · '.$g['registrados']->count().' de '.$total.' registrados';
+        return (\Filament\Facades\Filament::auth()->user()->planta?->nombre ?? 'Todas las plantas').' · '.$g['registrados']->count().' de '.$total.' registrados';
     }
 
     public static function lineaEstado(Residente $r, string $estado): string

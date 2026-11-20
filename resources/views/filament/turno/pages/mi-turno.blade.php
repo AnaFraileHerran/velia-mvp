@@ -11,7 +11,7 @@
 
     <x-filament::button tag="a" :href="\App\Filament\Turno\Pages\CerrarTurno::getUrl()" size="xl" class="w-full">Cerrar el turno</x-filament::button>
 
-    @if (auth()->user()->responsable_turno)
+    @if (\Filament\Facades\Filament::auth()->user()->responsable_turno)
         <x-filament::section heading="Como responsable de turno" icon="heroicon-o-star">
             <p class="text-sm text-gray-600 dark:text-gray-300">Restablece el PIN de una compañera. Si el micrófono de la tablet no funciona, revisa el permiso en los ajustes del navegador; mientras, se puede escribir.</p>
             <x-filament::button tag="a" :href="route('filament.turno.restablecer-pin')" color="gray" class="mt-3" icon="heroicon-o-key">Restablecer un PIN</x-filament::button>
@@ -23,7 +23,7 @@
         <div class="space-y-5">
             <div>
                 <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    {{ $companeras->count() === 1 ? '1 auxiliar más' : $companeras->count().' auxiliares más' }} · turno de {{ mb_strtolower(auth()->user()->etiquetaTurno()) }}
+                    {{ $companeras->count() === 1 ? '1 auxiliar más' : $companeras->count().' auxiliares más' }} · turno de {{ mb_strtolower(\Filament\Facades\Filament::auth()->user()->etiquetaTurno()) }}
                 </p>
                 @forelse ($companeras as $c)
                     <div class="flex items-center justify-between gap-3 border-t border-gray-100 py-2.5 first:border-t-0 dark:border-white/10">

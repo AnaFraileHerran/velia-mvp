@@ -44,7 +44,7 @@ class CerrarTurno extends Page
 
     public function relevo()
     {
-        $turno = auth()->user()->turnoAbierto();
+        $turno = \Filament\Facades\Filament::auth()->user()->turnoAbierto();
 
         return Registro::with('residente')->where('turno_id', $turno?->id)->where('estado', 'confirmado')
             ->whereNotIn('id', $this->quitados)->orderByDesc('incidencia_destacada')->get();
@@ -71,7 +71,7 @@ class CerrarTurno extends Page
             $lineas[] = trim($this->nota);
         }
 
-        auth()->user()->turnoAbierto()?->update([
+        \Filament\Facades\Filament::auth()->user()->turnoAbierto()?->update([
             'fin' => now(),
             'motivo_cierre' => $hayPendientes ? $this->motivo : null,
             'motivo_texto' => $this->motivo === 'otros' ? $this->motivoTexto : null,

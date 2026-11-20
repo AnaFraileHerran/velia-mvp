@@ -20,7 +20,7 @@ class TurnoActual
 
     public static function make(): self
     {
-        $u = auth()->user();
+        $u = \Filament\Facades\Filament::auth()->user();
 
         return new self($u, $u->turnoAbierto());
     }

@@ -75,7 +75,7 @@ class AuxiliarResource extends Resource
                     ->requiresConfirmation()
                     ->modalDescription('Se genera un PIN provisional. La auxiliar creará el suyo al entrar.')
                     ->action(function (User $r) {
-                        $pin = $r->generarPinProvisional(auth()->user());
+                        $pin = $r->generarPinProvisional(\Filament\Facades\Filament::auth()->user());
                         Notification::make()->title("PIN provisional de {$r->name}: {$pin}")
                             ->body('Comunícaselo en persona. Solo se muestra esta vez.')->persistent()->success()->send();
                     }),

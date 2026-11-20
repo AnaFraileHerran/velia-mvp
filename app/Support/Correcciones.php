@@ -37,7 +37,7 @@ class Correcciones
                     'antes' => $antesTexto,
                     'ahora' => $nuevoTexto,
                     'motivo' => $motivo,
-                    'user_id' => Auth::id(),
+                    'user_id' => \Filament\Facades\Filament::auth()->id(),
                 ]);
                 $modelo->setAttribute($campo, $nuevo);
                 $hechos++;

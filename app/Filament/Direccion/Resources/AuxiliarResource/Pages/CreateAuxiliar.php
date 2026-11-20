@@ -24,7 +24,7 @@ class CreateAuxiliar extends CreateRecord
 
     protected function afterCreate(): void
     {
-        $pin = $this->record->generarPinProvisional(auth()->user());
+        $pin = $this->record->generarPinProvisional(\Filament\Facades\Filament::auth()->user());
         Notification::make()
             ->title("PIN provisional de {$this->record->name}: {$pin}")
             ->body("Para su móvil, código de invitación: {$this->record->codigo_invitacion}. Comunícaselo en persona; creará su PIN al entrar.")

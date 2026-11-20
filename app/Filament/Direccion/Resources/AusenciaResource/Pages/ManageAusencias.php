@@ -31,7 +31,7 @@ class ManageAusencias extends ManageRecords
     {
         return [
             CreateAction::make()->label('Registrar ausencia')
-                ->mutateFormDataUsing(fn (array $data) => [...$data, 'registrada_por' => auth()->id()])
+                ->mutateFormDataUsing(fn (array $data) => [...$data, 'registrada_por' => \Filament\Facades\Filament::auth()->id()])
                 ->after(fn (Ausencia $record) => $record->residente->update(['estado' => 'fuera'])),
         ];
     }

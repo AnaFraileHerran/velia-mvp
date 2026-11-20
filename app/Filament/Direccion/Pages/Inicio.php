@@ -22,7 +22,7 @@ class Inicio extends Dashboard
 
     public function getHeading(): string|Htmlable
     {
-        $nombre = explode(' ', auth()->user()->name)[0];
+        $nombre = explode(' ', \Filament\Facades\Filament::auth()->user()->name)[0];
         $hora = (int) now()->format('H');
         $saludo = $hora < 14 ? 'Buenos días' : ($hora < 21 ? 'Buenas tardes' : 'Buenas noches');
 

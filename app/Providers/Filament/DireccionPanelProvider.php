@@ -30,9 +30,13 @@ class DireccionPanelProvider extends PanelProvider
             $panel->viteTheme('resources/css/filament/direccion/theme.css');
         }
 
+        // Cada panel con su propia sesión: entrar con PIN en la tablet no cierra la sesión de dirección (ni al revés).
+        config()->set('auth.guards.direccion', ['driver' => 'session', 'provider' => 'users']);
+
         return $panel
             ->default()
             ->id('direccion')
+            ->authGuard('direccion')
             ->path('direccion')
             ->login()
             ->passwordReset()
