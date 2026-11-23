@@ -1,5 +1,13 @@
 {{-- Lo que puede hacer daño va primero y destacado: alergia y riesgo. --}}
 <div class="space-y-4 text-sm">
+    {{-- Foto grande: reconocer a la persona antes que leer su ficha (primer día, suplencias) --}}
+    <div class="flex items-center gap-3">
+        <img src="{{ \App\Support\Avatar::url($r->foto, $r->nombre) }}" alt="Foto de {{ $r->nombre }}" style="width:72px;height:72px;border-radius:9999px;object-fit:cover;flex-shrink:0">
+        <div>
+            <p class="text-base font-semibold text-gray-950 dark:text-white">{{ $r->nombre }}</p>
+            <p class="text-gray-500">{{ $r->planta?->nombre }} · Hab. {{ $r->habitacion }}</p>
+        </div>
+    </div>
     @if ($r->alergias || $r->riesgos)
         <div class="rounded-xl bg-danger-50 p-3 font-semibold text-danger-700 dark:bg-danger-400/10 dark:text-danger-400">
             @if ($r->alergias) Alergia: {{ $r->alergias }} @endif

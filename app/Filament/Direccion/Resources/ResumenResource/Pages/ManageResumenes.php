@@ -9,6 +9,8 @@ use Filament\Resources\Pages\ManageRecords;
 
 class ManageResumenes extends ManageRecords
 {
+    use \App\Filament\Direccion\Concerns\MigasDePan;
+
     protected static string $resource = ResumenResource::class;
 
     protected static ?string $title = 'Familias';

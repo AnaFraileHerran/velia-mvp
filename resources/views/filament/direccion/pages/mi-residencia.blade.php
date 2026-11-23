@@ -10,7 +10,10 @@
         <x-filament::section heading="Plantas">
             <ul class="space-y-1 text-sm">
                 @foreach ($this->plantas() as $p)
-                    <li><span class="font-medium">{{ $p->nombre }}</span> · {{ $p->residentes_count }} residentes · {{ $p->auxiliares_count }} auxiliares</li>
+                    <li class="flex items-center justify-between gap-2">
+                        <span><span class="font-medium">{{ $p->nombre }}</span> · {{ $p->residentes_count }} residentes · {{ $p->auxiliares_count }} auxiliares</span>
+                        <x-filament::link :href="\App\Filament\Direccion\Resources\ResidenteResource::getUrl('index', ['tableFilters' => ['planta_id' => ['value' => $p->id]]])">Ver residentes</x-filament::link>
+                    </li>
                 @endforeach
             </ul>
         </x-filament::section>
@@ -27,6 +30,12 @@
                 <li>Registro en aplicación informática</li>
             </ul>
             <p class="mt-2 text-xs text-gray-500">Orden 2680/2024 de la Comunidad de Madrid</p>
+            <x-filament::link :href="\App\Filament\Direccion\Pages\Calidad::getUrl()" class="mt-3">Ver cómo vas en Calidad y auditoría</x-filament::link>
+        </x-filament::section>
+
+        <x-filament::section heading="¿Tienes otra residencia?">
+            <p class="text-sm text-gray-600 dark:text-gray-300">Puedes llevar varias residencias con Velia. Cada una tiene sus residentes, su equipo y su auditoría. Solicita el alta y la preparamos contigo.</p>
+            <div class="mt-3">{{ $this->solicitarResidenciaAction }}</div>
         </x-filament::section>
     </div>
 </x-filament-panels::page>

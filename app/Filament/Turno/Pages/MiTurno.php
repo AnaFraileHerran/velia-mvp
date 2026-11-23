@@ -20,14 +20,14 @@ class MiTurno extends Page
 
     public function getHeading(): string
     {
-        $u = auth()->user();
+        $u = \Filament\Facades\Filament::auth()->user();
 
         return $u->name.($u->responsable_turno ? ' · Responsable de turno' : '');
     }
 
     public function getSubheading(): ?string
     {
-        $u = auth()->user();
+        $u = \Filament\Facades\Filament::auth()->user();
         $t = $u->turnoAbierto();
 
         return ($u->planta?->nombre ?? 'Todas las plantas').' · Turno desde las '.$t?->inicio->format('H:i').' · '.now()->locale('es')->isoFormat('ddd D MMM');
@@ -36,7 +36,6 @@ class MiTurno extends Page
     public function cambiarDePersona()
     {
         Filament::auth()->logout();
-        session()->invalidate();
         session()->regenerateToken();
 
         return redirect()->to(Filament::getLoginUrl());
@@ -46,7 +45,7 @@ class MiTurno extends Page
     {
         $t = TurnoActual::make();
         $g = $t->agrupados();
-        $estados = $g['por_registrar']->map(fn ($r) => $t->estado($r));
+        $estados = $g['por_registrar']->map(fn ($record) => $t->estado($record));
 
         return [
             'registrados' => $g['registrados']->count(),
@@ -54,6 +53,8 @@ class MiTurno extends Page
             'borradores' => $estados->filter(fn ($e) => $e === 'borrador')->count(),
             'pendientes' => $estados->filter(fn ($e) => $e === 'pendiente')->count(),
             'fuera' => $g['fuera']->count(),
+            'companeras' => $t->companeras(),
+            'equipo' => \App\Models\Residencia::actual()->equipoHoy(),
         ];
     }
 }

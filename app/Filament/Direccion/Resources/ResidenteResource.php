@@ -18,7 +18,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Actions\Action as InfolistAction;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Split;
+use App\Support\Avatar;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
@@ -59,7 +63,14 @@ class ResidenteResource extends Resource
                 TextInput::make('alergias')->label('Alergias'),
                 TextInput::make('riesgos')->label('Riesgos'),
                 TextInput::make('movilidad')->label('Movilidad'),
-                Toggle::make('sujecion')->label('Usa sujeción')->helperText('La UNE pide registrar cada sujeción.'),
+                \Filament\Forms\Components\Radio::make('sujecion')->label('¿Usa sujeción?')->inline()
+                    ->options([1 => 'Sí', 0 => 'No'])->required()
+                    ->helperText('La UNE pide registrar cada sujeción, con prescripción y consentimiento.')
+                    ->afterStateHydrated(function ($component, $record) {
+                        if ($record && ! $record->sujecion_anotada) {
+                            $component->state(null); // sin anotar: obliga a elegir
+                        }
+                    }),
                 Textarea::make('como_tratarle')->label('Cómo tratarle')->rows(2),
             ],
             'Dieta' => [
@@ -68,7 +79,9 @@ class ResidenteResource extends Resource
             'Plan personal' => [
                 DatePicker::make('plan_ultima_revision')->label('Última revisión'),
                 DatePicker::make('plan_proxima_revision')->label('Próxima revisión'),
-                Select::make('plan_responsable_id')->label('Responsable')->options(User::auxiliares()->where('activo', true)->pluck('name', 'id')),
+                Select::make('plan_responsable_id')->label('Profesional de referencia')
+                    ->helperText('La UNE pide un profesional de referencia para cada plan personal.')
+                    ->options(User::whereIn('rol', ['auxiliar', 'sanitario'])->where('activo', true)->orderBy('name')->pluck('name', 'id')),
             ],
             'Informes' => [
                 FileUpload::make('informes')->label('Informes (PDF)')->multiple()->acceptedFileTypes(['application/pdf'])
@@ -78,6 +91,8 @@ class ResidenteResource extends Resource
                 Textarea::make('notas')->label('Notas')->rows(3),
             ],
             'Datos y ubicación' => [
+                FileUpload::make('foto')->label('Foto')->avatar()->image()->imageEditor()->directory('fotos')
+                    ->helperText('Con su consentimiento o el de su representante. Ayuda a una auxiliar nueva a reconocerle.')->columnSpanFull(),
                 TextInput::make('dni')->label('DNI / NIE'),
                 DatePicker::make('fecha_nacimiento')->label('Fecha de nacimiento'),
                 DatePicker::make('fecha_ingreso')->label('Fecha de ingreso'),
@@ -122,6 +137,8 @@ class ResidenteResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('foto')->label('')->circular()->size(40)->grow(false)
+                    ->defaultImageUrl(fn (Residente $r) => Avatar::iniciales($r->nombre)),
                 TextColumn::make('nombre')->label('Residente')->searchable()->weight('semibold')
                     ->description(fn (Residente $r) => ($r->planta?->nombre ?? '—').' · Hab. '.$r->habitacion),
                 TextColumn::make('estado')->label('Estado')->badge()
@@ -133,6 +150,14 @@ class ResidenteResource extends Resource
             ->defaultSort('habitacion')
             ->filters([
                 SelectFilter::make('planta_id')->label('Planta')->options(fn () => Planta::pluck('nombre', 'id')),
+                \Filament\Tables\Filters\Filter::make('sin_referencia')->label('Sin profesional de referencia')
+                    ->query(fn ($query) => $query->whereNull('plan_responsable_id')),
+                \Filament\Tables\Filters\Filter::make('sujecion_sin_anotar')->label('Sujeción sin anotar')
+                    ->query(fn ($query) => $query->where('sujecion_anotada', false)),
+                \Filament\Tables\Filters\Filter::make('plan_vencido')->label('Plan personal vencido')
+                    ->query(fn ($query) => $query->whereDate('plan_proxima_revision', '<', today())),
+                \Filament\Tables\Filters\Filter::make('sin_emergencia')->label('Sin contacto de emergencia')
+                    ->query(fn ($query) => $query->whereDoesntHave('contactos', fn ($c) => $c->where('emergencia', true))),
                 SelectFilter::make('estado')->label('Estado')
                     ->options(['en_centro' => 'En el centro', 'fuera' => 'Fuera', 'baja' => 'Bajas'])
                     ->query(fn ($query, array $data) => $data['value'] ? $query->where('estado', $data['value']) : $query->where('estado', '!=', 'baja')),
@@ -147,19 +172,23 @@ class ResidenteResource extends Resource
             'Cuidados' => [
                 TextEntry::make('riesgos')->label('Riesgos')->placeholder('—'),
                 TextEntry::make('movilidad')->label('Movilidad')->placeholder('—'),
-                TextEntry::make('sujecion')->label('Sujeción')->formatStateUsing(fn ($s) => $s ? 'Sí, registrar cada uso' : 'No indicada'),
+                TextEntry::make('sujecion')->label('Sujeción')
+                    ->state(fn (Residente $r) => ! $r->sujecion_anotada ? 'Sin anotar · pendiente para la auditoría' : ($r->sujecion ? 'Sí, registrar cada uso' : 'No usa'))
+                    ->color(fn (Residente $r) => $r->sujecion_anotada ? null : 'danger'),
                 TextEntry::make('como_tratarle')->label('Cómo tratarle')->placeholder('—')->columnSpanFull(),
             ],
             'Dieta' => [TextEntry::make('dieta')->hiddenLabel()->placeholder('—')],
             'Plan personal' => [
                 TextEntry::make('plan_proxima_revision')->label('Próxima revisión')->date('j M Y')->placeholder('—')
                     ->color(fn (Residente $r) => $r->plan_proxima_revision?->isPast() ? 'danger' : null),
-                TextEntry::make('planResponsable.name')->label('Responsable')->placeholder('Sin asignar'),
+                TextEntry::make('planResponsable.name')->label('Profesional de referencia')
+                    ->placeholder('Sin asignar · pendiente para la auditoría')
+                    ->color(fn (Residente $r) => $r->plan_responsable_id ? null : 'danger'),
                 TextEntry::make('plan_ultima_revision')->label('Última revisión')->date('j M Y')->placeholder('—'),
             ],
             'Informes' => [
                 TextEntry::make('informes')->hiddenLabel()->placeholder('Sin informes')->listWithLineBreaks()
-                    ->formatStateUsing(fn ($s) => basename((string) $s)),
+                    ->formatStateUsing(fn ($state) => basename((string) $state)),
             ],
             'Notas' => [TextEntry::make('notas')->hiddenLabel()->placeholder('Sin notas')->columnSpanFull()],
             'Datos y ubicación' => [
@@ -171,7 +200,9 @@ class ResidenteResource extends Resource
 
         $sections = [
             Section::make()
-                ->schema([
+                ->schema([Split::make([
+                    ImageEntry::make('foto')->hiddenLabel()->circular()->height(64)->grow(false)
+                        ->defaultImageUrl(fn (Residente $r) => Avatar::iniciales($r->nombre)),
                     TextEntry::make('emergencia')->hiddenLabel()->weight('semibold')
                         ->state(function (Residente $r) {
                             $c = $r->contactoEmergencia();
@@ -179,7 +210,7 @@ class ResidenteResource extends Resource
 
                             return $linea.' · Alergia: '.($r->alergias ?: 'ninguna conocida');
                         }),
-                ])->compact(),
+                ])->verticallyAlignCenter()])->compact(),
         ];
         foreach ($ficha as $titulo => $entries) {
             $sections[] = Section::make($titulo)

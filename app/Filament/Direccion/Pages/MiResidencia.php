@@ -4,6 +4,10 @@ namespace App\Filament\Direccion\Pages;
 
 use App\Models\Planta;
 use App\Models\Residencia;
+use App\Models\SolicitudResidencia;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
@@ -18,8 +22,11 @@ use Filament\Pages\Page;
  * 6 · Mi residencia (wireframe «V2 · Mi residencia»).
  * Arriba lo que la dirección cambia (identidad, auditoría, fotos); debajo, solo lectura (plan, plantas, normativa).
  */
-class MiResidencia extends Page implements HasForms
+class MiResidencia extends Page implements HasActions, HasForms
 {
+    use \App\Filament\Direccion\Concerns\MigasDePan;
+
+    use InteractsWithActions;
     use InteractsWithForms;
 
     protected static ?string $navigationLabel = 'Mi residencia';
@@ -37,6 +44,30 @@ class MiResidencia extends Page implements HasForms
     protected ?string $subheading = 'Los datos de tu centro: lo que ven las auxiliares en la tablet o el móvil y lo que firman los resúmenes para las familias.';
 
     public ?array $data = [];
+
+    /** Opción B (decisión 23/11/2026): no hay alta propia de otra residencia en el piloto; se solicita y ICARUS la prepara. */
+    public function solicitarResidenciaAction(): Action
+    {
+        return Action::make('solicitarResidencia')
+            ->label('Solicitar alta')
+            ->icon('heroicon-o-plus')
+            ->color('gray')
+            ->modalHeading('Añadir otra residencia')
+            ->modalDescription('Te llamamos para prepararla contigo, como hicimos con esta. Cada residencia tiene sus propios residentes, equipo y auditoría.')
+            ->modalSubmitActionLabel('Enviar solicitud')
+            ->form([
+                TextInput::make('nombre')->label('Nombre de la residencia')->required(),
+                TextInput::make('plazas')->label('Plazas')->numeric()->minValue(1),
+                TextInput::make('municipio')->label('Municipio'),
+            ])
+            ->action(function (array $data) {
+                SolicitudResidencia::create($data + [
+                    'residencia_id' => Residencia::actual()?->id,
+                    'user_id' => \Filament\Facades\Filament::auth()->id(),
+                ]);
+                Notification::make()->title('Solicitud enviada. Te llamamos esta semana.')->success()->send();
+            });
+    }
 
     public function mount(): void
     {
@@ -77,8 +108,8 @@ class MiResidencia extends Page implements HasForms
     public function plantas()
     {
         return Planta::withCount([
-            'residentes' => fn ($q) => $q->where('estado', '!=', 'baja'),
-            'auxiliares' => fn ($q) => $q->where('activo', true),
+            'residentes' => fn ($query) => $query->where('estado', '!=', 'baja'),
+            'auxiliares' => fn ($query) => $query->where('activo', true),
         ])->get();
     }
 }

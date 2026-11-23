@@ -45,7 +45,7 @@ class AusenciaResource extends Resource
             ->columns([
                 TextColumn::make('residente.nombre')->label('Residente')->weight('semibold')
                     ->description(fn (Ausencia $a) => 'Hab. '.$a->residente->habitacion),
-                TextColumn::make('tipo')->formatStateUsing(fn ($s) => Ausencia::TIPOS[$s] ?? $s),
+                TextColumn::make('tipo')->formatStateUsing(fn ($state) => Ausencia::TIPOS[$state] ?? $state),
                 TextColumn::make('sale')->date('D j M'),
                 TextColumn::make('vuelve')->date('D j M')->placeholder('Sin fecha de vuelta')
                     ->color(fn (Ausencia $a) => $a->vuelve && $a->vuelve->isPast() && ! $a->vuelve->isToday() ? 'danger' : null)
@@ -53,7 +53,7 @@ class AusenciaResource extends Resource
                 TextColumn::make('registradaPor.name')->label('Registrada por')->placeholder('Dirección'),
             ])
             // Primero quien debía haber vuelto (sin confirmar), luego por fecha de vuelta.
-            ->modifyQueryUsing(fn ($q) => $q->orderByRaw('CASE WHEN vuelve IS NULL THEN 1 ELSE 0 END')->orderBy('vuelve'))
+            ->modifyQueryUsing(fn ($query) => $query->orderByRaw('CASE WHEN vuelve IS NULL THEN 1 ELSE 0 END')->orderBy('vuelve'))
             ->actions([
                 Action::make('haVuelto')->label('Ha vuelto')->button()
                     ->visible(fn (Ausencia $a) => ! $a->ha_vuelto)

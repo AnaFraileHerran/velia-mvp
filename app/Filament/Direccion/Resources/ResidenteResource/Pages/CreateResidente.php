@@ -9,6 +9,13 @@ use Filament\Resources\Pages\CreateRecord;
 /** Único sitio con edición completa. Crea el aviso de la valoración inicial del plan personal (primer mes). */
 class CreateResidente extends CreateRecord
 {
+    use \App\Filament\Direccion\Concerns\MigasDePan;
+
+    protected function migas(): array
+    {
+        return [\App\Filament\Direccion\Resources\ResidenteResource::getUrl() => 'Residentes'];
+    }
+
     protected static string $resource = ResidenteResource::class;
 
     protected static ?string $title = 'Nuevo residente';

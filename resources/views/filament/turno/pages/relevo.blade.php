@@ -19,12 +19,22 @@
     @if (session('velia_consejos'))
         <x-filament::section heading="Tres cosas para empezar" icon="heroicon-o-light-bulb">
             <ol class="list-decimal space-y-1 ps-5 text-sm">
-                <li>Lee el relevo: lo importante del turno anterior está aquí.</li>
+                <li>Lee el resumen: lo importante del turno anterior está aquí.</li>
                 <li>Registra desde «Residentes»: habla y la IA lo ordena. Tú confirmas.</li>
                 <li>Al acabar, cierra el turno en «Mi turno».</li>
             </ol>
         </x-filament::section>
     @endif
+
+    {{-- 0. Te lo ha asignado la dirección: con plazo y botón «Hecho» --}}
+    @foreach ($asignados as $av)
+        <div style="border:2px solid rgb(150 169 212);background:rgb(240 243 250);border-radius:12px;padding:16px">
+            <p style="font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:rgb(15 61 149)">Te lo ha asignado la dirección</p>
+            <p class="mt-1 font-semibold text-gray-950 dark:text-white">{{ $av->titulo }}@if ($av->residente) · {{ $av->residente->nombre }}@endif</p>
+            <p class="text-sm {{ $av->vencido() ? 'text-danger-700 font-semibold' : 'text-gray-500' }}">{{ $av->vencido() ? 'Vencido el '.$av->vence_el->format('d/m') : ($av->vence_el ? 'Para el '.$av->vence_el->format('d/m') : 'Sin plazo') }}</p>
+            <div class="mt-3"><x-filament::button wire:click="hecho({{ $av->id }})" icon="heroicon-o-check">Hecho</x-filament::button></div>
+        </div>
+    @endforeach
 
     {{-- 1. Preguntas de la dirección: esperan respuesta --}}
     @foreach ($preguntas as $p)
@@ -49,6 +59,7 @@
                 <li>
                     <button type="button" wire:click="mountAction('comoAtender', { residente: {{ $n->residente_id }} })"
                         class="flex w-full items-start justify-between gap-3 px-4 py-3 text-start active:bg-gray-50 dark:active:bg-white/5">
+                        <span class="flex min-w-0 items-start gap-3"><img src="{{ \App\Support\Avatar::url($n->residente->foto, $n->residente->nombre) }}" alt="" style="width:40px;height:40px;border-radius:9999px;object-fit:cover;flex-shrink:0">
                         <span class="min-w-0">
                             <span class="block font-semibold text-gray-950 dark:text-white">
                                 @if ($n->incidencia_destacada)<span class="me-1 inline-block h-2 w-2 rounded-full bg-danger-500" title="Incidencia"></span>@endif
@@ -56,6 +67,7 @@
                             </span>
                             <span class="block text-sm text-gray-700 dark:text-gray-300">{{ $n->resumenCorto() }}</span>
                             <span class="block text-xs text-gray-500">{{ $n->user?->name ? strtok($n->user->name, ' ').' '.mb_substr(explode(' ', $n->user->name)[1] ?? '', 0, 1).'.' : '' }} · {{ $n->created_at->format('H:i') }}</span>
+                        </span>
                         </span>
                         <span aria-hidden="true" class="text-gray-400">›</span>
                     </button>

@@ -13,7 +13,7 @@ class Residente extends Model
     protected $fillable = [
         'nombre', 'dni', 'fecha_nacimiento', 'fecha_ingreso', 'planta_id', 'habitacion', 'tipo_habitacion',
         'estado', 'baja_motivo', 'baja_fecha', 'alergias', 'riesgos', 'movilidad', 'sujecion', 'dieta',
-        'como_tratarle', 'notas', 'informes', 'plan_ultima_revision', 'plan_proxima_revision', 'plan_responsable_id',
+        'como_tratarle', 'notas', 'informes', 'plan_ultima_revision', 'plan_proxima_revision', 'plan_responsable_id', 'foto', 'sujecion_anotada',
     ];
 
     protected function casts(): array
@@ -37,6 +37,16 @@ class Residente extends Model
     public function planResponsable(): BelongsTo
     {
         return $this->belongsTo(User::class, 'plan_responsable_id');
+    }
+
+    protected static function booted(): void
+    {
+        // Si alguien guarda el dato de sujeción (sí o no), deja de estar «sin anotar».
+        static::saving(function (self $r) {
+            if ($r->isDirty('sujecion')) {
+                $r->sujecion_anotada = true;
+            }
+        });
     }
 
     public function contactos(): HasMany

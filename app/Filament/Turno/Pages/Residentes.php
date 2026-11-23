@@ -9,6 +9,10 @@ use App\Support\TurnoActual;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Pages\Page;
+use App\Models\Registro;
+use Filament\Notifications\Actions\Action as AccionAviso;
+use Filament\Notifications\Notification;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 
 /**
@@ -48,7 +52,41 @@ class Residentes extends Page implements HasActions
         $g = $t->agrupados();
         $total = $g['por_registrar']->count() + $g['registrados']->count();
 
-        return (auth()->user()->planta?->nombre ?? 'Todas las plantas').' · '.$g['registrados']->count().' de '.$total.' registrados';
+        return (\Filament\Facades\Filament::auth()->user()->planta?->nombre ?? 'Todas las plantas').' · '.$g['registrados']->count().' de '.$total.' registrados';
+    }
+
+    /** «Sin novedad» a un toque desde la tarjeta (decisión UX 23/11/2026), con deshacer por si fue sin querer. */
+    public function sinNovedad(int $residente): void
+    {
+        $r = Residente::findOrFail($residente);
+        $registro = Registro::create([
+            'residente_id' => $r->id,
+            'user_id' => \Filament\Facades\Filament::auth()->id(),
+            'turno_id' => \Filament\Facades\Filament::auth()->user()->turnoAbierto()?->id,
+            'texto_original' => null,
+            'categorias' => [],
+            'estado' => 'sin_novedad',
+            'incidencia_destacada' => false,
+            'tipo_incidencia' => null,
+        ]);
+
+        Notification::make()
+            ->title('Sin novedad · '.$r->nombre)
+            ->success()
+            ->actions([
+                AccionAviso::make('deshacer')->label('Deshacer')->button()
+                    ->dispatch('deshacerSinNovedad', ['registro' => $registro->id])->close(),
+            ])
+            ->send();
+    }
+
+    #[On('deshacerSinNovedad')]
+    public function deshacerSinNovedad(int $registro): void
+    {
+        Registro::where('id', $registro)
+            ->where('estado', 'sin_novedad')
+            ->where('user_id', \Filament\Facades\Filament::auth()->id())
+            ->delete();
     }
 
     public static function lineaEstado(Residente $r, string $estado): string
@@ -71,7 +109,7 @@ class Residentes extends Page implements HasActions
         if ($this->buscar !== '') {
             $q = mb_strtolower($this->buscar);
             foreach ($g as $k => $lista) {
-                $g[$k] = $lista->filter(fn ($r) => str_contains(mb_strtolower($r->nombre), $q) || str_contains((string) $r->habitacion, $q));
+                $g[$k] = $lista->filter(fn ($record) => str_contains(mb_strtolower($record->nombre), $q) || str_contains((string) $record->habitacion, $q));
             }
         }
 

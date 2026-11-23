@@ -50,9 +50,12 @@
             <p class="font-semibold">Escribe el registro</p>
             <p>Si el micrófono no funciona o no hay cobertura, escríbelo aquí. La IA lo ordena igual.</p>
         </div>
-        <form wire:submit="ordenar" class="space-y-3">
+        <form x-data="copiaLocal({{ $residente }})" x-on:submit.prevent="enviar()" class="space-y-3">
+            <div x-show="pendiente" x-cloak style="border-radius:12px;padding:12px 14px;background:rgb(240 243 250);border:1px solid rgb(150 169 212);font-size:14px">
+                <strong>Guardado en esta tablet.</strong> Se enviará a revisar en cuanto vuelva la conexión. No cierres esta pantalla.
+            </div>
             <x-filament::input.wrapper>
-                <textarea wire:model="texto" rows="6" class="block w-full border-0 bg-transparent p-3 text-base focus:ring-0" placeholder="Escribe con naturalidad…" autofocus></textarea>
+                <textarea x-ref="txt" wire:model="texto" x-on:input="guardar()" rows="6" class="block w-full border-0 bg-transparent p-3 text-base focus:ring-0" placeholder="Escribe con naturalidad…" autofocus></textarea>
             </x-filament::input.wrapper>
             <p class="text-xs text-gray-500">Puedes mencionar: alimentación e hidratación · higiene · movilidad y sujeción · descanso · ánimo · incidencias</p>
             <div class="flex flex-wrap gap-3">
@@ -61,6 +64,32 @@
             </div>
         </form>
         <x-filament::link tag="button" wire:click="sinNovedad">¿Turno tranquilo? Marca «Sin novedad»</x-filament::link>
+        <script>
+            {{-- Sin conexión (decisión 23/11/2026): el texto se copia en la tablet mientras se escribe; si no hay red al enviar, queda pendiente y se envía a revisar al volver. La IA propone y la auxiliar confirma siempre. --}}
+            function copiaLocal(id) {
+                const clave = 'velia-pendiente-' + id;
+                const leer = () => { try { return JSON.parse(localStorage.getItem(clave) || 'null'); } catch (e) { return null; } };
+                const escribir = (v) => { try { localStorage.setItem(clave, JSON.stringify(v)); } catch (e) {} };
+                return {
+                    pendiente: false,
+                    init() {
+                        const c = leer();
+                        if (c && c.texto && !this.$refs.txt.value && Date.now() - c.ts < 12 * 3600 * 1000) {
+                            this.$refs.txt.value = c.texto; this.$wire.set('texto', c.texto, false); this.pendiente = !!c.pendiente;
+                        }
+                        window.addEventListener('online', () => { if (this.pendiente) this.enviar(); });
+                    },
+                    guardar() { escribir({ texto: this.$refs.txt.value, ts: Date.now(), pendiente: this.pendiente }); },
+                    enviar() {
+                        const texto = this.$refs.txt.value.trim();
+                        if (!texto) return;
+                        if (!navigator.onLine) { this.pendiente = true; this.guardar(); return; }
+                        this.pendiente = false; this.guardar();
+                        this.$wire.set('texto', texto, false); this.$wire.ordenar();
+                    },
+                };
+            }
+        </script>
 
     @else
         {{-- Revisar: lo que la IA ha entendido, por categorías. Incidencia arriba si la hay. --}}

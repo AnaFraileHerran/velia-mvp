@@ -46,6 +46,16 @@ class DatabaseSeeder extends Seeder
         };
         $lucia = $aux('Lucía Martín', $p1, 'manana', '1234');
         $ana = $aux('Ana Torres', null, 'manana', '2468', true);
+        $aux('Sonia Prieto', $p1, 'manana', '5310');
+
+        // Enfermería y medicina: en Equipo y en «Mi turno» de las auxiliares; no entran en la app.
+        foreach ([
+            ['Elena Vidal', 'enfermeria', [1, 2, 3, 4, 5], '08:00', '15:00', 'Ext. 210'],
+            ['Lucas Herrero', 'enfermeria', [1, 2, 3, 4, 5], '15:00', '22:00', 'Ext. 210'],
+            ['Javier Molina', 'medicina', [2, 4], '10:00', '13:00', 'Ext. 215'],
+        ] as [$n, $puesto, $dias, $desde, $hasta, $contacto]) {
+            User::create(['name' => $n, 'rol' => 'sanitario', 'puesto' => $puesto, 'dias' => $dias, 'desde' => $desde, 'hasta' => $hasta, 'contacto' => $contacto]);
+        }
         $rosa = $aux('Rosa Delgado', $p2, 'noche', '1357', true);
         $jorge = $aux('Jorge Sanz', $p1, 'noche', '9753');
         $aux('Marisol Vega', $p2, 'tarde', '8642', true);
@@ -112,6 +122,16 @@ class DatabaseSeeder extends Seeder
                     ? explode(' ', $r)[0].' ha tenido una semana tranquila en general. Hubo una incidencia que el equipo está siguiendo de cerca.'
                     : explode(' ', $r)[0].' ha tenido una semana tranquila. Ha comido bien y ha participado en las actividades.',
             ]);
+        }
+    
+        // Fotos ficticias de la demo (retratos de stock); en una residencia real las sube la dirección.
+        foreach (\App\Models\User::whereIn('rol', ['auxiliar', 'sanitario', 'direccion'])->whereNull('foto')->get() as $u) {
+            $u->update(['foto' => \App\Support\FotosDemo::para($u->name, $u->id)]);
+        }
+        $contador = ['m' => 0, 'h' => 0];
+        foreach (Residente::whereNull('foto')->orderBy('id')->get() as $r) {
+            $k = \App\Support\FotosDemo::esMujer($r->nombre) ? 'm' : 'h';
+            $r->update(['foto' => \App\Support\FotosDemo::residente($r->nombre, $contador[$k]++)]);
         }
     }
 }

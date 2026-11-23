@@ -124,7 +124,7 @@ class ResumenResource extends Resource
             return;
         }
         // Simulación: en el MVP no se envía nada; se marca como enviado.
-        $r->update(['estado' => 'enviado', 'aprobado_por' => auth()->id(), 'enviado_at' => now()]);
+        $r->update(['estado' => 'enviado', 'aprobado_por' => \Filament\Facades\Filament::auth()->id(), 'enviado_at' => now()]);
         if ($avisar) {
             Notification::make()->title('Enviado a la familia.')->success()->send();
         }

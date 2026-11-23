@@ -1,0 +1,49 @@
+/*
+ * Velia · tema para shadcn-vue (https://www.shadcn-vue.com/docs/theming), 23/11/2026.
+ * Mismos valores que el panel actual (app/Support/TemaVelia.php). Formato oklch, como el tema por defecto de shadcn-vue.
+ * Pegar en el CSS global del proyecto Vue. Modo oscuro: pendiente (Velia aún no lo tiene).
+ * success y warning no existen en shadcn-vue: se añaden como extra y hay que registrarlos en @theme inline.
+ */
+:root {
+  --radius: 0.75rem; /* tarjetas 12 px; botones redondeados completos con rounded-full */
+  --background: oklch(0.979 0.004 271.4); /* #F7F8FB · fondo de pantalla (neutro 50) */
+  --foreground: oklch(0.200 0.010 268.2); /* #14161B · texto (neutro 900) */
+  --card: oklch(1.000 0 0); /* #FFFFFF · tarjetas */
+  --card-foreground: oklch(0.200 0.010 268.2); /* #14161B */
+  --popover: oklch(1.000 0 0); /* #FFFFFF · menús y modales */
+  --popover-foreground: oklch(0.200 0.010 268.2); /* #14161B */
+  --primary: oklch(0.390 0.153 261.8); /* #0F3D95 · acción principal (cobalto 600, 9,9:1 con blanco) */
+  --primary-foreground: oklch(1.000 0 0); /* #FFFFFF */
+  --secondary: oklch(0.964 0.010 267.4); /* #F0F3FA · botón secundario y hover (cobalto 50) */
+  --secondary-foreground: oklch(0.330 0.127 261.9); /* #0B2F75 · (cobalto 700) */
+  --muted: oklch(0.951 0.007 260.7); /* #ECEFF4 · zonas apagadas (neutro 100) */
+  --muted-foreground: oklch(0.505 0.022 262.9); /* #5E6572 · texto secundario (neutro 500, 5,9:1) */
+  --accent: oklch(0.964 0.010 267.4); /* #F0F3FA · hover de listas y menú (cobalto 50) */
+  --accent-foreground: oklch(0.390 0.153 261.8); /* #0F3D95 */
+  --destructive: oklch(0.505 0.190 27.5); /* #B91C1C · incidencias, bajas, errores (rojo 700) */
+  --border: oklch(0.924 0.010 261.8); /* #E2E6ED · líneas y bordes (neutro 200) */
+  --input: oklch(0.642 0.020 261.3); /* #868D99 · borde de campos: neutro 400, 3,4:1 (WCAG 1.4.11) */
+  --ring: oklch(0.390 0.153 261.8); /* #0F3D95 · foco */
+  --success: oklch(0.527 0.137 150.1); /* #15803D · extra Velia: «Al día», punto activo */
+  --success-foreground: oklch(1.000 0 0); /* #FFFFFF */
+  --warning: oklch(0.555 0.146 49.0); /* #B45309 · extra Velia: solo badges y bordes */
+  --chart-1: oklch(0.390 0.153 261.8); /* #0F3D95 */
+  --chart-2: oklch(0.527 0.137 150.1); /* #15803D */
+  --chart-3: oklch(0.505 0.190 27.5); /* #B91C1C */
+  --chart-4: oklch(0.555 0.146 49.0); /* #B45309 */
+  --chart-5: oklch(0.642 0.020 261.3); /* #868D99 */
+  --sidebar: oklch(1.000 0 0); /* #FFFFFF */
+  --sidebar-foreground: oklch(0.200 0.010 268.2); /* #14161B */
+  --sidebar-primary: oklch(0.390 0.153 261.8); /* #0F3D95 */
+  --sidebar-primary-foreground: oklch(1.000 0 0); /* #FFFFFF */
+  --sidebar-accent: oklch(0.927 0.019 266.0); /* #E1E7F4 · elemento activo (cobalto 100) */
+  --sidebar-accent-foreground: oklch(0.330 0.127 261.9); /* #0B2F75 */
+  --sidebar-border: oklch(0.924 0.010 261.8); /* #E2E6ED */
+  --sidebar-ring: oklch(0.390 0.153 261.8); /* #0F3D95 */
+}
+
+@theme inline {
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+}

@@ -37,7 +37,10 @@ class PinLogin extends Login
     {
         $this->error = null;
         if (strlen($this->pin) === 4) {
-            $this->entrar();
+            // Desde un hook «updated» Livewire ignora la respuesta devuelta: hay que redirigir aquí.
+            if ($this->entrar()) {
+                $this->redirect(session()->pull('url.intended', Filament::getUrl()));
+            }
         }
     }
 
@@ -76,6 +79,12 @@ class PinLogin extends Login
     public function authenticate(): ?LoginResponse
     {
         return $this->entrar();
+    }
+
+    /** La pantalla ya tiene su propio título («Introduce tu PIN»). */
+    public function getHeading(): string
+    {
+        return '';
     }
 
     protected function getViewData(): array

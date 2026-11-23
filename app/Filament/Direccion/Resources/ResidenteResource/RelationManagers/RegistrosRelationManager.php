@@ -28,7 +28,7 @@ class RegistrosRelationManager extends RelationManager
                 TextColumn::make('resumen')->label('Registro')->state(fn (Registro $r) => $r->resumenCorto())->wrap(),
                 TextColumn::make('tipo_incidencia')->label('Incidencia')->badge()->color('danger')->placeholder('—'),
                 TextColumn::make('user.name')->label('Quién'),
-                TextColumn::make('estado')->badge()->formatStateUsing(fn ($s) => match ($s) { 'sin_novedad' => 'Sin novedad', 'confirmado' => 'Confirmado', default => 'Borrador' }),
+                TextColumn::make('estado')->badge()->formatStateUsing(fn ($state) => match ($state) { 'sin_novedad' => 'Sin novedad', 'confirmado' => 'Confirmado', default => 'Borrador' }),
             ])
             ->filters([TernaryFilter::make('incidencia_destacada')->label('Solo incidencias')]);
     }

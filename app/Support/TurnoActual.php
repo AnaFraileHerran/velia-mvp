@@ -20,7 +20,7 @@ class TurnoActual
 
     public static function make(): self
     {
-        $u = auth()->user();
+        $u = \Filament\Facades\Filament::auth()->user();
 
         return new self($u, $u->turnoAbierto());
     }
@@ -84,7 +84,7 @@ class TurnoActual
 
     public function preguntas(): Collection
     {
-        return Pregunta::with('residente')->whereIn('residente_id', $this->idsPlanta())->whereNull('respuesta')->latest()->get();
+        return Pregunta::with('residente')->whereIn('residente_id', $this->idsPlanta())->whereNull('respuesta')->whereNull('cerrada_at')->latest()->get();
     }
 
     public function vuelvenHoy(): Collection
@@ -105,5 +105,25 @@ class TurnoActual
         $con = $this->novedades()->pluck('residente_id');
 
         return $this->residentes()->where('estado', 'en_centro')->whereNotIn('id', $con)->values();
+    }
+
+    /**
+     * Compañeras del mismo turno en tu planta (o en todas, si no tienes planta fija).
+     * Primero quien ya ha entrado; si aún no ha abierto turno, «Le toca hoy».
+     */
+    public function companeras(): Collection
+    {
+        $u = $this->user;
+
+        return User::auxiliares()
+            ->where('activo', true)
+            ->whereKeyNot($u->id)
+            ->where('turno_habitual', $u->turno_habitual)
+            ->when($u->planta_id, fn ($query) => $query->where(fn ($query) => $query->where('planta_id', $u->planta_id)->orWhereNull('planta_id')))
+            ->with('planta')
+            ->get()
+            ->map(fn (User $c) => ['user' => $c, 'enTurno' => (bool) $c->turnoAbierto()])
+            ->sortBy(fn ($c) => [$c['enTurno'] ? 0 : 1, $c['user']->name])
+            ->values();
     }
 }

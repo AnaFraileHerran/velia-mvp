@@ -36,7 +36,7 @@
     @endif
 
     <section>
-        <h2 class="text-sm font-semibold">Relevo para el siguiente turno <span class="font-normal text-gray-500">· revisa antes de cerrar</span></h2>
+        <h2 class="text-sm font-semibold">Resumen para el siguiente turno <span class="font-normal text-gray-500">· revisa antes de cerrar</span></h2>
         <ul class="mt-2 divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white dark:divide-white/5 dark:border-white/10 dark:bg-gray-900">
             @forelse ($this->relevo() as $r)
                 <li class="flex items-center justify-between gap-3 px-4 py-2 text-sm">

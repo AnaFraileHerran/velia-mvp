@@ -10,6 +10,13 @@ use Filament\Resources\Pages\ManageRecords;
 
 class ManageAusencias extends ManageRecords
 {
+    use \App\Filament\Direccion\Concerns\MigasDePan;
+
+    protected function migas(): array
+    {
+        return [\App\Filament\Direccion\Resources\ResidenteResource::getUrl() => 'Residentes'];
+    }
+
     protected static string $resource = AusenciaResource::class;
 
     protected ?string $subheading = 'Quién está fuera y cuándo vuelve. Las auxiliares lo ven en su relevo.';
@@ -17,13 +24,13 @@ class ManageAusencias extends ManageRecords
     /** Wireframe: «Fuera ahora · 3» y «Salidas previstas · 1». */
     public function getTabs(): array
     {
-        $fuera = fn ($q) => $q->where('ha_vuelto', false)->whereDate('sale', '<=', today());
-        $previstas = fn ($q) => $q->where('ha_vuelto', false)->whereDate('sale', '>', today());
+        $fuera = fn ($query) => $query->where('ha_vuelto', false)->whereDate('sale', '<=', today());
+        $previstas = fn ($query) => $query->where('ha_vuelto', false)->whereDate('sale', '>', today());
 
         return [
             'fuera' => Tab::make('Fuera ahora')->modifyQueryUsing($fuera)->badge($fuera(Ausencia::query())->count()),
             'previstas' => Tab::make('Salidas previstas')->modifyQueryUsing($previstas)->badge($previstas(Ausencia::query())->count()),
-            'vueltas' => Tab::make('Han vuelto')->modifyQueryUsing(fn ($q) => $q->where('ha_vuelto', true)),
+            'vueltas' => Tab::make('Han vuelto')->modifyQueryUsing(fn ($query) => $query->where('ha_vuelto', true)),
         ];
     }
 
@@ -31,7 +38,7 @@ class ManageAusencias extends ManageRecords
     {
         return [
             CreateAction::make()->label('Registrar ausencia')
-                ->mutateFormDataUsing(fn (array $data) => [...$data, 'registrada_por' => auth()->id()])
+                ->mutateFormDataUsing(fn (array $data) => [...$data, 'registrada_por' => \Filament\Facades\Filament::auth()->id()])
                 ->after(fn (Ausencia $record) => $record->residente->update(['estado' => 'fuera'])),
         ];
     }

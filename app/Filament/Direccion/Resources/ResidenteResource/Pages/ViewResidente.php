@@ -16,7 +16,38 @@ use Filament\Resources\Pages\ViewRecord;
 /** Ficha del residente. «Dar de baja» está solo en «… Más», con motivo y confirmación (regla 6). */
 class ViewResidente extends ViewRecord
 {
+    use \App\Filament\Direccion\Concerns\MigasDePan;
+
+    protected function migas(): array
+    {
+        return [\App\Filament\Direccion\Resources\ResidenteResource::getUrl() => 'Residentes'];
+    }
+
+    protected function migaActual(): string
+    {
+        return $this->getRecord()->nombre;
+    }
+
     protected static string $resource = ResidenteResource::class;
+
+    /**
+     * Pestañas arriba (decisión UX 23/11/2026): «Ficha · Historial de registros · Correcciones · Autorizados de la familia».
+     * Abajo quedaban bajo una ficha larga y no se veían; la dirección suele llegar aquí desde un aviso para mirar el historial.
+     */
+    public function hasCombinedRelationManagerTabsWithContent(): bool
+    {
+        return true;
+    }
+
+    public function getContentTabLabel(): ?string
+    {
+        return 'Ficha';
+    }
+
+    public function getContentTabIcon(): ?string
+    {
+        return 'heroicon-o-identification';
+    }
 
     public function getSubheading(): ?string
     {
@@ -58,7 +89,7 @@ class ViewResidente extends ViewRecord
                         Correcciones::aplicar($this->record, ['estado' => 'baja', 'baja_motivo' => $data['motivo'], 'baja_fecha' => $data['fecha']], 'Baja: '.$motivo);
                         Notification::make()->title('Baja registrada. El historial se conserva.')->success()->send();
                     }),
-            ])->label('… Más')->icon('heroicon-o-ellipsis-horizontal')->button()->color('gray'),
+            ])->label('Más acciones')->icon('heroicon-m-chevron-down')->iconPosition(\Filament\Support\Enums\IconPosition::After)->button()->color('gray'),
         ];
     }
 }
