@@ -2,6 +2,7 @@
 
 namespace App\Filament\Direccion\Pages;
 
+use App\Filament\Direccion\Concerns\MigasDePan;
 use App\Filament\Direccion\Resources\AusenciaResource;
 use App\Filament\Direccion\Resources\AuxiliarResource;
 use App\Filament\Direccion\Resources\ResidenteResource;
@@ -14,15 +15,15 @@ use Filament\Pages\Page;
  */
 class Ayuda extends Page
 {
-    use \App\Filament\Direccion\Concerns\MigasDePan;
+    use MigasDePan;
 
     protected static ?string $title = 'Ayuda';
 
-    protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-question-mark-circle';
 
     protected static ?int $navigationSort = 7;
 
-    protected static string $view = 'filament.direccion.pages.ayuda';
+    protected string $view = 'filament.direccion.pages.ayuda';
 
     protected ?string $subheading = 'Las dudas más frecuentes, cada una con el enlace a donde se resuelve.';
 

@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Filament\Facades\Filament;
 use App\Models\Ausencia;
 use App\Models\Pregunta;
 use App\Models\Registro;
@@ -20,7 +21,7 @@ class TurnoActual
 
     public static function make(): self
     {
-        $u = \Filament\Facades\Filament::auth()->user();
+        $u = Filament::auth()->user();
 
         return new self($u, $u->turnoAbierto());
     }

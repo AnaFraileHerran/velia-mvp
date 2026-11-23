@@ -2,6 +2,13 @@
 
 namespace App\Filament\Direccion\Widgets;
 
+use App\Support\TurnosSinAbrir;
+use App\Models\Planta;
+use App\Support\Franja;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Facades\Filament;
 use App\Models\Aviso;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -20,7 +27,7 @@ class AlertaTurno extends Widget implements HasActions, HasForms
     use InteractsWithActions;
     use InteractsWithForms;
 
-    protected static string $view = 'filament.direccion.widgets.alerta-turno';
+    protected string $view = 'filament.direccion.widgets.alerta-turno';
 
     protected int|string|array $columnSpan = 'full';
 
@@ -28,7 +35,7 @@ class AlertaTurno extends Widget implements HasActions, HasForms
 
     public function getAvisos()
     {
-        \App\Support\TurnosSinAbrir::comprobar();
+        TurnosSinAbrir::comprobar();
 
         return Aviso::where('tipo', 'turno_sin_abrir')->where('estado', 'pendiente')->get();
     }
@@ -44,12 +51,12 @@ class AlertaTurno extends Widget implements HasActions, HasForms
             ->modalSubmitAction(false)
             ->modalCancelActionLabel('Cerrar')
             ->modalContent(function (array $arguments) {
-                $p = \App\Models\Planta::find($arguments['planta'] ?? null);
+                $p = Planta::find($arguments['planta'] ?? null);
 
                 return view('filament.direccion.widgets.quien-falta', [
                     'planta' => $p,
-                    'personas' => $p ? \App\Support\TurnosSinAbrir::quienDeberia($p) : collect(),
-                    'franja' => \App\Support\Franja::actual(),
+                    'personas' => $p ? TurnosSinAbrir::quienDeberia($p) : collect(),
+                    'franja' => Franja::actual(),
                 ]);
             });
     }
@@ -64,19 +71,19 @@ class AlertaTurno extends Widget implements HasActions, HasForms
             ->modalHeading('¿Por qué no procede?')
             ->modalDescription('La alerta se quita y queda anotado con tu nombre, la fecha y el motivo.')
             ->modalSubmitActionLabel('Guardar')
-            ->form([
-                \Filament\Forms\Components\Radio::make('motivo')->label('Motivo')->required()->options([
+            ->schema([
+                Radio::make('motivo')->label('Motivo')->required()->options([
                     'cubierto' => 'El turno está cubierto, pero no se ha abierto en Velia',
                     'sin_residentes' => 'Hoy no hay residentes en esa planta',
                     'otro' => 'Otro motivo',
                 ])->live(),
-                \Filament\Forms\Components\TextInput::make('texto')->label('Cuéntalo en pocas palabras')
-                    ->visible(fn (\Filament\Forms\Get $get) => $get('motivo') === 'otro')->required(fn (\Filament\Forms\Get $get) => $get('motivo') === 'otro'),
+                TextInput::make('texto')->label('Cuéntalo en pocas palabras')
+                    ->visible(fn (Get $get) => $get('motivo') === 'otro')->required(fn (Get $get) => $get('motivo') === 'otro'),
             ])
             ->action(function (array $data, array $arguments) {
                 $textos = ['cubierto' => 'Turno cubierto sin abrir en Velia', 'sin_residentes' => 'Sin residentes en la planta', 'otro' => 'Otro motivo'];
                 Aviso::whereKey($arguments['aviso'])->update([
-                    'estado' => 'descartado', 'revisado_por' => \Filament\Facades\Filament::auth()->id(), 'revisado_at' => now(),
+                    'estado' => 'descartado', 'revisado_por' => Filament::auth()->id(), 'revisado_at' => now(),
                     'motivo_descarte' => $textos[$data['motivo']].(($data['texto'] ?? '') !== '' ? ': '.$data['texto'] : ''),
                 ]);
                 Notification::make()->title('Anotado como «no procede».')->send();

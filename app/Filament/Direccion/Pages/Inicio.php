@@ -2,6 +2,8 @@
 
 namespace App\Filament\Direccion\Pages;
 
+use Filament\Facades\Filament;
+use App\Support\PendientesAuditoria;
 use App\Filament\Direccion\Widgets\AhoraEnElCentro;
 use App\Filament\Direccion\Widgets\AlertaTurno;
 use App\Filament\Direccion\Widgets\ComoVaLaSemana;
@@ -19,7 +21,7 @@ class Inicio extends Dashboard
 
     protected static ?string $navigationLabel = 'Inicio';
 
-    protected static ?string $navigationIcon = 'heroicon-o-home';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-home';
 
     protected static ?int $navigationSort = 1;
 
@@ -31,7 +33,7 @@ class Inicio extends Dashboard
 
     public function getSubheading(): ?string
     {
-        $nombre = explode(' ', \Filament\Facades\Filament::auth()->user()->name)[0];
+        $nombre = explode(' ', Filament::auth()->user()->name)[0];
         $h = (int) now()->format('H');
         $saludo = $h < 14 ? 'Buenos días' : ($h < 21 ? 'Buenas tardes' : 'Buenas noches');
 
@@ -48,14 +50,14 @@ class Inicio extends Dashboard
                     if (! $r->proxima_auditoria) {
                         return 'Fija la próxima auditoría';
                     }
-                    $n = \App\Support\PendientesAuditoria::resumen()['total'];
+                    $n = PendientesAuditoria::resumen()['total'];
 
                     return 'Auditoría: '.$r->proxima_auditoria->locale('es')->isoFormat('D MMM YYYY').' · '.($n ? $n.' '.($n === 1 ? 'pendiente' : 'pendientes') : 'todo al día');
                 })
                 ->color('gray')
                 ->icon('heroicon-o-shield-check')
                 ->tooltip(function () {
-                    $items = \App\Support\PendientesAuditoria::resumen()['items'];
+                    $items = PendientesAuditoria::resumen()['items'];
 
                     return $items ? collect($items)->map(fn ($x) => $x['n'].' '.$x['texto'])->join(' · ').'. Ver en Calidad y auditoría.' : 'Todo al día con lo que mide Velia.';
                 })
@@ -68,7 +70,7 @@ class Inicio extends Dashboard
         return [AlertaTurno::class, AhoraEnElCentro::class, HoyNecesitaTuDecision::class, EstaSemana::class, ComoVaLaSemana::class];
     }
 
-    public function getColumns(): int|string|array
+    public function getColumns(): int|array
     {
         return ['xl' => 3];
     }

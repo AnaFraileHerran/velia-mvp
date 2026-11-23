@@ -9,9 +9,10 @@
 .fi-wi-stats-overview-stat,
 .fi-fo-repeater-item,
 .fi-in-section {
+    /* (en Filament 5 las fichas usan también .fi-section) */
     border-radius: 1.25rem;
     box-shadow: none;
-    --tw-ring-color: rgba(var(--gray-200), 1);
+    --tw-ring-color: var(--gray-200);
 }
 
 .fi-modal-window {
@@ -21,7 +22,7 @@
 /* Botones, badges y menú en píldora */
 .fi-btn,
 .fi-badge,
-.fi-sidebar-item-button,
+.fi-sidebar-item-btn,
 .fi-tabs-item,
 .fi-dropdown-list-item {
     border-radius: 9999px;
@@ -33,8 +34,8 @@
 }
 
 /* Sección activa del menú: tinte cobalto y texto cobalto */
-.fi-sidebar-item-active .fi-sidebar-item-button {
-    background-color: rgba(var(--primary-50), 1);
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn {
+    background-color: var(--primary-50);
 }
 
 /* Títulos grandes y ligeros */

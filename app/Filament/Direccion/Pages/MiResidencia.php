@@ -2,6 +2,10 @@
 
 namespace App\Filament\Direccion\Pages;
 
+use App\Filament\Direccion\Concerns\MigasDePan;
+use Filament\Facades\Filament;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use App\Models\Planta;
 use App\Models\Residencia;
 use App\Models\SolicitudResidencia;
@@ -10,11 +14,9 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
@@ -24,7 +26,7 @@ use Filament\Pages\Page;
  */
 class MiResidencia extends Page implements HasActions, HasForms
 {
-    use \App\Filament\Direccion\Concerns\MigasDePan;
+    use MigasDePan;
 
     use InteractsWithActions;
     use InteractsWithForms;
@@ -35,11 +37,11 @@ class MiResidencia extends Page implements HasActions, HasForms
 
     protected static ?string $slug = 'mi-residencia';
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
 
     protected static ?int $navigationSort = 6;
 
-    protected static string $view = 'filament.direccion.pages.mi-residencia';
+    protected string $view = 'filament.direccion.pages.mi-residencia';
 
     protected ?string $subheading = 'Los datos de tu centro: lo que ven las auxiliares en la tablet o el móvil y lo que firman los resúmenes para las familias.';
 
@@ -55,7 +57,7 @@ class MiResidencia extends Page implements HasActions, HasForms
             ->modalHeading('Añadir otra residencia')
             ->modalDescription('Te llamamos para prepararla contigo, como hicimos con esta. Cada residencia tiene sus propios residentes, equipo y auditoría.')
             ->modalSubmitActionLabel('Enviar solicitud')
-            ->form([
+            ->schema([
                 TextInput::make('nombre')->label('Nombre de la residencia')->required(),
                 TextInput::make('plazas')->label('Plazas')->numeric()->minValue(1),
                 TextInput::make('municipio')->label('Municipio'),
@@ -63,7 +65,7 @@ class MiResidencia extends Page implements HasActions, HasForms
             ->action(function (array $data) {
                 SolicitudResidencia::create($data + [
                     'residencia_id' => Residencia::actual()?->id,
-                    'user_id' => \Filament\Facades\Filament::auth()->id(),
+                    'user_id' => Filament::auth()->id(),
                 ]);
                 Notification::make()->title('Solicitud enviada. Te llamamos esta semana.')->success()->send();
             });
@@ -74,9 +76,9 @@ class MiResidencia extends Page implements HasActions, HasForms
         $this->form->fill(Residencia::actual()->attributesToArray());
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->statePath('data')->schema([
+        return $schema->statePath('data')->components([
             Section::make('Identidad y contacto')
                 ->description('Aparece al pie de cada resumen para las familias.')
                 ->schema([

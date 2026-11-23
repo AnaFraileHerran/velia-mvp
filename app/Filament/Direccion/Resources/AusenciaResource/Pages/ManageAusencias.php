@@ -2,19 +2,22 @@
 
 namespace App\Filament\Direccion\Resources\AusenciaResource\Pages;
 
+use App\Filament\Direccion\Concerns\MigasDePan;
+use App\Filament\Direccion\Resources\ResidenteResource;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Facades\Filament;
 use App\Filament\Direccion\Resources\AusenciaResource;
 use App\Models\Ausencia;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ManageRecords;
 
 class ManageAusencias extends ManageRecords
 {
-    use \App\Filament\Direccion\Concerns\MigasDePan;
+    use MigasDePan;
 
     protected function migas(): array
     {
-        return [\App\Filament\Direccion\Resources\ResidenteResource::getUrl() => 'Residentes'];
+        return [ResidenteResource::getUrl() => 'Residentes'];
     }
 
     protected static string $resource = AusenciaResource::class;
@@ -38,7 +41,7 @@ class ManageAusencias extends ManageRecords
     {
         return [
             CreateAction::make()->label('Registrar ausencia')
-                ->mutateFormDataUsing(fn (array $data) => [...$data, 'registrada_por' => \Filament\Facades\Filament::auth()->id()])
+                ->mutateDataUsing(fn (array $data) => [...$data, 'registrada_por' => Filament::auth()->id()])
                 ->after(fn (Ausencia $record) => $record->residente->update(['estado' => 'fuera'])),
         ];
     }

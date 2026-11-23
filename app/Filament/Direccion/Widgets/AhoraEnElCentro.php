@@ -2,6 +2,9 @@
 
 namespace App\Filament\Direccion\Widgets;
 
+use App\Support\Sanitarios;
+use App\Models\Ausencia;
+use App\Support\Franja;
 use App\Filament\Direccion\Widgets\EstaSemana;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -20,7 +23,7 @@ class AhoraEnElCentro extends Widget implements HasActions, HasForms
     use InteractsWithActions;
     use InteractsWithForms;
 
-    protected static string $view = 'filament.direccion.widgets.ahora-en-el-centro';
+    protected string $view = 'filament.direccion.widgets.ahora-en-el-centro';
 
     protected int|string|array $columnSpan = 'full';
 
@@ -32,9 +35,9 @@ class AhoraEnElCentro extends Widget implements HasActions, HasForms
 
         return [
             'plantas' => $plantas,
-            'sanitarios' => \App\Support\Sanitarios::ahora(),
-            'fuera' => \App\Models\Ausencia::where('ha_vuelto', false)->with('residente')->orderBy('vuelve')->get(),
-            'franja' => \App\Support\Franja::actual(),
+            'sanitarios' => Sanitarios::ahora(),
+            'fuera' => Ausencia::where('ha_vuelto', false)->with('residente')->orderBy('vuelve')->get(),
+            'franja' => Franja::actual(),
         ];
     }
 }

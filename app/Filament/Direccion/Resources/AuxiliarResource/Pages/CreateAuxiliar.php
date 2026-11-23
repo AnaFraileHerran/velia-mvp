@@ -2,6 +2,8 @@
 
 namespace App\Filament\Direccion\Resources\AuxiliarResource\Pages;
 
+use App\Filament\Direccion\Concerns\MigasDePan;
+use Filament\Facades\Filament;
 use App\Filament\Direccion\Resources\AuxiliarResource;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
@@ -10,11 +12,11 @@ use Illuminate\Support\Str;
 /** Al añadir una auxiliar, el panel genera su PIN provisional y un código para vincular su móvil. */
 class CreateAuxiliar extends CreateRecord
 {
-    use \App\Filament\Direccion\Concerns\MigasDePan;
+    use MigasDePan;
 
     protected function migas(): array
     {
-        return [\App\Filament\Direccion\Resources\AuxiliarResource::getUrl() => 'Equipo'];
+        return [AuxiliarResource::getUrl() => 'Equipo'];
     }
 
     protected static string $resource = AuxiliarResource::class;
@@ -42,7 +44,7 @@ class CreateAuxiliar extends CreateRecord
 
             return;
         }
-        $pin = $this->record->generarPinProvisional(\Filament\Facades\Filament::auth()->user());
+        $pin = $this->record->generarPinProvisional(Filament::auth()->user());
         Notification::make()
             ->title("PIN provisional de {$this->record->name}: {$pin}")
             ->body("Para su móvil, código de invitación: {$this->record->codigo_invitacion}. Comunícaselo en persona; creará su PIN al entrar.")

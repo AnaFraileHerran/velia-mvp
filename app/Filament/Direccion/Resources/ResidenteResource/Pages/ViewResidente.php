@@ -2,6 +2,8 @@
 
 namespace App\Filament\Direccion\Resources\ResidenteResource\Pages;
 
+use App\Filament\Direccion\Concerns\MigasDePan;
+use Filament\Support\Enums\IconPosition;
 use App\Filament\Direccion\Resources\ResidenteResource;
 use App\Models\Residente;
 use App\Support\Correcciones;
@@ -16,11 +18,11 @@ use Filament\Resources\Pages\ViewRecord;
 /** Ficha del residente. «Dar de baja» está solo en «… Más», con motivo y confirmación (regla 6). */
 class ViewResidente extends ViewRecord
 {
-    use \App\Filament\Direccion\Concerns\MigasDePan;
+    use MigasDePan;
 
     protected function migas(): array
     {
-        return [\App\Filament\Direccion\Resources\ResidenteResource::getUrl() => 'Residentes'];
+        return [ResidenteResource::getUrl() => 'Residentes'];
     }
 
     protected function migaActual(): string
@@ -78,7 +80,7 @@ class ViewResidente extends ViewRecord
                     ->requiresConfirmation()
                     ->modalHeading(fn () => 'Dar de baja a '.$this->record->nombre)
                     ->modalDescription('Deja de aparecer en los turnos, los avisos y los resúmenes. Su historial se conserva para la auditoría y para consultarlo con el filtro «Bajas».')
-                    ->form([
+                    ->schema([
                         Radio::make('motivo')->label('Motivo (obligatorio)')->required()->inline()
                             ->options(['Fallecimiento' => 'Fallecimiento', 'Cambio de residencia' => 'Cambio de residencia', 'Otros' => 'Otros']),
                         DatePicker::make('fecha')->label('Fecha de la baja')->default(now())->required(),
@@ -89,7 +91,7 @@ class ViewResidente extends ViewRecord
                         Correcciones::aplicar($this->record, ['estado' => 'baja', 'baja_motivo' => $data['motivo'], 'baja_fecha' => $data['fecha']], 'Baja: '.$motivo);
                         Notification::make()->title('Baja registrada. El historial se conserva.')->success()->send();
                     }),
-            ])->label('Más acciones')->icon('heroicon-m-chevron-down')->iconPosition(\Filament\Support\Enums\IconPosition::After)->button()->color('gray'),
+            ])->label('Más acciones')->icon('heroicon-m-chevron-down')->iconPosition(IconPosition::After)->button()->color('gray'),
         ];
     }
 }

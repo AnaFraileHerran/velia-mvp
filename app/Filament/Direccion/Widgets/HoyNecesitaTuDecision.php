@@ -2,6 +2,13 @@
 
 namespace App\Filament\Direccion\Widgets;
 
+use App\Support\TurnosSinAbrir;
+use Filament\Facades\Filament;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
+use App\Models\Planta;
+use App\Support\Franja;
 use App\Models\Aviso;
 use App\Models\Pregunta;
 use App\Models\User;
@@ -24,7 +31,7 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
 
     public const MAXIMO = 5;
 
-    protected static string $view = 'filament.direccion.widgets.hoy-necesita-tu-decision';
+    protected string $view = 'filament.direccion.widgets.hoy-necesita-tu-decision';
 
     protected int|string|array $columnSpan = ['xl' => 2];
 
@@ -34,7 +41,7 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
 
     public function getAvisos()
     {
-        \App\Support\TurnosSinAbrir::comprobar();
+        TurnosSinAbrir::comprobar();
 
         $q = Aviso::abiertos()->where('tipo', '!=', 'turno_sin_abrir')->with('residente.planta');
 
@@ -43,7 +50,7 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
 
     public function getTotal(): int
     {
-        \App\Support\TurnosSinAbrir::comprobar();
+        TurnosSinAbrir::comprobar();
 
         return Aviso::abiertos()->where('tipo', '!=', 'turno_sin_abrir')->count();
     }
@@ -53,7 +60,7 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
         return Action::make('asignar')
             ->label('Asignar')
             ->modalHeading('Asignar responsable')
-            ->form([
+            ->schema([
                 Select::make('responsable_id')->label('¿Quién hace el seguimiento?')
                     ->options(User::auxiliares()->where('activo', true)->pluck('name', 'id'))->required(),
                 DatePicker::make('vence_el')->label('¿Para cuándo?')->native(false)->displayFormat('d/m/Y')
@@ -71,7 +78,7 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
         return Action::make('preguntar')
             ->label('Preguntar al turno')
             ->color('gray')
-            ->form([Textarea::make('texto')->label('Pregunta')->required()->rows(2)])
+            ->schema([Textarea::make('texto')->label('Pregunta')->required()->rows(2)])
             ->action(function (array $data, array $arguments) {
                 $aviso = Aviso::findOrFail($arguments['aviso']);
                 Pregunta::create(['residente_id' => $aviso->residente_id, 'aviso_id' => $aviso->id, 'texto' => $data['texto']]);
@@ -88,7 +95,7 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
             ->icon('heroicon-o-check')
             ->color('gray')
             ->action(function (array $arguments) {
-                $u = \Filament\Facades\Filament::auth()->user();
+                $u = Filament::auth()->user();
                 Aviso::findOrFail($arguments['aviso'])->update(['estado' => 'revisado', 'revisado_por' => $u->id, 'revisado_at' => now()]);
                 Notification::make()->title('Revisado por '.strtok($u->name, ' ').', hoy a las '.now()->format('H:i'))
                     ->body('Queda en el historial para la auditoría.')->success()->send();
@@ -105,15 +112,15 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
             ->modalHeading('¿Por qué no procede este aviso?')
             ->modalDescription('Se quita de la lista y queda anotado con tu nombre, la fecha y el motivo.')
             ->modalSubmitActionLabel('Guardar')
-            ->form([
-                \Filament\Forms\Components\Radio::make('motivo')->label('Motivo')->required()->options(Aviso::MOTIVOS_DESCARTE)->live(),
-                \Filament\Forms\Components\TextInput::make('texto')->label('Cuéntalo en pocas palabras')
-                    ->visible(fn (\Filament\Forms\Get $get) => $get('motivo') === 'otro')->required(fn (\Filament\Forms\Get $get) => $get('motivo') === 'otro'),
+            ->schema([
+                Radio::make('motivo')->label('Motivo')->required()->options(Aviso::MOTIVOS_DESCARTE)->live(),
+                TextInput::make('texto')->label('Cuéntalo en pocas palabras')
+                    ->visible(fn (Get $get) => $get('motivo') === 'otro')->required(fn (Get $get) => $get('motivo') === 'otro'),
             ])
             ->action(function (array $data, array $arguments) {
                 $motivo = Aviso::MOTIVOS_DESCARTE[$data['motivo']].(($data['texto'] ?? '') !== '' ? ': '.$data['texto'] : '');
                 Aviso::findOrFail($arguments['aviso'])->update([
-                    'estado' => 'descartado', 'revisado_por' => \Filament\Facades\Filament::auth()->id(), 'revisado_at' => now(), 'motivo_descarte' => $motivo,
+                    'estado' => 'descartado', 'revisado_por' => Filament::auth()->id(), 'revisado_at' => now(), 'motivo_descarte' => $motivo,
                 ]);
                 Notification::make()->title('Anotado como «no procede».')->body($motivo)->send();
             });
@@ -130,12 +137,12 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
             ->modalSubmitAction(false)
             ->modalCancelActionLabel('Cerrar')
             ->modalContent(function (array $arguments) {
-                $p = \App\Models\Planta::find($arguments['planta'] ?? null);
+                $p = Planta::find($arguments['planta'] ?? null);
 
                 return view('filament.direccion.widgets.quien-falta', [
                     'planta' => $p,
-                    'personas' => $p ? \App\Support\TurnosSinAbrir::quienDeberia($p) : collect(),
-                    'franja' => \App\Support\Franja::actual(),
+                    'personas' => $p ? TurnosSinAbrir::quienDeberia($p) : collect(),
+                    'franja' => Franja::actual(),
                 ]);
             });
     }

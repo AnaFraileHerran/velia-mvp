@@ -2,6 +2,7 @@
 
 namespace App\Filament\Direccion\Pages;
 
+use App\Filament\Direccion\Concerns\MigasDePan;
 use App\Filament\Direccion\Resources\ResumenResource;
 use App\Models\Ausencia;
 use App\Models\Registro;
@@ -13,11 +14,11 @@ use Filament\Pages\Page;
 /** 5 · Familias › Residencia y ocupación (wireframe «V2 · Familias · residencia y ocupación»). */
 class Ocupacion extends Page
 {
-    use \App\Filament\Direccion\Concerns\MigasDePan;
+    use MigasDePan;
 
     protected function migas(): array
     {
-        return [\App\Filament\Direccion\Resources\ResumenResource::getUrl() => 'Familias'];
+        return [ResumenResource::getUrl() => 'Familias'];
     }
 
     protected static ?string $title = 'Familias';
@@ -26,7 +27,7 @@ class Ocupacion extends Page
 
     protected static bool $shouldRegisterNavigation = false;
 
-    protected static string $view = 'filament.direccion.pages.ocupacion';
+    protected string $view = 'filament.direccion.pages.ocupacion';
 
     public function getSubheading(): ?string
     {

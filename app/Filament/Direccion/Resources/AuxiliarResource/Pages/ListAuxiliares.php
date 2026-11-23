@@ -2,15 +2,16 @@
 
 namespace App\Filament\Direccion\Resources\AuxiliarResource\Pages;
 
+use App\Filament\Direccion\Concerns\MigasDePan;
+use Filament\Schemas\Components\Tabs\Tab;
 use App\Filament\Direccion\Resources\AuxiliarResource;
 use App\Models\User;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 
 class ListAuxiliares extends ListRecords
 {
-    use \App\Filament\Direccion\Concerns\MigasDePan;
+    use MigasDePan;
 
     protected static string $resource = AuxiliarResource::class;
 

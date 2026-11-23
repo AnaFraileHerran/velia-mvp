@@ -17,7 +17,7 @@ use Livewire\Attributes\Url;
  */
 class PrimerAcceso extends SimplePage
 {
-    protected static string $view = 'filament.turno.auth.primer-acceso';
+    protected string $view = 'filament.turno.auth.primer-acceso';
 
     protected static string $layout = 'filament-panels::components.layout.simple';
 

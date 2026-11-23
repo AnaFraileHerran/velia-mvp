@@ -2,6 +2,9 @@
 
 namespace App\Filament\Direccion\Resources\ResidenteResource\Pages;
 
+use App\Filament\Direccion\Concerns\MigasDePan;
+use App\Models\Residente;
+use App\Models\Residencia;
 use App\Filament\Direccion\Resources\AusenciaResource;
 use App\Filament\Direccion\Resources\ResidenteResource;
 use Filament\Actions\Action;
@@ -10,16 +13,16 @@ use Filament\Resources\Pages\ListRecords;
 
 class ListResidentes extends ListRecords
 {
-    use \App\Filament\Direccion\Concerns\MigasDePan;
+    use MigasDePan;
 
     protected static string $resource = ResidenteResource::class;
 
     /** Capacidad de un vistazo y lo que pide atención, en una línea bajo el título. */
     public function getSubheading(): ?string
     {
-        $activos = \App\Models\Residente::activos();
+        $activos = Residente::activos();
         $n = (clone $activos)->count();
-        $plazas = \App\Models\Residencia::actual()->plazas_autorizadas;
+        $plazas = Residencia::actual()->plazas_autorizadas;
         $fuera = (clone $activos)->where('estado', 'fuera')->count();
         $planes = (clone $activos)->whereDate('plan_proxima_revision', '<', today())->count();
         $sinEmergencia = (clone $activos)->whereDoesntHave('contactos', fn ($query) => $query->where('emergencia', true))->count();

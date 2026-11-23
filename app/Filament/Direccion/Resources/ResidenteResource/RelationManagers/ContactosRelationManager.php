@@ -2,13 +2,13 @@
 
 namespace App\Filament\Direccion\Resources\ResidenteResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -26,9 +26,9 @@ class ContactosRelationManager extends RelationManager
         return false;
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             TextInput::make('nombre')->label('Nombre')->required(),
             TextInput::make('relacion')->label('Relación')->required(),
             TextInput::make('telefono')->label('Teléfono')->tel(),
@@ -51,6 +51,6 @@ class ContactosRelationManager extends RelationManager
                 IconColumn::make('recibe_resumen')->label('Resumen')->boolean(),
             ])
             ->headerActions([CreateAction::make()->label('Añadir contacto')->modalHeading('Añadir contacto')->createAnother(false)])
-            ->actions([EditAction::make()]);
+            ->recordActions([EditAction::make()]);
     }
 }

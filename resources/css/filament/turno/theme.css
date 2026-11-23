@@ -1,4 +1,7 @@
-@import '/vendor/filament/filament/resources/css/theme.css';
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
 @import '../velia.css';
 
-@config 'tailwind.config.js';
+@source '../../../../app/Filament/**/*';
+@source '../../../../app/Support/**/*';
+@source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/components/**/*';

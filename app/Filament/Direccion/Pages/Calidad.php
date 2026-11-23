@@ -2,6 +2,8 @@
 
 namespace App\Filament\Direccion\Pages;
 
+use App\Filament\Direccion\Concerns\MigasDePan;
+use App\Support\PendientesAuditoria;
 use App\Filament\Direccion\Resources\ResidenteResource;
 use App\Filament\Direccion\Resources\ResumenResource;
 use App\Models\Correccion;
@@ -19,7 +21,7 @@ use Filament\Pages\Page;
  */
 class Calidad extends Page
 {
-    use \App\Filament\Direccion\Concerns\MigasDePan;
+    use MigasDePan;
 
     protected static ?string $navigationLabel = 'Calidad y auditoría';
 
@@ -27,11 +29,11 @@ class Calidad extends Page
 
     protected static ?string $slug = 'calidad';
 
-    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shield-check';
 
     protected static ?int $navigationSort = 4;
 
-    protected static string $view = 'filament.direccion.pages.calidad';
+    protected string $view = 'filament.direccion.pages.calidad';
 
     public function getSubheading(): ?string
     {
@@ -40,14 +42,14 @@ class Calidad extends Page
             return 'Añade la fecha de la próxima auditoría en Mi residencia.';
         }
 
-        $n = \App\Support\PendientesAuditoria::resumen()['total'];
+        $n = PendientesAuditoria::resumen()['total'];
 
         return 'Auditoría UNE 158101: '.$fecha->locale('es')->isoFormat('D MMM YYYY').' · en '.(int) now()->startOfDay()->diffInDays($fecha).' días · '.($n ? $n.' '.($n === 1 ? 'pendiente' : 'pendientes') : 'todo al día con lo que mide Velia');
     }
 
     public function pendientes(): array
     {
-        return \App\Support\PendientesAuditoria::resumen();
+        return PendientesAuditoria::resumen();
     }
 
     /**
@@ -56,7 +58,7 @@ class Calidad extends Page
      */
     public function apartados(): array
     {
-        $P = fn (string $a) => \App\Support\PendientesAuditoria::porApartado($a);
+        $P = fn (string $a) => PendientesAuditoria::porApartado($a);
         $turnos = Turno::whereNotNull('fin')->where('fin', '>=', now()->subDays(30));
         $tTotal = (clone $turnos)->count();
         $tCompletos = (clone $turnos)->whereNull('motivo_cierre')->count();

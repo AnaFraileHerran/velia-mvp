@@ -2,6 +2,9 @@
 
 namespace App\Filament\Direccion\Resources\AuxiliarResource\Pages;
 
+use App\Filament\Direccion\Concerns\MigasDePan;
+use Illuminate\Support\HtmlString;
+use Filament\Support\Enums\IconPosition;
 use App\Filament\Direccion\Resources\AuxiliarResource;
 use App\Models\User;
 use App\Models\Planta;
@@ -17,7 +20,7 @@ use Filament\Resources\Pages\ViewRecord;
 /** Ficha de una persona del equipo (auxiliar, enfermería o medicina). Se abre al pulsar su nombre en Equipo. */
 class ViewAuxiliar extends ViewRecord
 {
-    use \App\Filament\Direccion\Concerns\MigasDePan;
+    use MigasDePan;
 
     protected static string $resource = AuxiliarResource::class;
 
@@ -45,7 +48,7 @@ class ViewAuxiliar extends ViewRecord
     {
         return Action::make('accesoGenerado')
             ->modalHeading(fn (array $arguments) => $arguments['titulo'] ?? '')
-            ->modalContent(fn (array $arguments) => new \Illuminate\Support\HtmlString(
+            ->modalContent(fn (array $arguments) => new HtmlString(
                 '<p style="font-family:\'Atkinson Hyperlegible Next\',\'Albert Sans\',sans-serif;font-size:40px;font-weight:700;letter-spacing:.15em;text-align:center;margin:8px 0">'
                 .e($arguments['valor'] ?? '').'</p><p style="text-align:center;font-size:14px;color:rgb(94 101 114)">'.e($arguments['instruccion'] ?? '').' Solo se muestra esta vez.</p>'))
             ->modalSubmitActionLabel('Ya se lo he dicho')
@@ -64,7 +67,7 @@ class ViewAuxiliar extends ViewRecord
                 ->modalHeading(fn () => strtok($this->record->name, ' ').' no puede entrar')
                 ->modalDescription('Elige la situación. No cambia nada hasta que confirmes.')
                 ->modalSubmitActionLabel('Confirmar y generar')
-                ->form(AuxiliarResource::formNoPuedeEntrar())
+                ->schema(AuxiliarResource::formNoPuedeEntrar())
                 ->action(function (array $data) {
                     [$titulo, $valor, $instruccion] = AuxiliarResource::resolverAcceso($this->record, $data['que']);
                     // Se muestra dentro de una ventana (no en un aviso que se queda en pantalla) y se cierra con «Ya se lo he dicho».
@@ -82,7 +85,7 @@ class ViewAuxiliar extends ViewRecord
                     ->icon('heroicon-o-arrows-right-left')
                     ->visible(fn () => $this->record->activo && $this->record->rol === 'auxiliar')
                     ->fillForm(fn () => ['planta_id' => $this->record->planta_id, 'turno_habitual' => $this->record->turno_habitual])
-                    ->form([
+                    ->schema([
                         Select::make('planta_id')->label('Planta')->options(fn () => Planta::pluck('nombre', 'id'))->placeholder('Todas las plantas'),
                         Select::make('turno_habitual')->label('Turno habitual')->options(['manana' => 'Mañana', 'tarde' => 'Tarde', 'noche' => 'Noche'])->required(),
                     ])
@@ -94,7 +97,7 @@ class ViewAuxiliar extends ViewRecord
                     ->visible(fn () => $this->record->activo)
                     ->requiresConfirmation()
                     ->modalDescription(fn () => $this->record->rol === 'auxiliar' ? 'Pierde el acceso a la tablet y al móvil. Sus registros se conservan.' : 'Deja de aparecer en «Mi turno» de las auxiliares.')
-                    ->form([
+                    ->schema([
                         Select::make('motivo')->label('Motivo')->required()
                             ->options(['fin_contrato' => 'Fin de contrato', 'cambio' => 'Cambio de centro', 'otros' => 'Otros']),
                         Textarea::make('nota')->label('Nota (opcional)')->rows(2),
@@ -103,7 +106,7 @@ class ViewAuxiliar extends ViewRecord
                 Action::make('reactivar')->label('Reactivar')->icon('heroicon-o-arrow-path')
                     ->visible(fn () => ! $this->record->activo)
                     ->action(fn () => $this->record->update(['activo' => true, 'baja_motivo' => null])),
-            ])->label('Más acciones')->icon('heroicon-m-chevron-down')->iconPosition(\Filament\Support\Enums\IconPosition::After)->button()->color('gray'),
+            ])->label('Más acciones')->icon('heroicon-m-chevron-down')->iconPosition(IconPosition::After)->button()->color('gray'),
         ];
     }
 }

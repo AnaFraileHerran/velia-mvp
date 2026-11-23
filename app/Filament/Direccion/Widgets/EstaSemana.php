@@ -2,6 +2,11 @@
 
 namespace App\Filament\Direccion\Widgets;
 
+use App\Support\Franja;
+use App\Models\Planta;
+use App\Models\Registro;
+use App\Support\TurnosSinAbrir;
+use App\Support\Sanitarios;
 use App\Models\Ausencia;
 use App\Models\Pregunta;
 use App\Models\Residente;
@@ -21,7 +26,7 @@ class EstaSemana extends Widget implements HasActions, HasForms
     use InteractsWithActions;
     use InteractsWithForms;
 
-    protected static string $view = 'filament.direccion.widgets.esta-semana';
+    protected string $view = 'filament.direccion.widgets.esta-semana';
 
     protected int|string|array $columnSpan = ['xl' => 1];
 
@@ -65,12 +70,12 @@ class EstaSemana extends Widget implements HasActions, HasForms
     /** Ahora en el centro: por planta, quién está de turno y cuántos residentes llevan registro en este turno. */
     public static function ahoraPorPlanta(): array
     {
-        $f = \App\Support\Franja::actual();
+        $f = Franja::actual();
 
-        return \App\Models\Planta::orderBy('nombre')->get()->map(function ($p) use ($f) {
+        return Planta::orderBy('nombre')->get()->map(function ($p) use ($f) {
             $abiertos = Turno::whereNull('fin')->with('user')->where(fn ($q) => $q->where('planta_id', $p->id)->orWhereNull('planta_id'))->get();
             $ids = Residente::activos()->where('estado', 'en_centro')->where('planta_id', $p->id)->pluck('id');
-            $registrados = \App\Models\Registro::whereIn('residente_id', $ids)->whereIn('estado', ['confirmado', 'sin_novedad'])
+            $registrados = Registro::whereIn('residente_id', $ids)->whereIn('estado', ['confirmado', 'sin_novedad'])
                 ->where('created_at', '>=', $f['inicio'])->distinct('residente_id')->count('residente_id');
 
             return ['id' => $p->id, 'planta' => $p->nombre, 'franja' => $f['nombre'], 'personas' => $abiertos->map(fn ($t) => $t->user)->filter()->unique('id')->values(),
@@ -89,12 +94,12 @@ class EstaSemana extends Widget implements HasActions, HasForms
             ->modalSubmitAction(false)
             ->modalCancelActionLabel('Cerrar')
             ->modalContent(function (array $arguments) {
-                $p = \App\Models\Planta::find($arguments['planta'] ?? null);
+                $p = Planta::find($arguments['planta'] ?? null);
 
                 return view('filament.direccion.widgets.quien-falta', [
                     'planta' => $p,
-                    'personas' => $p ? \App\Support\TurnosSinAbrir::quienDeberia($p) : collect(),
-                    'franja' => \App\Support\Franja::actual(),
+                    'personas' => $p ? TurnosSinAbrir::quienDeberia($p) : collect(),
+                    'franja' => Franja::actual(),
                 ]);
             });
     }
@@ -108,7 +113,7 @@ class EstaSemana extends Widget implements HasActions, HasForms
             'esperando' => Pregunta::abiertas()->whereNull('respuesta')->count(),
             'respondidas' => Pregunta::abiertas()->whereNotNull('respuesta')->count(),
             'plantas' => self::ahoraPorPlanta(),
-            'sanitarios' => \App\Support\Sanitarios::ahora(),
+            'sanitarios' => Sanitarios::ahora(),
             'fuera' => Ausencia::where('ha_vuelto', false)->with('residente')->orderBy('vuelve')->get(),
         ];
     }

@@ -16,7 +16,7 @@ class ComoVaLaSemana extends Widget implements HasActions, HasForms
     use InteractsWithActions;
     use InteractsWithForms;
 
-    protected static string $view = 'filament.direccion.widgets.como-va-la-semana';
+    protected string $view = 'filament.direccion.widgets.como-va-la-semana';
 
     protected int|string|array $columnSpan = 'full';
 

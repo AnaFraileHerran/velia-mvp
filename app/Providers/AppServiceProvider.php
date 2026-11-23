@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Artisan;
+use App\Support\DatosDemo;
+use Throwable;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,11 +31,11 @@ class AppServiceProvider extends ServiceProvider
                     $hechas = $migrator->getRepository()->getRan();
                     $archivos = array_keys($migrator->getMigrationFiles([database_path('migrations')]));
                     if (array_diff($archivos, $hechas)) {
-                        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+                        Artisan::call('migrate', ['--force' => true]);
                     }
                 }
-                \App\Support\DatosDemo::asegurar();
-            } catch (\Throwable $e) {
+                DatosDemo::asegurar();
+            } catch (Throwable $e) {
                 report($e);
             }
         }

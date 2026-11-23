@@ -2,13 +2,14 @@
 
 namespace App\Filament\Direccion\Resources\AuxiliarResource\Pages;
 
+use App\Filament\Direccion\Concerns\MigasDePan;
 use App\Filament\Direccion\Resources\AuxiliarResource;
 use Filament\Resources\Pages\EditRecord;
 
 /** Editar la ficha: los mismos campos que al añadir (auxiliar, o enfermería y medicina). El PIN no se edita aquí. */
 class EditAuxiliar extends EditRecord
 {
-    use \App\Filament\Direccion\Concerns\MigasDePan;
+    use MigasDePan;
 
     protected static string $resource = AuxiliarResource::class;
 

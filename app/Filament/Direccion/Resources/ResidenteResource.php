@@ -2,6 +2,18 @@
 
 namespace App\Filament\Direccion\Resources;
 
+use Filament\Forms\Components\Radio;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Tables\Filters\Filter;
+use Filament\Schemas\Components\Flex;
+use Filament\Actions\Action;
+use App\Filament\Direccion\Resources\ResidenteResource\RelationManagers\RegistrosRelationManager;
+use App\Filament\Direccion\Resources\ResidenteResource\RelationManagers\CorreccionesRelationManager;
+use App\Filament\Direccion\Resources\ResidenteResource\RelationManagers\ContactosRelationManager;
+use App\Filament\Direccion\Resources\ResidenteResource\Pages\ListResidentes;
+use App\Filament\Direccion\Resources\ResidenteResource\Pages\CreateResidente;
+use App\Filament\Direccion\Resources\ResidenteResource\Pages\ViewResidente;
 use App\Filament\Direccion\Resources\ResidenteResource\Pages;
 use App\Filament\Direccion\Resources\ResidenteResource\RelationManagers;
 use App\Models\Planta;
@@ -11,20 +23,14 @@ use App\Support\Correcciones;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Actions\Action as InfolistAction;
 use Filament\Infolists\Components\ImageEntry;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Split;
 use App\Support\Avatar;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -48,7 +54,7 @@ class ResidenteResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'nombre';
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
 
     protected static ?int $navigationSort = 3;
 
@@ -63,7 +69,7 @@ class ResidenteResource extends Resource
                 TextInput::make('alergias')->label('Alergias'),
                 TextInput::make('riesgos')->label('Riesgos'),
                 TextInput::make('movilidad')->label('Movilidad'),
-                \Filament\Forms\Components\Radio::make('sujecion')->label('¿Usa sujeción?')->inline()
+                Radio::make('sujecion')->label('¿Usa sujeción?')->inline()
                     ->options([1 => 'Sí', 0 => 'No'])->required()
                     ->helperText('La UNE pide registrar cada sujeción, con prescripción y consentimiento.')
                     ->afterStateHydrated(function ($component, $record) {
@@ -104,20 +110,20 @@ class ResidenteResource extends Resource
     }
 
     /** Formulario completo: solo al dar de alta (Nuevo residente). */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         // Wireframe «V2 · Nuevo residente»: Datos y ubicación → Ficha de cuidados → Plan personal y contactos.
         $c = self::camposCorregibles();
 
-        return $form->schema([
-            FormSection::make('Datos y ubicación')->schema([
+        return $schema->components([
+            Section::make('Datos y ubicación')->schema([
                 TextInput::make('nombre')->label('Nombre y apellidos')->required()->columnSpanFull(),
                 ...$c['Datos y ubicación'],
             ])->columns(2),
-            FormSection::make('Ficha de cuidados')
+            Section::make('Ficha de cuidados')
                 ->description('Sin ficha, una auxiliar nueva no sabrá cómo atender a este residente.')
                 ->schema([...$c['Cuidados'], ...$c['Dieta']])->columns(2),
-            FormSection::make('Plan personal y contactos')
+            Section::make('Plan personal y contactos')
                 ->description('Valoración inicial: antes de un mes desde el ingreso (Orden 2680/2024). Se creará un aviso en Inicio. Sin contactos, no se podrá enviar el resumen semanal a la familia.')
                 ->schema([
                     Repeater::make('contactos')->relationship()->label('')->addActionLabel('Añadir contacto')
@@ -150,13 +156,13 @@ class ResidenteResource extends Resource
             ->defaultSort('habitacion')
             ->filters([
                 SelectFilter::make('planta_id')->label('Planta')->options(fn () => Planta::pluck('nombre', 'id')),
-                \Filament\Tables\Filters\Filter::make('sin_referencia')->label('Sin profesional de referencia')
+                Filter::make('sin_referencia')->label('Sin profesional de referencia')
                     ->query(fn ($query) => $query->whereNull('plan_responsable_id')),
-                \Filament\Tables\Filters\Filter::make('sujecion_sin_anotar')->label('Sujeción sin anotar')
+                Filter::make('sujecion_sin_anotar')->label('Sujeción sin anotar')
                     ->query(fn ($query) => $query->where('sujecion_anotada', false)),
-                \Filament\Tables\Filters\Filter::make('plan_vencido')->label('Plan personal vencido')
+                Filter::make('plan_vencido')->label('Plan personal vencido')
                     ->query(fn ($query) => $query->whereDate('plan_proxima_revision', '<', today())),
-                \Filament\Tables\Filters\Filter::make('sin_emergencia')->label('Sin contacto de emergencia')
+                Filter::make('sin_emergencia')->label('Sin contacto de emergencia')
                     ->query(fn ($query) => $query->whereDoesntHave('contactos', fn ($c) => $c->where('emergencia', true))),
                 SelectFilter::make('estado')->label('Estado')
                     ->options(['en_centro' => 'En el centro', 'fuera' => 'Fuera', 'baja' => 'Bajas'])
@@ -165,7 +171,7 @@ class ResidenteResource extends Resource
             ->recordUrl(fn (Residente $r) => static::getUrl('view', ['record' => $r]));
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         // Orden del wireframe: Emergencia · Cuidados · Dieta · Plan personal · Familia · Informes · Notas.
         $ficha = [
@@ -200,7 +206,7 @@ class ResidenteResource extends Resource
 
         $sections = [
             Section::make()
-                ->schema([Split::make([
+                ->schema([Flex::make([
                     ImageEntry::make('foto')->hiddenLabel()->circular()->height(64)->grow(false)
                         ->defaultImageUrl(fn (Residente $r) => Avatar::iniciales($r->nombre)),
                     TextEntry::make('emergencia')->hiddenLabel()->weight('semibold')
@@ -227,22 +233,22 @@ class ResidenteResource extends Resource
                             ->placeholder('Sin contactos: no se podrá enviar el resumen semanal'),
                     ])
                     ->headerActions([
-                        InfolistAction::make('corregir_familia')->label('Corregir')->icon('heroicon-o-pencil-square')->link()
+                        Action::make('corregir_familia')->label('Corregir')->icon('heroicon-o-pencil-square')->link()
                             ->url(fn (Residente $r) => static::getUrl('view', ['record' => $r]).'?activeRelationManager=2'),
                     ]);
             }
         }
 
-        return $infolist->schema($sections);
+        return $schema->components($sections);
     }
 
     /** «Corregir» de un bloque: mismos campos, motivo obligatorio, guarda versión. */
-    public static function corregirAction(string $bloque): InfolistAction
+    public static function corregirAction(string $bloque): Action
     {
         $campos = self::camposCorregibles()[$bloque];
         $nombres = array_map(fn ($c) => $c->getName(), $campos);
 
-        return InfolistAction::make('corregir_'.str($bloque)->slug('_'))
+        return Action::make('corregir_'.str($bloque)->slug('_'))
             ->label('Corregir')
             ->icon('heroicon-o-pencil-square')
             ->link()
@@ -250,7 +256,7 @@ class ResidenteResource extends Resource
             ->modalDescription(fn (Residente $record) => "{$record->nombre} · Hab. {$record->habitacion}. Se guarda una versión con fecha y persona. La auxiliar lo ve al momento en «Cómo atender».")
             ->modalSubmitActionLabel('Guardar con motivo')
             ->fillForm(fn (Residente $record) => Arr::only($record->attributesToArray(), $nombres))
-            ->form([
+            ->schema([
                 ...$campos,
                 Textarea::make('motivo')->label('Motivo (obligatorio)')->required()->rows(2)
                     ->placeholder('Ej.: indicación de la logopeda tras la valoración'),
@@ -264,18 +270,18 @@ class ResidenteResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\RegistrosRelationManager::class,
-            RelationManagers\CorreccionesRelationManager::class,
-            RelationManagers\ContactosRelationManager::class,
+            RegistrosRelationManager::class,
+            CorreccionesRelationManager::class,
+            ContactosRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListResidentes::route('/'),
-            'create' => Pages\CreateResidente::route('/nuevo'),
-            'view' => Pages\ViewResidente::route('/{record}'),
+            'index' => ListResidentes::route('/'),
+            'create' => CreateResidente::route('/nuevo'),
+            'view' => ViewResidente::route('/{record}'),
         ];
     }
 }

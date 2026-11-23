@@ -2,6 +2,7 @@
 
 namespace App\Filament\Turno\Pages;
 
+use App\Models\Residencia;
 use App\Support\TurnoActual;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
@@ -16,18 +17,18 @@ class MiTurno extends Page
 
     protected static ?string $slug = 'mi-turno';
 
-    protected static string $view = 'filament.turno.pages.mi-turno';
+    protected string $view = 'filament.turno.pages.mi-turno';
 
     public function getHeading(): string
     {
-        $u = \Filament\Facades\Filament::auth()->user();
+        $u = Filament::auth()->user();
 
         return $u->name.($u->responsable_turno ? ' · Responsable de turno' : '');
     }
 
     public function getSubheading(): ?string
     {
-        $u = \Filament\Facades\Filament::auth()->user();
+        $u = Filament::auth()->user();
         $t = $u->turnoAbierto();
 
         return ($u->planta?->nombre ?? 'Todas las plantas').' · Turno desde las '.$t?->inicio->format('H:i').' · '.now()->locale('es')->isoFormat('ddd D MMM');
@@ -54,7 +55,7 @@ class MiTurno extends Page
             'pendientes' => $estados->filter(fn ($e) => $e === 'pendiente')->count(),
             'fuera' => $g['fuera']->count(),
             'companeras' => $t->companeras(),
-            'equipo' => \App\Models\Residencia::actual()->equipoHoy(),
+            'equipo' => Residencia::actual()->equipoHoy(),
         ];
     }
 }

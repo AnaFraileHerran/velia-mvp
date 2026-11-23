@@ -2,6 +2,21 @@
 
 namespace App\Filament\Direccion\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Flex;
+use Filament\Schemas\Components\Grid;
+use Filament\Infolists\Components\ViewEntry;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Forms\Components\Radio;
+use Illuminate\Support\Str;
+use Filament\Facades\Filament;
+use App\Filament\Direccion\Resources\AuxiliarResource\Pages\ListAuxiliares;
+use App\Filament\Direccion\Resources\AuxiliarResource\Pages\CreateAuxiliar;
+use App\Filament\Direccion\Resources\AuxiliarResource\Pages\ViewAuxiliar;
+use App\Filament\Direccion\Resources\AuxiliarResource\Pages\EditAuxiliar;
 use App\Filament\Direccion\Resources\AuxiliarResource\Pages;
 use App\Models\Planta;
 use App\Models\User;
@@ -12,22 +27,14 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TimePicker;
-use Filament\Forms\Get;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Grid as InfoGrid;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\ImageEntry;
-use Filament\Infolists\Components\Section as InfoSection;
-use Filament\Infolists\Components\Split as InfoSplit;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -51,7 +58,7 @@ class AuxiliarResource extends Resource
 
     protected static ?string $slug = 'equipo';
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?int $navigationSort = 2;
 
@@ -60,18 +67,18 @@ class AuxiliarResource extends Resource
         return parent::getEloquentQuery()->whereIn('rol', ['auxiliar', 'sanitario']);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         $aux = fn (Get $get) => $get('rol') !== 'sanitario';
 
-        return $form->schema([
+        return $schema->components([
             Hidden::make('rol')->default(fn () => request()->query('rol') === 'sanitario' ? 'sanitario' : 'auxiliar'),
-            \Filament\Forms\Components\Section::make('Datos personales')->columns(2)->schema([
+            Section::make('Datos personales')->columns(2)->schema([
                 FileUpload::make('foto')->label('Foto')->avatar()->image()->imageEditor()->directory('fotos')
                     ->helperText('Ayuda a reconocerse en la tablet, sobre todo el primer día.')->columnSpanFull(),
                 TextInput::make('name')->label('Nombre y apellidos')->required()->columnSpanFull(),
             ]),
-            \Filament\Forms\Components\Section::make(fn (Get $get) => $get('rol') === 'sanitario' ? 'Puesto y horario' : 'Planta y turno')->columns(2)->schema([
+            Section::make(fn (Get $get) => $get('rol') === 'sanitario' ? 'Puesto y horario' : 'Planta y turno')->columns(2)->schema([
             Select::make('planta_id')->label('Planta')->options(Planta::pluck('nombre', 'id'))->placeholder('Todas las plantas')->visible($aux),
             Select::make('turno_habitual')->label('Turno habitual')->options(['manana' => 'Mañana', 'tarde' => 'Tarde', 'noche' => 'Noche'])->required($aux)->visible($aux),
             TextInput::make('telefono')->label('Teléfono o extensión de trabajo')->placeholder('Ext. 120 o móvil de empresa')->visible($aux)
@@ -84,17 +91,17 @@ class AuxiliarResource extends Resource
     }
 
     /** Ficha de la persona: lo que la dirección consulta antes de llamarla, asignarle algo o cambiarle el turno. */
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         $aux = fn (User $r) => $r->rol === 'auxiliar';
         $san = fn (User $r) => $r->rol === 'sanitario';
 
-        return $infolist->schema([
+        return $schema->components([
             // 1. Cabecera: quién es, dónde y cuándo trabaja, y si está ahora
-            InfoSection::make()->compact()->schema([InfoSplit::make([
+            Section::make()->compact()->schema([Flex::make([
                 ImageEntry::make('foto')->hiddenLabel()->circular()->height(80)->grow(false)
                     ->state(fn (User $r) => Avatar::url($r->foto, $r->name)),
-                InfoGrid::make(1)->schema([
+                Grid::make(1)->schema([
                     TextEntry::make('rol')->hiddenLabel()->badge()->color('gray')
                         ->formatStateUsing(fn (User $r) => $r->rol === 'sanitario' ? $r->etiquetaPuesto() : ($r->responsable_turno ? 'Auxiliar · responsable de turno' : 'Auxiliar')),
                     TextEntry::make('donde')->hiddenLabel()->visible($aux)
@@ -108,32 +115,32 @@ class AuxiliarResource extends Resource
             ])->verticallyAlignCenter()]),
 
             // 2. Lo que tiene pendiente: antes de asignarle algo, ves cuánto tiene ya
-            InfoSection::make('Pendiente')->visible($aux)->schema([
-                \Filament\Infolists\Components\ViewEntry::make('pendiente')->hiddenLabel()
+            Section::make('Pendiente')->visible($aux)->schema([
+                ViewEntry::make('pendiente')->hiddenLabel()
                     ->view('filament.direccion.equipo.pendiente'),
             ]),
 
             // 3. Últimos turnos: hechos, no notas (nada de porcentajes ni rankings)
-            InfoSection::make('Últimos turnos')->visible($aux)
+            Section::make('Últimos turnos')->visible($aux)
                 ->description('Para entender un turno cerrado con pendientes, no para puntuar a nadie.')
                 ->schema([
-                    \Filament\Infolists\Components\ViewEntry::make('turnos')->hiddenLabel()
+                    ViewEntry::make('turnos')->hiddenLabel()
                         ->view('filament.direccion.equipo.ultimos-turnos'),
                 ]),
 
             // 4. Acceso a Velia (solo el dato que es cierto)
-            InfoSection::make('Acceso a Velia')->visible($aux)->schema([
+            Section::make('Acceso a Velia')->visible($aux)->schema([
                 TextEntry::make('pin_estado')->label('PIN')->state(fn (User $r) => self::estadoPin($r)),
             ]),
 
             // Enfermería y medicina: no usan la app
-            InfoSection::make('Puesto y horario')->columns(2)->visible($san)->schema([
+            Section::make('Puesto y horario')->columns(2)->visible($san)->schema([
                 TextEntry::make('puesto')->label('Puesto')->formatStateUsing(fn (User $r) => $r->etiquetaPuesto()),
                 TextEntry::make('horario')->label('Días y horario')->state(fn (User $r) => $r->etiquetaHorario()),
                 TextEntry::make('contacto')->label('Cómo localizarle')->placeholder('—')->copyable()->icon('heroicon-o-phone'),
                 TextEntry::make('app')->label('En Velia')->state('No entra en la app. Las auxiliares le ven en «Mi turno».'),
             ]),
-            InfoSection::make('Baja')->visible(fn (User $r) => ! $r->activo)->schema([
+            Section::make('Baja')->visible(fn (User $r) => ! $r->activo)->schema([
                 TextEntry::make('baja_motivo')->label('Motivo')->placeholder('—'),
             ]),
         ]);
@@ -171,13 +178,13 @@ class AuxiliarResource extends Resource
             ->filters([
                 TernaryFilter::make('activo')->label('Estado')->trueLabel('Activas')->falseLabel('De baja')->default(true),
             ])
-            ->actions([
+            ->recordActions([
                 Action::make('editar')->label('Editar')->color('gray')->icon('heroicon-o-pencil-square')
                     ->visible(fn (User $r) => $r->activo)
                     ->url(fn (User $r) => self::getUrl('edit', ['record' => $r])),
                 Action::make('editarSanitario')->visible(false)
                     ->fillForm(fn (User $r) => $r->only(['rol', 'foto', 'name', 'puesto', 'dias', 'desde', 'hasta', 'contacto']))
-                    ->form(fn () => [
+                    ->schema(fn () => [
                         Hidden::make('rol'),
                         FileUpload::make('foto')->label('Foto')->avatar()->image()->imageEditor()->directory('fotos'),
                         TextInput::make('name')->label('Nombre y apellidos')->required(),
@@ -188,7 +195,7 @@ class AuxiliarResource extends Resource
                     Action::make('foto')->label('Cambiar foto')->icon('heroicon-o-camera')
                         ->visible(fn (User $r) => $r->rol === 'auxiliar')
                         ->fillForm(fn (User $r) => ['foto' => $r->foto])
-                        ->form([FileUpload::make('foto')->label('Foto')->avatar()->image()->imageEditor()->directory('fotos')])
+                        ->schema([FileUpload::make('foto')->label('Foto')->avatar()->image()->imageEditor()->directory('fotos')])
                         ->action(fn (User $r, array $data) => $r->update(['foto' => $data['foto']])),
                     Action::make('responsable')
                         ->label(fn (User $r) => $r->responsable_turno ? 'Quitar como responsable de turno' : 'Hacer responsable de turno')
@@ -200,7 +207,7 @@ class AuxiliarResource extends Resource
                         ->icon('heroicon-o-arrows-right-left')
                         ->visible(fn (User $r) => $r->rol === 'auxiliar')
                         ->fillForm(fn (User $r) => ['planta_id' => $r->planta_id, 'turno_habitual' => $r->turno_habitual])
-                        ->form([
+                        ->schema([
                             Select::make('planta_id')->label('Planta')->options(fn () => Planta::pluck('nombre', 'id'))->placeholder('Todas las plantas'),
                             Select::make('turno_habitual')->label('Turno habitual')->options(['manana' => 'Mañana', 'tarde' => 'Tarde', 'noche' => 'Noche'])->required(),
                         ])
@@ -212,7 +219,7 @@ class AuxiliarResource extends Resource
                         ->visible(fn (User $r) => $r->activo)
                         ->requiresConfirmation()
                         ->modalDescription(fn (User $r) => $r->rol === 'auxiliar' ? 'Pierde el acceso a la tablet y al móvil. Sus registros se conservan.' : 'Deja de aparecer en «Mi turno» de las auxiliares.')
-                        ->form([
+                        ->schema([
                             Select::make('motivo')->label('Motivo')->required()
                                 ->options(['fin_contrato' => 'Fin de contrato', 'cambio' => 'Cambio de centro', 'otros' => 'Otros']),
                             Textarea::make('nota')->label('Nota (opcional)')->rows(2),
@@ -229,7 +236,7 @@ class AuxiliarResource extends Resource
     public static function formNoPuedeEntrar(): array
     {
         return [
-            \Filament\Forms\Components\Radio::make('que')->label('¿Qué le pasa?')->required()
+            Radio::make('que')->label('¿Qué le pasa?')->required()
                 ->validationMessages(['required' => 'Elige qué le pasa. Cada opción cambia algo distinto.'])
                 ->options([
                     'pin' => 'Ha olvidado su PIN',
@@ -247,12 +254,12 @@ class AuxiliarResource extends Resource
     {
         $nombre = strtok($r->name, ' ');
         if ($que === 'movil') {
-            $codigo = \Illuminate\Support\Str::upper(\Illuminate\Support\Str::random(3)).random_int(100, 999);
+            $codigo = Str::upper(Str::random(3)).random_int(100, 999);
             $r->update(['codigo_invitacion' => $codigo]);
 
             return ["Código para el móvil de {$nombre}", $codigo, 'Díselo en persona. Lo escribe al abrir Velia en su móvil. El código anterior ya no sirve.'];
         }
-        $pin = $r->generarPinProvisional(\Filament\Facades\Filament::auth()->user());
+        $pin = $r->generarPinProvisional(Filament::auth()->user());
 
         return ["PIN provisional de {$nombre}", $pin, 'Díselo en persona. Al entrar con él, creará su PIN.'];
     }
@@ -293,10 +300,10 @@ class AuxiliarResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAuxiliares::route('/'),
-            'create' => Pages\CreateAuxiliar::route('/nueva'),
-            'view' => Pages\ViewAuxiliar::route('/{record}'),
-            'edit' => Pages\EditAuxiliar::route('/{record}/editar'),
+            'index' => ListAuxiliares::route('/'),
+            'create' => CreateAuxiliar::route('/nueva'),
+            'view' => ViewAuxiliar::route('/{record}'),
+            'edit' => EditAuxiliar::route('/{record}/editar'),
         ];
     }
 }

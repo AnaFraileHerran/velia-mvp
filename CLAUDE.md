@@ -7,10 +7,11 @@ Este repositorio es la fuente de los wireframes funcionales: cada pantalla de «
 - Wireframes v2 (Figma, página «Wireframes v2 · propuesta UX»): https://www.figma.com/design/jX0tVZ5A0uheE4VzqXw62X
 - Flujos y MoSCoW (FigJam): https://www.figma.com/board/pUdiiOvLcHCzL0mtFtyhps
 - Prototipo anterior (referencia de contenido): https://frabjous-selkie-afb6cd.netlify.app/
-- Estilos: Filament v3 (https://filamentphp.com). Usa sus componentes y su tema; no inventes CSS si Filament ya lo resuelve.
+- Estilos: Filament v5 (https://filamentphp.com/docs/5.x). Usa sus componentes y su tema; no inventes CSS si Filament ya lo resuelve.
 
 ## Stack
-- Laravel 12, PHP 8.3, Filament 3.3, Livewire 3, SQLite en local.
+- Laravel 13, PHP 8.3+ (en el Mac de Ana, 8.5), Filament 5, Livewire 4, Tailwind 4 (tema con @tailwindcss/vite), SQLite en local.
+- Migrado de Laravel 12 + Filament 3.3 el 23/11/2026 (rama `migracion-filament-5`). En páginas, `$view` ya no es estático; formularios y fichas usan `Schema`.
 - Dos paneles de Filament:
   - `direccion` en `/direccion`: web de la dirección, entra con email y contraseña.
   - `turno` en `/turno`: app de las auxiliares para tablet compartida o móvil, entra con PIN.

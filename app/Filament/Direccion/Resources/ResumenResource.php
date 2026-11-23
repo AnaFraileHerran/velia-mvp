@@ -2,14 +2,16 @@
 
 namespace App\Filament\Direccion\Resources;
 
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Facades\Filament;
+use App\Filament\Direccion\Resources\ResumenResource\Pages\ManageResumenes;
 use App\Filament\Direccion\Resources\ResumenResource\Pages;
 use App\Models\Residencia;
 use App\Models\Resumen;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -28,7 +30,7 @@ class ResumenResource extends Resource
 
     protected static ?string $slug = 'familias';
 
-    protected static ?string $navigationIcon = 'heroicon-o-envelope';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-envelope';
 
     protected static ?int $navigationSort = 5;
 
@@ -51,11 +53,11 @@ class ResumenResource extends Resource
                     }),
             ])
             ->filters([SelectFilter::make('estado')->options(['por_revisar' => 'Por revisar', 'aprobado' => 'Aprobado', 'enviado' => 'Enviado'])])
-            ->actions([
+            ->recordActions([
                 Action::make('editar')->label('Editar')->color('gray')
                     ->visible(fn (Resumen $r) => $r->estado !== 'enviado')
                     ->fillForm(fn (Resumen $r) => ['texto' => $r->texto])
-                    ->form([Textarea::make('texto')->label('Texto para la familia')->rows(6)->required()])
+                    ->schema([Textarea::make('texto')->label('Texto para la familia')->rows(6)->required()])
                     ->action(fn (Resumen $r, array $data) => $r->update($data)),
                 Action::make('enviar')->label(fn (Resumen $r) => $r->tieneContacto() ? 'Revisar y enviar' : 'Añadir contacto')
                     ->visible(fn (Resumen $r) => $r->estado !== 'enviado')
@@ -71,7 +73,7 @@ class ResumenResource extends Resource
                     ->modalSubmitActionLabel('Enviar')
                     ->action(fn (Resumen $r) => self::enviar($r)),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkAction::make('aprobarSinIncidencias')->label('Enviar los que no tienen incidencias')
                     ->modalDescription('Los que tienen incidencias o les falta contacto se quedan para que los revises uno a uno.')
                     ->requiresConfirmation()
@@ -124,7 +126,7 @@ class ResumenResource extends Resource
             return;
         }
         // Simulación: en el MVP no se envía nada; se marca como enviado.
-        $r->update(['estado' => 'enviado', 'aprobado_por' => \Filament\Facades\Filament::auth()->id(), 'enviado_at' => now()]);
+        $r->update(['estado' => 'enviado', 'aprobado_por' => Filament::auth()->id(), 'enviado_at' => now()]);
         if ($avisar) {
             Notification::make()->title('Enviado a la familia.')->success()->send();
         }
@@ -132,6 +134,6 @@ class ResumenResource extends Resource
 
     public static function getPages(): array
     {
-        return ['index' => Pages\ManageResumenes::route('/')];
+        return ['index' => ManageResumenes::route('/')];
     }
 }

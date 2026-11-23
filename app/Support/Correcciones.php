@@ -2,6 +2,9 @@
 
 namespace App\Support;
 
+use InvalidArgumentException;
+use Filament\Facades\Filament;
+use DateTimeInterface;
 use App\Models\Correccion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +21,7 @@ class Correcciones
     {
         $motivo = trim($motivo);
         if ($motivo === '') {
-            throw new \InvalidArgumentException('El motivo es obligatorio.');
+            throw new InvalidArgumentException('El motivo es obligatorio.');
         }
 
         return DB::transaction(function () use ($modelo, $cambios, $motivo) {
@@ -37,7 +40,7 @@ class Correcciones
                     'antes' => $antesTexto,
                     'ahora' => $nuevoTexto,
                     'motivo' => $motivo,
-                    'user_id' => \Filament\Facades\Filament::auth()->id(),
+                    'user_id' => Filament::auth()->id(),
                 ]);
                 $modelo->setAttribute($campo, $nuevo);
                 $hechos++;
@@ -50,7 +53,7 @@ class Correcciones
 
     private static function texto(mixed $valor): ?string
     {
-        if ($valor instanceof \DateTimeInterface) {
+        if ($valor instanceof DateTimeInterface) {
             return $valor->format('Y-m-d');
         }
         if (is_array($valor)) {

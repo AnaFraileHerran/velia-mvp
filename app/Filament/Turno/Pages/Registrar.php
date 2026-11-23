@@ -2,6 +2,7 @@
 
 namespace App\Filament\Turno\Pages;
 
+use Filament\Facades\Filament;
 use App\Models\Aviso;
 use App\Models\Registro;
 use App\Models\Residente;
@@ -19,7 +20,7 @@ class Registrar extends Page
 {
     protected static ?string $slug = 'registrar';
 
-    protected static string $view = 'filament.turno.pages.registrar';
+    protected string $view = 'filament.turno.pages.registrar';
 
     #[Url]
     public ?int $residente = null;
@@ -44,7 +45,7 @@ class Registrar extends Page
     {
         abort_unless($this->residente && $this->r(), 404);
         // Si dejó un borrador en este turno, se retoma en «Revisar».
-        $b = Registro::where('residente_id', $this->residente)->where('turno_id', \Filament\Facades\Filament::auth()->user()->turnoAbierto()?->id)
+        $b = Registro::where('residente_id', $this->residente)->where('turno_id', Filament::auth()->user()->turnoAbierto()?->id)
             ->where('estado', 'borrador')->latest()->first();
         if ($b) {
             $this->registroId = $b->id;
@@ -108,10 +109,10 @@ class Registrar extends Page
 
     private function guardar(string $estado)
     {
-        $turno = \Filament\Facades\Filament::auth()->user()->turnoAbierto();
+        $turno = Filament::auth()->user()->turnoAbierto();
         $datos = [
             'residente_id' => $this->residente,
-            'user_id' => \Filament\Facades\Filament::auth()->id(),
+            'user_id' => Filament::auth()->id(),
             'turno_id' => $turno?->id,
             'texto_original' => $estado === 'sin_novedad' ? null : $this->texto,
             'categorias' => $estado === 'sin_novedad' ? [] : array_filter($this->categorias, fn ($v) => trim($v) !== ''),

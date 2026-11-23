@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
+use App\Support\Avatar;
 use Illuminate\Database\Eloquent\Model;
 
 class Residencia extends Model
@@ -31,7 +33,7 @@ class Residencia extends Model
      * Equipo sanitario y de apoyo con su estado ahora: en la residencia, viene hoy más tarde,
      * ya se ha ido o cuándo vuelve. Primero quien está, para saber a quién llamar.
      */
-    public function equipoHoy(?\Carbon\CarbonInterface $ahora = null): array
+    public function equipoHoy(?CarbonInterface $ahora = null): array
     {
         $ahora ??= now();
         $hoy = $ahora->isoWeekday();
@@ -55,7 +57,7 @@ class Residencia extends Model
                 'nombre' => $p->name,
                 'puesto' => $p->etiquetaPuesto(),
                 'contacto' => $p->contacto,
-                'foto' => \App\Support\Avatar::url($p->foto, $p->name),
+                'foto' => Avatar::url($p->foto, $p->name),
                 'estado' => $estado,
                 'texto' => $texto,
                 'orden' => $orden,
@@ -63,7 +65,7 @@ class Residencia extends Model
         })->sortBy('orden')->values()->all();
     }
 
-    private function proximoDia(array $dias, \Carbon\CarbonInterface $ahora, ?string $desde): string
+    private function proximoDia(array $dias, CarbonInterface $ahora, ?string $desde): string
     {
         if ($dias === []) {
             return 'Sin horario fijo';

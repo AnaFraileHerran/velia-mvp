@@ -2,6 +2,7 @@
 
 namespace App\Filament\Direccion\Resources\ResumenResource\Pages;
 
+use App\Filament\Direccion\Concerns\MigasDePan;
 use App\Filament\Direccion\Pages\Ocupacion;
 use App\Filament\Direccion\Resources\ResumenResource;
 use Filament\Actions\Action;
@@ -9,7 +10,7 @@ use Filament\Resources\Pages\ManageRecords;
 
 class ManageResumenes extends ManageRecords
 {
-    use \App\Filament\Direccion\Concerns\MigasDePan;
+    use MigasDePan;
 
     protected static string $resource = ResumenResource::class;
 

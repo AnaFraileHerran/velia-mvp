@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Filament\Direccion\Resources\AuxiliarResource;
 use App\Models\Residencia;
 use App\Models\User;
 
@@ -26,7 +27,7 @@ class Sanitarios
 
             if ($aqui) {
                 $filas[] = ['puesto' => $etiqueta, 'texto' => strtok($aqui->name, ' ').' · hasta las '.$aqui->hasta, 'contacto' => $aqui->contacto,
-                    'ficha' => \App\Filament\Direccion\Resources\AuxiliarResource::getUrl('view', ['record' => $aqui]), 'ahora' => true];
+                    'ficha' => AuxiliarResource::getUrl('view', ['record' => $aqui]), 'ahora' => true];
 
                 continue;
             }
@@ -45,7 +46,7 @@ class Sanitarios
                 }
             }
             $filas[] = ['puesto' => $etiqueta, 'texto' => $proxima['texto'] ?? 'Sin horario fijo', 'contacto' => $proxima['u']->contacto ?? null,
-                'ficha' => isset($proxima['u']) ? \App\Filament\Direccion\Resources\AuxiliarResource::getUrl('view', ['record' => $proxima['u']]) : null, 'ahora' => false];
+                'ficha' => isset($proxima['u']) ? AuxiliarResource::getUrl('view', ['record' => $proxima['u']]) : null, 'ahora' => false];
         }
 
         return $filas;

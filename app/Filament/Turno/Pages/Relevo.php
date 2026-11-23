@@ -2,6 +2,8 @@
 
 namespace App\Filament\Turno\Pages;
 
+use Filament\Panel;
+use Filament\Facades\Filament;
 use App\Filament\Turno\Concerns\ComoAtender;
 use App\Models\Ausencia;
 use App\Models\Aviso;
@@ -26,12 +28,12 @@ class Relevo extends Page implements HasActions
 
     protected static ?string $slug = 'relevo';
 
-    protected static string $view = 'filament.turno.pages.relevo';
+    protected string $view = 'filament.turno.pages.relevo';
 
     /** @var array<int, string> */
     public array $respuestas = [];
 
-    public static function getRoutePath(): string
+    public static function getRoutePath(Panel $panel): string
     {
         return '/';
     }
@@ -41,12 +43,12 @@ class Relevo extends Page implements HasActions
         $h = (int) now()->format('G');
         $saludo = $h < 14 ? 'Buenos días' : ($h < 21 ? 'Buenas tardes' : 'Buenas noches');
 
-        return $saludo.', '.strtok(\Filament\Facades\Filament::auth()->user()->name, ' ');
+        return $saludo.', '.strtok(Filament::auth()->user()->name, ' ');
     }
 
     public function getSubheading(): ?string
     {
-        $u = \Filament\Facades\Filament::auth()->user();
+        $u = Filament::auth()->user();
 
         return ($u->planta?->nombre ?? 'Todas las plantas').' · Turno de '.mb_strtolower($u->etiquetaTurno()).' · '.now()->locale('es')->isoFormat('ddd D MMM');
     }
@@ -57,14 +59,14 @@ class Relevo extends Page implements HasActions
         if ($texto === '') {
             return;
         }
-        Pregunta::findOrFail($id)->update(['respuesta' => $texto, 'respondida_por' => \Filament\Facades\Filament::auth()->id()]);
+        Pregunta::findOrFail($id)->update(['respuesta' => $texto, 'respondida_por' => Filament::auth()->id()]);
         unset($this->respuestas[$id]);
         Notification::make()->title('Respuesta enviada a la dirección.')->success()->send();
     }
 
     public function hecho(int $avisoId): void
     {
-        Aviso::asignadosA(\Filament\Facades\Filament::auth()->id())->whereKey($avisoId)->update(['hecho_at' => now(), 'estado' => 'hecho']);
+        Aviso::asignadosA(Filament::auth()->id())->whereKey($avisoId)->update(['hecho_at' => now(), 'estado' => 'hecho']);
         Notification::make()->title('Hecho. La dirección lo verá en el historial.')->success()->send();
     }
 
@@ -78,6 +80,6 @@ class Relevo extends Page implements HasActions
 
     protected function getViewData(): array
     {
-        return ['t' => TurnoActual::make(), 'asignados' => Aviso::asignadosA(\Filament\Facades\Filament::auth()->id())->with('residente')->get()];
+        return ['t' => TurnoActual::make(), 'asignados' => Aviso::asignadosA(Filament::auth()->id())->with('residente')->get()];
     }
 }
