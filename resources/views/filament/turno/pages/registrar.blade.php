@@ -110,6 +110,15 @@
             </span>
         </label>
 
+        @if ($faltan = $this->faltan())
+            <x-velia-sugiere :texto="'No has dicho nada de '.implode(' ni de ', array_map('mb_strtolower', $faltan)).'.'" porque="Es lo que suele anotarse en este turno. Si no hay nada que contar, añade «Sin novedad».">
+                @foreach ($faltan as $cat)
+                    <x-filament::button size="lg" color="gray" wire:click="anadirSinNovedad('{{ $cat }}')" icon="heroicon-o-plus">«Sin novedad» en {{ mb_strtolower($cat) }}</x-filament::button>
+                @endforeach
+                <x-filament::link tag="button" color="gray" wire:click="descartarFaltan">No hace falta</x-filament::link>
+            </x-velia-sugiere>
+        @endif
+
         <div class="space-y-3">
             @foreach ($categorias as $cat => $txt)
                 <div class="rounded-xl border border-gray-200 bg-white p-3 dark:border-white/10 dark:bg-gray-900" x-data="{ editar: false }">

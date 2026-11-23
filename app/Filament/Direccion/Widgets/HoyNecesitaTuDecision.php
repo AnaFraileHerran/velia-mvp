@@ -22,6 +22,8 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Widgets\Widget;
+use App\Models\SugerenciaIa;
+use App\Support\Ia\Sugerencias;
 
 /** Hoy necesita tu decisión: como máximo 5 avisos, ordenados por urgencia. Cada uno se resuelve aquí (D2). */
 class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
@@ -38,6 +40,58 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
     protected static ?int $sort = 1;
 
     public bool $verTodos = false;
+
+    /** Sugerencias que la directora ha descartado en esta visita (quedan anotadas en sugerencias_ia). */
+    public array $descartadas = [];
+
+    /** «Velia te sugiere» para un aviso, si la hay y no se ha descartado. */
+    public function sugerencia(Aviso $aviso): ?array
+    {
+        if (in_array($aviso->id, $this->descartadas) || $aviso->tipo === 'turno_sin_abrir') {
+            return null;
+        }
+
+        return Sugerencias::paraAviso($aviso);
+    }
+
+    /** Aceptar la sugerencia tal cual: un toque. Queda anotado quién la aceptó. */
+    public function aceptarSugerencia(int $id): void
+    {
+        $aviso = Aviso::findOrFail($id);
+        $s = Sugerencias::paraAviso($aviso);
+        if (! $s) {
+            return;
+        }
+        if ($s['tipo'] === 'asignar') {
+            $aviso->update(['estado' => 'asignado', 'responsable_id' => $s['datos']['responsable_id'], 'vence_el' => $s['datos']['vence_el'], 'hecho_at' => null]);
+            Notification::make()->title('Asignado. Lo verá en su relevo.')->body($s['texto'])->success()->send();
+        } else {
+            Pregunta::create(['residente_id' => $aviso->residente_id, 'aviso_id' => $aviso->id, 'texto' => $s['datos']['texto']]);
+            $aviso->update(['estado' => 'pregunta']);
+            Notification::make()->title('La pregunta aparece en el relevo del turno.')->success()->send();
+        }
+        SugerenciaIa::anotar('inicio.aviso', $s['texto'], 'aceptada', $aviso);
+    }
+
+    public function descartarSugerencia(int $id): void
+    {
+        $aviso = Aviso::findOrFail($id);
+        if ($s = Sugerencias::paraAviso($aviso)) {
+            SugerenciaIa::anotar('inicio.aviso', $s['texto'], 'descartada', $aviso);
+        }
+        $this->descartadas[] = $id;
+    }
+
+    /** Si la directora usa «Asignar» o «Preguntar al turno» y cambia lo sugerido, se anota como «cambiada». */
+    private function anotarSiCambia(Aviso $aviso, array $data): void
+    {
+        $s = Sugerencias::paraAviso($aviso);
+        if ($s && array_intersect_key($data, $s['datos']) != $s['datos']) {
+            SugerenciaIa::anotar('inicio.aviso', $s['texto'], 'cambiada', $aviso, json_encode($data, JSON_UNESCAPED_UNICODE));
+        } elseif ($s) {
+            SugerenciaIa::anotar('inicio.aviso', $s['texto'], 'aceptada', $aviso);
+        }
+    }
 
     public function getAvisos()
     {
@@ -60,6 +114,7 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
         return Action::make('asignar')
             ->label('Asignar')
             ->modalHeading('Asignar responsable')
+            ->fillForm(fn (array $arguments) => (($s = Sugerencias::paraAviso(Aviso::find($arguments['aviso']))) && $s['tipo'] === 'asignar') ? $s['datos'] : ['vence_el' => today()->addDays(2)->toDateString()])
             ->schema([
                 Select::make('responsable_id')->label('¿Quién hace el seguimiento?')
                     ->options(User::auxiliares()->where('activo', true)->pluck('name', 'id'))->required(),
@@ -68,7 +123,9 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
                     ->helperText('Si no está hecho ese día, vuelve a «Hoy necesita tu decisión».'),
             ])
             ->action(function (array $data, array $arguments) {
-                Aviso::findOrFail($arguments['aviso'])->update(['estado' => 'asignado', 'responsable_id' => $data['responsable_id'], 'vence_el' => $data['vence_el'], 'hecho_at' => null]);
+                $aviso = Aviso::findOrFail($arguments['aviso']);
+                $this->anotarSiCambia($aviso, ['responsable_id' => (int) $data['responsable_id'], 'vence_el' => \Illuminate\Support\Carbon::parse($data['vence_el'])->toDateString()]);
+                $aviso->update(['estado' => 'asignado', 'responsable_id' => $data['responsable_id'], 'vence_el' => $data['vence_el'], 'hecho_at' => null]);
                 Notification::make()->title('Asignado. Lo verá en su relevo.')->success()->send();
             });
     }
@@ -78,9 +135,11 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
         return Action::make('preguntar')
             ->label('Preguntar al turno')
             ->color('gray')
+            ->fillForm(fn (array $arguments) => (($s = Sugerencias::paraAviso(Aviso::find($arguments['aviso']))) && $s['tipo'] === 'preguntar') ? $s['datos'] : [])
             ->schema([Textarea::make('texto')->label('Pregunta')->required()->rows(2)])
             ->action(function (array $data, array $arguments) {
                 $aviso = Aviso::findOrFail($arguments['aviso']);
+                $this->anotarSiCambia($aviso, ['texto' => $data['texto']]);
                 Pregunta::create(['residente_id' => $aviso->residente_id, 'aviso_id' => $aviso->id, 'texto' => $data['texto']]);
                 $aviso->update(['estado' => 'pregunta']);
                 Notification::make()->title('La pregunta aparece en el relevo del turno.')->success()->send();

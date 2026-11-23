@@ -67,7 +67,10 @@ class DireccionPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->renderHook(PanelsRenderHook::HEAD_END, fn () => Blade::render("@include('filament.marca.ajustes-finos')" . "@include('filament.marca.hover-accion')"))
+            ->renderHook(PanelsRenderHook::HEAD_END, fn () => Blade::render("@include('filament.marca.ajustes-finos')" . "@include('filament.marca.hover-accion')" . "@include('filament.marca.dictado')"))
+            // Navegación contextual (23/11/2026): paleta «Ir a…» con ⌘K y botón en la cabecera.
+            ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => filament()->getCurrentPanel()?->getId() === 'direccion' ? Blade::render("@include('filament.direccion.partials.ir-a-boton')") : '')
+            ->renderHook(PanelsRenderHook::BODY_END, fn () => filament()->getCurrentPanel()?->getId() === 'direccion' && filament()->auth()->check() ? Blade::render("@include('filament.direccion.partials.ir-a')") : '')
             ->authMiddleware([Authenticate::class]);
     }
 

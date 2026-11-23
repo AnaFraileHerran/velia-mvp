@@ -39,6 +39,12 @@ class Registrar extends Page
 
     public ?int $registroId = null;
 
+    /** Lo que propuso la IA al ordenar, para anotar al confirmar si se aceptó tal cual o se cambió. */
+    public array $propuesta = [];
+
+    /** Categorías que suelen anotarse en esta franja y la auxiliar ha decidido no añadir. */
+    public array $faltanDescartadas = [];
+
     public const TIPOS_INCIDENCIA = ['Caídas y mareos', 'Piel y úlceras', 'Alimentación e hidratación', 'Conducta', 'Otra'];
 
     public function mount(): void
@@ -84,7 +90,28 @@ class Registrar extends Page
         $this->categorias = $o['categorias'];
         $this->incidencia = $o['incidencia'];
         $this->tipoIncidencia = $o['tipo_incidencia'];
+        $this->propuesta = $o['categorias'];
         $this->paso = 'revisar';
+    }
+
+    /** «Velia te sugiere»: lo que suele anotarse en este turno y no se ha dicho. */
+    public function faltan(): array
+    {
+        return array_values(array_diff(\App\Support\Ia\Sugerencias::faltanEnRegistro($this->categorias), $this->faltanDescartadas));
+    }
+
+    public function anadirSinNovedad(string $cat): void
+    {
+        $this->categorias[$cat] = 'Sin novedad.';
+        \App\Models\SugerenciaIa::anotar('registrar.faltan', 'Añadir «Sin novedad» en '.$cat, 'aceptada', $this->r());
+    }
+
+    public function descartarFaltan(): void
+    {
+        foreach ($this->faltan() as $cat) {
+            \App\Models\SugerenciaIa::anotar('registrar.faltan', 'Añadir «Sin novedad» en '.$cat, 'descartada', $this->r());
+            $this->faltanDescartadas[] = $cat;
+        }
     }
 
     public function quitarCategoria(string $cat): void
@@ -121,6 +148,11 @@ class Registrar extends Page
             'tipo_incidencia' => $this->incidencia ? ($this->tipoIncidencia ?: 'Otra') : null,
         ];
         $registro = $this->registroId ? tap(Registro::find($this->registroId))->update($datos) : Registro::create($datos);
+
+        if ($estado === 'confirmado' && $this->propuesta) {
+            $propuesta = collect($this->propuesta)->map(fn ($v, $k) => "{$k}: {$v}")->join(' | ');
+            \App\Models\SugerenciaIa::anotar('registrar.ordenar', $propuesta, $datos['categorias'] == $this->propuesta ? 'aceptada' : 'cambiada', $registro);
+        }
 
         if ($estado === 'confirmado' && $registro->incidencia_destacada) {
             Aviso::create([

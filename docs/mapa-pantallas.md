@@ -34,6 +34,23 @@ Cómo se trabaja: un comentario en Figma sobre un wireframe → se cambia el arc
 | 5 · Familias › Ocupación | Residencia y ocupación (120:401) | `app/Filament/Direccion/Pages/Ocupacion.php` · `resources/views/filament/direccion/pages/ocupacion.blade.php` |
 | 6 · Mi residencia | Mi residencia (116:1334) | `app/Filament/Direccion/Pages/MiResidencia.php` · `resources/views/filament/direccion/pages/mi-residencia.blade.php` |
 
+## Asistente IA, voz y navegación contextual (23/11/2026) — Figma: página «Wireframes v3 · Filament 5 + IA»
+
+| Qué | Wireframe v3 | Archivo |
+|---|---|---|
+| Ayuda · Pregúntale a Velia (chat, dictar, escuchar) | V3 · Ayuda · Pregúntale a Velia / Dictando | `app/Filament/Direccion/Pages/Ayuda.php` · `resources/views/filament/direccion/pages/ayuda.blade.php` · `app/Support/Ia/Asistente.php` |
+| Voz común (dictar y leer en voz alta) | — | `resources/views/filament/marca/dictado.blade.php` |
+| Inicio · Velia te sugiere (asignar / preguntar) | V3 · Inicio · Velia te sugiere | `app/Filament/Direccion/Widgets/HoyNecesitaTuDecision.php` · `app/Support/Ia/Sugerencias.php` |
+| Familias · Redactar con Velia | V3 · Familias · Redactar con Velia | `app/Filament/Direccion/Resources/ResumenResource.php` |
+| Calidad · Por dónde empezar | V3 · Calidad · Por dónde empezar | `app/Filament/Direccion/Pages/Calidad.php` · `.../pages/calidad.blade.php` |
+| Nuevo residente · Cuéntaselo a Velia | V3 · Nuevo residente · Cuéntaselo a Velia | `ResidenteResource::form` · `.../partials/dictar-ficha.blade.php` · `CreateResidente::rellenarConVelia` |
+| Registrar · lo que falta por anotar | V3 · A2 Revisar el registro · lo que falta | `app/Filament/Turno/Pages/Registrar.php` · `.../turno/pages/registrar.blade.php` |
+| Paleta «Ir a…» (⌘K) | V3 · Paleta «Ir a…» | `resources/views/filament/direccion/partials/ir-a.blade.php` · `ir-a-boton.blade.php` · `app/Support/Destinos.php` |
+| Ficha · Relacionado | V3 · Ficha del residente · Relacionado | `ResidenteResource::infolist` · `Destinos::relacionadosResidente` |
+| Bloque «Velia te sugiere» | Componente «Velia te sugiere» | `resources/views/components/velia-sugiere.blade.php` |
+| Rastro de la IA (aceptada / cambiada / descartada) | — | `app/Models/SugerenciaIa.php` · migración `2026_11_23_000010` |
+| Configuración (simulado / proveedor real) | — | `config/velia.php` · `.env` (`VELIA_IA`, `ANTHROPIC_API_KEY`) |
+
 ## Marca y estilos (Design System v2)
 - Colores para Filament (cobalto suave, neutros): `app/Support/TemaVelia.php`
 - Estilos propios (píldoras, tarjetas, menú): `resources/css/filament/velia.css`, compilado por `resources/css/filament/{direccion,turno}/theme.css` con `npm run build`

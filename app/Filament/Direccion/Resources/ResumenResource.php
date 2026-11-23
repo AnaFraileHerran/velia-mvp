@@ -16,6 +16,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use App\Models\SugerenciaIa;
+use App\Support\Ia\Asistente;
+use App\Support\Ia\Sugerencias;
 
 /** 5 · Familias: resúmenes semanales. La dirección revisa y aprueba antes de enviar. */
 class ResumenResource extends Resource
@@ -54,6 +57,21 @@ class ResumenResource extends Resource
             ])
             ->filters([SelectFilter::make('estado')->options(['por_revisar' => 'Por revisar', 'aprobado' => 'Aprobado', 'enviado' => 'Enviado'])])
             ->recordActions([
+                // Familias (23/11/2026): la IA redacta un borrador con los registros confirmados; la dirección lo edita y lo aprueba.
+                Action::make('redactar')->label('Redactar con Velia')->icon('heroicon-o-light-bulb')->color('gray')
+                    ->visible(fn (Resumen $r) => $r->estado !== 'enviado')
+                    ->modalHeading(fn (Resumen $r) => 'Borrador para la familia de '.$r->residente->nombre)
+                    ->modalDescription(fn () => 'Velia lo ha redactado con los registros confirmados de la semana, en lenguaje sencillo. Revísalo y cámbialo lo que quieras: nada se envía sin tu aprobación.'
+                        .(Asistente::esSimulado() ? ' (Ejemplo: borrador hecho con reglas durante el piloto.)' : ''))
+                    ->fillForm(fn (Resumen $r) => ['texto' => Sugerencias::resumenFamilia($r)])
+                    ->schema([Textarea::make('texto')->label('Texto para la familia')->rows(8)->required()])
+                    ->modalSubmitActionLabel('Guardar como borrador')
+                    ->action(function (Resumen $r, array $data) {
+                        $propuesta = Sugerencias::resumenFamilia($r);
+                        $r->update(['texto' => $data['texto']]);
+                        SugerenciaIa::anotar('familias.resumen', $propuesta, trim($data['texto']) === trim($propuesta) ? 'aceptada' : 'cambiada', $r);
+                        Notification::make()->title('Borrador guardado. Envíalo cuando lo hayas revisado.')->success()->send();
+                    }),
                 Action::make('editar')->label('Editar')->color('gray')
                     ->visible(fn (Resumen $r) => $r->estado !== 'enviado')
                     ->fillForm(fn (Resumen $r) => ['texto' => $r->texto])

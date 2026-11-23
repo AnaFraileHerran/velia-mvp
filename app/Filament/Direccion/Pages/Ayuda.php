@@ -8,6 +8,8 @@ use App\Filament\Direccion\Resources\AuxiliarResource;
 use App\Filament\Direccion\Resources\ResidenteResource;
 use App\Filament\Direccion\Resources\ResumenResource;
 use Filament\Pages\Page;
+use App\Support\Ia\Asistente;
+use Livewire\Attributes\Url;
 
 /**
  * 7 · Ayuda. Organizada por tareas (lo que la dirección quiere hacer), no por pantallas.
@@ -25,7 +27,48 @@ class Ayuda extends Page
 
     protected string $view = 'filament.direccion.pages.ayuda';
 
-    protected ?string $subheading = 'Las dudas más frecuentes, cada una con el enlace a donde se resuelve.';
+    protected ?string $subheading = 'Pregúntale a Velia, con voz o por escrito, o busca en las dudas frecuentes.';
+
+    /** Pregunta que llega desde la paleta «Ir a…» (⌘K): «Preguntar a Velia: …». */
+    #[Url(as: 'pregunta')]
+    public string $preguntaInicial = '';
+
+    public string $pregunta = '';
+
+    /** Conversación de esta visita. No se guarda: la ayuda no necesita datos de residentes ni dejar rastro. */
+    public array $conversacion = [];
+
+    public function mount(): void
+    {
+        if (trim($this->preguntaInicial) !== '') {
+            $this->pregunta = $this->preguntaInicial;
+            $this->preguntaInicial = '';
+            $this->preguntar();
+        }
+    }
+
+    public function preguntar(?string $texto = null): void
+    {
+        $texto = trim($texto ?? $this->pregunta);
+        if ($texto === '') {
+            return;
+        }
+        $this->conversacion[] = ['de' => 'yo', 'texto' => $texto];
+        $this->conversacion[] = ['de' => 'velia', ...Asistente::responder($texto)];
+        $this->pregunta = '';
+        $this->dispatch('velia-respuesta', texto: end($this->conversacion)['texto']);
+    }
+
+    public function preguntarEjemplo(int $i): void
+    {
+        $this->preguntar($this->ejemplos()[$i] ?? null);
+    }
+
+    /** Preguntas de ejemplo para empezar (las más frecuentes en las sesiones con directoras). */
+    public function ejemplos(): array
+    {
+        return ['¿Qué me falta para la auditoría?', 'Una auxiliar no puede entrar', '¿Cómo envío el resumen a las familias?', '¿Cómo doy de alta a un residente?'];
+    }
 
     public function temas(): array
     {

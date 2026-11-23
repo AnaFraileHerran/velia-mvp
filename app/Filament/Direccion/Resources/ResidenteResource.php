@@ -116,6 +116,13 @@ class ResidenteResource extends Resource
         $c = self::camposCorregibles();
 
         return $schema->components([
+            // Nuevo residente con IA (23/11/2026): la directora cuenta lo que sabe y Velia propone los campos de la ficha.
+            Section::make('Cuéntaselo a Velia')
+                ->description('Dicta o escribe lo que sabes de la persona y Velia rellena la ficha de cuidados. Tú lo revisas antes de guardar.')
+                ->icon('heroicon-o-light-bulb')
+                ->collapsible()
+                ->schema([\Filament\Schemas\Components\View::make('filament.direccion.partials.dictar-ficha')])
+                ->visibleOn('create'),
             Section::make('Datos y ubicación')->schema([
                 TextInput::make('nombre')->label('Nombre y apellidos')->required()->columnSpanFull(),
                 ...$c['Datos y ubicación'],
@@ -217,6 +224,14 @@ class ResidenteResource extends Resource
                             return $linea.' · Alergia: '.($r->alergias ?: 'ninguna conocida');
                         }),
                 ])->verticallyAlignCenter()])->compact(),
+            // Navegación contextual (23/11/2026): lo que suele buscarse después de abrir una ficha, con el dato al lado.
+            Section::make('Relacionado')->compact()->collapsible()
+                ->schema([
+                    TextEntry::make('relacionado')->hiddenLabel()->html()
+                        ->state(fn (Residente $r) => collect(\App\Support\Destinos::relacionadosResidente($r))
+                            ->map(fn ($d) => '<a href="'.e($d['url']).'" style="display:inline-flex;align-items:center;gap:.25rem;min-height:32px;margin:0 1rem .25rem 0;color:'.($d['destacar'] ? 'rgb(185 28 28)' : '#0F3D95').';text-decoration:underline;text-underline-offset:3px">'.e($d['titulo']).' →</a>')
+                            ->join('')),
+                ]),
         ];
         foreach ($ficha as $titulo => $entries) {
             $sections[] = Section::make($titulo)

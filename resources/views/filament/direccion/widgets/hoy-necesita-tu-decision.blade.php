@@ -5,7 +5,8 @@
 
         <ul class="divide-y divide-gray-200 dark:divide-white/10">
             @forelse ($this->getAvisos() as $aviso)
-                <li class="velia-aviso py-3">
+                <li class="py-3">
+                    <div class="velia-aviso">
                     <div class="flex-1">
                         {{-- Tipo como etiqueta de texto: la forma de píldora queda solo para lo que se pulsa --}}
                         <p class="mb-1 flex items-center gap-1 text-xs font-semibold {{ $aviso->urgencia <= 1 ? 'text-danger-700' : 'text-warning-700' }}">
@@ -16,7 +17,7 @@
                             <p class="text-xs font-semibold text-danger-700">Vencido el {{ $aviso->vence_el->format('d/m') }} sin hacer · asignado a {{ $aviso->responsable?->name }}</p>
                         @endif
                         <p class="text-sm font-semibold text-gray-950 dark:text-white">
-                            {{ $aviso->titulo }}@if ($aviso->residente) · {{ $aviso->residente->nombre }}@endif
+                            {{ $aviso->titulo }}@if ($aviso->residente) · <a href="{{ \App\Filament\Direccion\Resources\ResidenteResource::getUrl('view', ['record' => $aviso->residente]) }}" class="underline decoration-gray-300 underline-offset-2 hover:text-primary-700" title="Abrir su ficha">{{ $aviso->residente->nombre }}</a>@endif
                         </p>
                         @if ($aviso->residente)
                             <p class="text-xs text-gray-500">{{ $aviso->residente->planta?->nombre }} · Hab. {{ $aviso->residente->habitacion }}</p>
@@ -33,6 +34,14 @@
                         @endif
                         {{ ($this->noProcedeAction)(['aviso' => $aviso->id]) }}
                     </div>
+                    </div>
+                    @if ($s = $this->sugerencia($aviso))
+                        <x-velia-sugiere :texto="$s['texto']" :porque="$s['porque']">
+                            <x-filament::button size="sm" wire:click="aceptarSugerencia({{ $aviso->id }})" icon="heroicon-o-check">Aceptar</x-filament::button>
+                            <span class="text-xs text-gray-500">o cámbialo con «{{ $s['tipo'] === 'asignar' ? 'Asignar' : 'Preguntar al turno' }}»</span>
+                            <x-filament::link tag="button" color="gray" size="sm" wire:click="descartarSugerencia({{ $aviso->id }})">No, gracias</x-filament::link>
+                        </x-velia-sugiere>
+                    @endif
                 </li>
             @empty
                 <li class="py-6 text-center text-sm text-gray-500">Nada pendiente. Buen trabajo.</li>

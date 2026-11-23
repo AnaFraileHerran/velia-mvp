@@ -22,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Scripts que lanza Claude desde Finder (locales)
+/scripts-claude/

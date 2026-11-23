@@ -1,6 +1,13 @@
 <x-filament-panels::page>
     @php($p = $this->pendientes())
 
+    @if ($sug = $this->sugerencia())
+        <x-velia-sugiere :texto="$sug['texto']" :porque="$sug['porque']" style="margin-top:0">
+            <x-filament::button size="sm" wire:click="seguirSugerencia">{{ $sug['accion'] }}</x-filament::button>
+            <x-filament::link tag="button" color="gray" size="sm" wire:click="descartarSugerencia">Ahora no</x-filament::link>
+        </x-velia-sugiere>
+    @endif
+
     {{-- 1. Lo que falta: la lista de tareas de la norma, cada una con su acción. Los mismos pendientes que el Inicio. --}}
     <x-filament::section heading="Lo que falta para la auditoría" :description="$p['total'] ? 'Lo que Velia sabe que falta. Cada línea lleva a donde se resuelve.' : 'Con lo que mide Velia, no falta nada.'">
         @if ($p['items'])

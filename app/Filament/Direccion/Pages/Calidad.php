@@ -13,6 +13,8 @@ use App\Models\Residente;
 use App\Models\Resumen;
 use App\Models\Turno;
 use Filament\Pages\Page;
+use App\Models\SugerenciaIa;
+use App\Support\Ia\Sugerencias;
 
 /**
  * 4 · Calidad y auditoría (wireframe «V2 · Calidad y auditoría»).
@@ -45,6 +47,32 @@ class Calidad extends Page
         $n = PendientesAuditoria::resumen()['total'];
 
         return 'Auditoría UNE 158101: '.$fecha->locale('es')->isoFormat('D MMM YYYY').' · en '.(int) now()->startOfDay()->diffInDays($fecha).' días · '.($n ? $n.' '.($n === 1 ? 'pendiente' : 'pendientes') : 'todo al día con lo que mide Velia');
+    }
+
+    /** «Velia te sugiere» por dónde empezar. Se oculta hasta mañana si la directora dice «Ahora no». */
+    public function sugerencia(): ?array
+    {
+        if (session('velia.calidad.sin_sugerencia') === today()->toDateString()) {
+            return null;
+        }
+
+        return Sugerencias::porDondeEmpezar(PendientesAuditoria::items());
+    }
+
+    public function seguirSugerencia(): void
+    {
+        if ($s = $this->sugerencia()) {
+            SugerenciaIa::anotar('calidad.empezar', $s['texto'], 'aceptada');
+            $this->redirect($s['url']);
+        }
+    }
+
+    public function descartarSugerencia(): void
+    {
+        if ($s = $this->sugerencia()) {
+            SugerenciaIa::anotar('calidad.empezar', $s['texto'], 'descartada');
+        }
+        session(['velia.calidad.sin_sugerencia' => today()->toDateString()]);
     }
 
     public function pendientes(): array

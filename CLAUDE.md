@@ -26,7 +26,8 @@ Este repositorio es la fuente de los wireframes funcionales: cada pantalla de «
 7. Inicio de dirección: «Hoy necesita tu decisión» muestra **como máximo 5** avisos.
 8. Nada interno a la vista del cliente: ni etiquetas MoSCoW (Should, Could), ni precios no decididos.
 9. Sin medicación, constantes ni diagnósticos en el MVP.
-10. Indicadores de calidad: se muestran como «Ejemplo» hasta validar que se pueden calcular del registro (hipótesis H2).
+10. IA: la IA propone y la persona confirma. Toda sugerencia se acepta, se cambia o se descarta, y se anota con `SugerenciaIa::anotar()`. Simulada por defecto (`config/velia.php`); con proveedor real, el asistente de Ayuda solo envía la pregunta, nunca datos de residentes.
+11. Indicadores de calidad: se muestran como «Ejemplo» hasta validar que se pueden calcular del registro (hipótesis H2).
 
 ## Textos
 - Español de España, tuteo, frases cortas, sin jerga técnica. Sin género en textos dirigidos a quien dirige («para llegar con todo listo», no «preparada»).
