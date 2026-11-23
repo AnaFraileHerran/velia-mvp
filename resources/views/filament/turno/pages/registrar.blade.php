@@ -1,21 +1,5 @@
 <x-filament-panels::page>
-    @if ($paso === 'grabar')
-        {{-- Grabar: un botón enorme. Si el micrófono falla, pasa a escribir sin perder nada. --}}
-        <div x-data="dictado()" class="flex flex-col items-center gap-6 py-6 text-center">
-            <button type="button" x-on:click="alternar()"
-                :class="grabando ? 'bg-danger-600 animate-pulse' : 'bg-primary-600'"
-                class="flex h-36 w-36 items-center justify-center rounded-full text-white shadow-lg"
-                :aria-label="grabando ? 'Parar y revisar' : 'Grabar'">
-                <x-filament::icon icon="heroicon-s-microphone" class="h-14 w-14" />
-            </button>
-            <p class="text-lg font-semibold" x-text="grabando ? 'Grabando · ' + reloj + ' · toca para terminar' : 'Toca para grabar'"></p>
-            <p class="max-w-sm text-sm text-gray-600 dark:text-gray-300">Habla con naturalidad. La IA ordena lo que digas y tú lo confirmas.</p>
-            <p x-show="parcial" x-text="parcial" class="max-w-md text-sm italic text-gray-500"></p>
-        </div>
-        <div class="flex flex-col items-center gap-3">
-            <x-filament::button color="gray" icon="heroicon-o-pencil" wire:click="$set('paso', 'escribir')">Escribir</x-filament::button>
-            <x-filament::link tag="button" wire:click="sinNovedad">¿Turno tranquilo? Marca «Sin novedad»</x-filament::link>
-        </div>
+    {{-- Funciones de grabar y escribir: se cargan una vez al abrir la página. Livewire no ejecuta los <script> que aparecen al cambiar de paso (fallo visto tras migrar a Livewire 4, 23/11/2026). --}}
         <script>
             function dictado() {
                 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -44,26 +28,6 @@
                 };
             }
         </script>
-
-    @elseif ($paso === 'escribir')
-        <div class="rounded-xl bg-warning-50 p-4 text-sm dark:bg-warning-400/10">
-            <p class="font-semibold">Escribe el registro</p>
-            <p>Si el micrófono no funciona o no hay cobertura, escríbelo aquí. La IA lo ordena igual.</p>
-        </div>
-        <form x-data="copiaLocal({{ $residente }})" x-on:submit.prevent="enviar()" class="space-y-3">
-            <div x-show="pendiente" x-cloak style="border-radius:12px;padding:12px 14px;background:rgb(240 243 250);border:1px solid rgb(150 169 212);font-size:14px">
-                <strong>Guardado en esta tablet.</strong> Se enviará a revisar en cuanto vuelva la conexión. No cierres esta pantalla.
-            </div>
-            <x-filament::input.wrapper>
-                <textarea x-ref="txt" wire:model="texto" x-on:input="guardar()" rows="6" class="block w-full border-0 bg-transparent p-3 text-base focus:ring-0" placeholder="Escribe con naturalidad…" autofocus></textarea>
-            </x-filament::input.wrapper>
-            <p class="text-xs text-gray-500">Puedes mencionar: alimentación e hidratación · higiene · movilidad y sujeción · descanso · ánimo · incidencias</p>
-            <div class="flex flex-wrap gap-3">
-                <x-filament::button type="submit" size="lg">Ordenar y revisar</x-filament::button>
-                <x-filament::button color="gray" size="lg" wire:click="$set('paso', 'grabar')" icon="heroicon-o-microphone">Grabar</x-filament::button>
-            </div>
-        </form>
-        <x-filament::link tag="button" wire:click="sinNovedad">¿Turno tranquilo? Marca «Sin novedad»</x-filament::link>
         <script>
             {{-- Sin conexión (decisión 23/11/2026): el texto se copia en la tablet mientras se escribe; si no hay red al enviar, queda pendiente y se envía a revisar al volver. La IA propone y la auxiliar confirma siempre. --}}
             function copiaLocal(id) {
@@ -90,6 +54,43 @@
                 };
             }
         </script>
+    @if ($paso === 'grabar')
+        {{-- Grabar: un botón enorme. Si el micrófono falla, pasa a escribir sin perder nada. --}}
+        <div x-data="dictado()" class="flex flex-col items-center gap-6 py-6 text-center">
+            <button type="button" x-on:click="alternar()"
+                :class="grabando ? 'bg-danger-600 animate-pulse' : 'bg-primary-600'"
+                class="flex h-36 w-36 items-center justify-center rounded-full text-white shadow-lg"
+                :aria-label="grabando ? 'Parar y revisar' : 'Grabar'">
+                <x-filament::icon icon="heroicon-s-microphone" class="h-14 w-14" />
+            </button>
+            <p class="text-lg font-semibold" x-text="grabando ? 'Grabando · ' + reloj + ' · toca para terminar' : 'Toca para grabar'"></p>
+            <p class="max-w-sm text-sm text-gray-600 dark:text-gray-300">Habla con naturalidad. La IA ordena lo que digas y tú lo confirmas.</p>
+            <p x-show="parcial" x-text="parcial" class="max-w-md text-sm italic text-gray-500"></p>
+        </div>
+        <div class="flex flex-col items-center gap-3">
+            <x-filament::button color="gray" icon="heroicon-o-pencil" wire:click="$set('paso', 'escribir')">Escribir</x-filament::button>
+            <x-filament::link tag="button" wire:click="sinNovedad">¿Turno tranquilo? Marca «Sin novedad»</x-filament::link>
+        </div>
+
+    @elseif ($paso === 'escribir')
+        <div class="rounded-xl bg-warning-50 p-4 text-sm dark:bg-warning-400/10">
+            <p class="font-semibold">Escribe el registro</p>
+            <p>Si el micrófono no funciona o no hay cobertura, escríbelo aquí. La IA lo ordena igual.</p>
+        </div>
+        <form x-data="copiaLocal({{ $residente }})" x-on:submit.prevent="enviar()" class="space-y-3">
+            <div x-show="pendiente" x-cloak style="border-radius:12px;padding:12px 14px;background:rgb(240 243 250);border:1px solid rgb(150 169 212);font-size:14px">
+                <strong>Guardado en esta tablet.</strong> Se enviará a revisar en cuanto vuelva la conexión. No cierres esta pantalla.
+            </div>
+            <x-filament::input.wrapper>
+                <textarea x-ref="txt" wire:model="texto" x-on:input="guardar()" rows="6" class="block w-full border-0 bg-transparent p-3 text-base focus:ring-0" placeholder="Escribe con naturalidad…" autofocus></textarea>
+            </x-filament::input.wrapper>
+            <p class="text-xs text-gray-500">Puedes mencionar: alimentación e hidratación · higiene · movilidad y sujeción · descanso · ánimo · incidencias</p>
+            <div class="flex flex-wrap gap-3">
+                <x-filament::button type="submit" size="lg">Ordenar y revisar</x-filament::button>
+                <x-filament::button color="gray" size="lg" wire:click="$set('paso', 'grabar')" icon="heroicon-o-microphone">Grabar</x-filament::button>
+            </div>
+        </form>
+        <x-filament::link tag="button" wire:click="sinNovedad">¿Turno tranquilo? Marca «Sin novedad»</x-filament::link>
 
     @else
         {{-- Revisar: lo que la IA ha entendido, por categorías. Incidencia arriba si la hay. --}}

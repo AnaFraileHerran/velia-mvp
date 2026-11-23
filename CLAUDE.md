@@ -40,3 +40,12 @@ Ver `docs/mapa-pantallas.md`. Si añades o quitas una pantalla, actualiza ese ma
 - `php -l` en los archivos tocados y `php artisan test`.
 - Revisar la pantalla a 390 px y a 1194 px (panel `turno`) o a 1440 px (panel `direccion`).
 - Si el cambio altera un flujo, avisar para actualizar el FigJam y la página de wireframes en Figma.
+
+## Cambios pedidos en Figma (comentarios del equipo)
+El equipo comenta en la página «Velia · Pantallas por flujo (localhost)» del archivo de Figma `jX0tVZ5A0uheE4VzqXw62X` (id de página `137:184`). Cuando pidan «aplica los comentarios de Figma»:
+1. Lee los comentarios sin resolver de esa página (`get_comments` del MCP de Figma, `pageId: 137:184`, `resolved: false`).
+2. Para cada comentario, localiza la pantalla por el nodo o por el código del principio (p. ej. «RES-02:») y busca su archivo en `docs/mapa-pantallas.md` (tabla «Pantallas reales por flujo»).
+3. Antes de cambiar nada, aplica las reglas de producto de arriba. Si el comentario es una duda, contradice una regla o no está claro, no toques el código: déjalo como pregunta.
+4. Aplica el cambio, pasa `php artisan test` y revisa la pantalla en local.
+5. Devuelve una tabla: código · comentario (resumido) · qué se ha cambiado y en qué archivo · pendiente o pregunta. Quien revisa marca el comentario como resuelto en Figma.
+6. Si el cambio altera la pantalla, vuelve a capturarla con `docs/figma/captura-pantallas.js` (instrucciones dentro) y sustituye el marco con el mismo código.

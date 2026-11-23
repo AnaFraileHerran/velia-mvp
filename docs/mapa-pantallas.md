@@ -69,3 +69,62 @@ Cómo se trabaja: un comentario en Figma sobre un wireframe → se cambia el arc
 - Huella o Face ID en el móvil (118:369): necesita WebAuthn. Hoy se entra con PIN.
 - Indicadores de calidad: se muestran como «Ejemplo» hasta validar H2.
 - Envío real de resúmenes por email y WhatsApp corporativo: simulado.
+
+
+## Pantallas reales por flujo para comentar (Figma, 23/11/2026)
+
+Página «Velia · Pantallas por flujo (localhost · 23/11/2026)» (id `137:184`) del archivo `jX0tVZ5A0uheE4VzqXw62X`. Cada pantalla es una captura editable del localhost; su nombre empieza por el código. Enlace a una pantalla: `https://www.figma.com/design/jX0tVZ5A0uheE4VzqXw62X?node-id=<nodo con guion>`.
+
+| Código | Pantalla | Nodo | Archivo |
+|---|---|---|---|
+| A00-01 | Primer acceso · tablet | `173:2` | `app/Filament/Turno/Acceso/PrimerAcceso.php · resources/views/filament/turno/auth/primer-acceso.blade.php` |
+| A00-02 | Primer acceso · móvil | `176:2` | `ídem` |
+| A0-01 | Restablecer el PIN · tablet | `174:2` | `app/Filament/Turno/Acceso/RestablecerPin.php · resources/views/filament/turno/auth/restablecer-pin.blade.php` |
+| A0-02 | Restablecer el PIN · móvil | `177:2` | `ídem` |
+| A1E-01 | Entrar con PIN · tablet | `175:2` | `app/Filament/Turno/Pages/Auth/PinLogin.php · resources/views/filament/turno/auth/pin-login.blade.php` |
+| A1E-02 | Entrar con PIN · móvil | `178:2` | `ídem` |
+| A1-01 | Relevo del turno · tablet | `188:2` | `app/Filament/Turno/Pages/Relevo.php · resources/views/filament/turno/pages/relevo.blade.php` |
+| A1-02 | Cómo atender · tablet | `189:2` | `app/Filament/Turno/Concerns/ComoAtender.php · resources/views/filament/turno/partials/como-atender.blade.php` |
+| A1-03 | Relevo del turno · móvil | `179:2` | `como A1-01` |
+| A1-04 | Cómo atender · móvil | `180:2` | `como A1-02` |
+| A2-01 | Residentes · lista · tablet | `190:2` | `app/Filament/Turno/Pages/Residentes.php · resources/views/filament/turno/pages/residentes.blade.php · .../partials/fila-residente.blade.php` |
+| A2-02 | Residentes · plano de planta · tablet | `191:2` | `como A2-01` |
+| A2-03 | Grabar el registro · tablet | `192:2` | `app/Filament/Turno/Pages/Registrar.php · resources/views/filament/turno/pages/registrar.blade.php` |
+| A2-04 | Escribir (sin micrófono) · tablet | `193:2` | `como A2-03` |
+| A2-05 | Revisar lo que ordena la IA + lo que falta · tablet | `194:2` | `como A2-03 · app/Support/OrdenarRegistro.php · app/Support/Ia/Sugerencias.php` |
+| A2-06 | Residentes · móvil | `181:2` | `como A2-01` |
+| A2-07 | Grabar el registro · móvil | `182:2` | `como A2-03` |
+| A2-08 | Escribir (sin micrófono) · móvil | `183:2` | `como A2-03` |
+| A2-09 | Revisar lo que ordena la IA + lo que falta · móvil | `185:2` | `como A2-05` |
+| A3-01 | Mi turno · tablet | `195:2` | `app/Filament/Turno/Pages/MiTurno.php · resources/views/filament/turno/pages/mi-turno.blade.php` |
+| A3-02 | Cerrar el turno · tablet | `196:2` | `app/Filament/Turno/Pages/CerrarTurno.php · resources/views/filament/turno/pages/cerrar-turno.blade.php` |
+| A3-03 | Mi turno · móvil | `186:2` | `como A3-01` |
+| A3-04 | Cerrar el turno · móvil | `187:2` | `como A3-02` |
+| D1-01 | Acceso de la dirección | `172:2` | `app/Providers/Filament/DireccionPanelProvider.php (->login() de Filament)` |
+| INI-01 | Inicio · Hoy necesita tu decisión (con «Velia te sugiere») | `140:2` | `app/Filament/Direccion/Pages/Inicio.php · app/Filament/Direccion/Widgets/*.php · resources/views/filament/direccion/widgets/*.blade.php` |
+| INI-02 | D2 · Preguntar al turno (rellenado por Velia) | `163:2` | `HoyNecesitaTuDecision.php (preguntarAction) · app/Support/Ia/Sugerencias.php` |
+| INI-03 | D2 · No procede con motivo | `165:2` | `HoyNecesitaTuDecision.php (noProcedeAction)` |
+| INI-04 | Turno sin abrir · ver quién falta | `164:2` | `HoyNecesitaTuDecision.php (quienFaltaAction) · .../widgets/quien-falta.blade.php · app/Support/TurnosSinAbrir.php` |
+| EQ-01 | Equipo · lista | `141:2` | `app/Filament/Direccion/Resources/AuxiliarResource.php · .../AuxiliarResource/Pages/ListAuxiliares.php` |
+| EQ-02 | Equipo · enfermería y medicina | `142:2` | `como EQ-01` |
+| EQ-03 | Ficha de la auxiliar | `143:2` | `AuxiliarResource.php (infolist) · .../Pages/ViewAuxiliar.php · resources/views/filament/direccion/equipo/*` |
+| EQ-04 | «No puede entrar» (PIN o móvil) | `167:2` | `AuxiliarResource.php (formNoPuedeEntrar, resolverAcceso)` |
+| EQ-05 | Editar ficha | `160:2` | `AuxiliarResource.php (form) · .../Pages/EditAuxiliar.php` |
+| EQ-06 | Añadir auxiliar | `144:2` | `AuxiliarResource.php (form) · .../Pages/CreateAuxiliar.php` |
+| RES-01 | Residentes · lista | `145:2` | `app/Filament/Direccion/Resources/ResidenteResource.php (table) · .../Pages/ListResidentes.php` |
+| RES-02 | Ficha del residente con «Relacionado» | `146:2` | `ResidenteResource.php (infolist) · .../Pages/ViewResidente.php · app/Support/Destinos.php` |
+| RES-03 | Corregir un dato con motivo | `166:2` | `ResidenteResource.php (corregirAction) · app/Support/Correcciones.php` |
+| RES-04 | Historial de registros | `148:2` | `ResidenteResource/RelationManagers/RegistrosRelationManager.php` |
+| RES-05 | Correcciones | `149:2` | `ResidenteResource/RelationManagers/CorreccionesRelationManager.php` |
+| RES-06 | Autorizados de la familia | `158:2` | `ResidenteResource/RelationManagers/ContactosRelationManager.php` |
+| RES-07 | Nuevo residente · rellenado por Velia | `157:2` | `ResidenteResource.php (form) · .../Pages/CreateResidente.php · resources/views/filament/direccion/partials/dictar-ficha.blade.php` |
+| RES-08 | Ausencias (D5) | `154:2` | `app/Filament/Direccion/Resources/AusenciaResource.php · .../Pages/ManageAusencias.php` |
+| CAL-01 | Calidad y auditoría (con «Por dónde empezar») | `150:2` | `app/Filament/Direccion/Pages/Calidad.php · resources/views/filament/direccion/pages/calidad.blade.php · app/Support/PendientesAuditoria.php` |
+| FAM-01 | Familias · resúmenes semanales | `151:2` | `app/Filament/Direccion/Resources/ResumenResource.php` |
+| FAM-02 | D3 · Redactar con Velia | `169:2` | `ResumenResource.php (redactar) · app/Support/Ia/Sugerencias.php` |
+| FAM-03 | D3 · Editar el resumen | `170:2` | `ResumenResource.php (editar)` |
+| FAM-04 | Residencia y ocupación | `153:2` | `app/Filament/Direccion/Pages/Ocupacion.php · resources/views/filament/direccion/pages/ocupacion.blade.php` |
+| MIR-01 | Mi residencia | `152:2` | `app/Filament/Direccion/Pages/MiResidencia.php · resources/views/filament/direccion/pages/mi-residencia.blade.php` |
+| AYU-01 | Ayuda · Pregúntale a Velia | `155:2` | `app/Filament/Direccion/Pages/Ayuda.php · resources/views/filament/direccion/pages/ayuda.blade.php · resources/views/filament/marca/dictado.blade.php` |
+| AYU-02 | Ayuda · respuesta del asistente | `156:2` | `Ayuda.php · app/Support/Ia/Asistente.php` |
+| NAV-01 | Paleta «Ir a…» (⌘K) | `171:2` | `resources/views/filament/direccion/partials/ir-a.blade.php · ir-a-boton.blade.php · app/Support/Destinos.php` |
