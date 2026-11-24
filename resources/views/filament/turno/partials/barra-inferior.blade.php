@@ -1,5 +1,5 @@
 {{--
-    Barra inferior de 3 pestañas (Relevo · Residentes · Mi turno), fija abajo para el pulgar.
+    Barra inferior de 3 pestañas (Resumen · Residentes · Mi turno), fija abajo para el pulgar.
     Bloqueo: si nadie toca la pantalla en 5 minutos, se cierra la sesión (el turno sigue abierto).
 --}}
 @php

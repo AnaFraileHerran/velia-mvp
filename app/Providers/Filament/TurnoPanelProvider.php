@@ -27,7 +27,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 /**
  * App de las auxiliares (tablet compartida o móvil). Sin menú lateral: barra inferior de 3 pestañas
- * (Relevo · Residentes · Mi turno), como en «Wireframes v2 · propuesta UX». Debe funcionar a 390 px.
+ * (Resumen · Residentes · Mi turno), como en «Wireframes v2 · propuesta UX». Debe funcionar a 390 px.
  */
 class TurnoPanelProvider extends PanelProvider
 {

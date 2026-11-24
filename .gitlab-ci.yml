@@ -1,0 +1,31 @@
+# Velia · integración continua en GitLab.
+# Pasa los tests de Laravel en cada push y en cada merge request. Sin tema compilado: no hace falta Node
+# (los paneles usan el aspecto base de Filament si no existe public/build/manifest.json).
+stages:
+  - test
+
+tests:
+  stage: test
+  image: php:8.4-cli
+  variables:
+    COMPOSER_ALLOW_SUPERUSER: "1"
+    COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.composer-cache"
+  cache:
+    key:
+      files:
+        - composer.lock
+    paths:
+      - .composer-cache/
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq git unzip libicu-dev libzip-dev > /dev/null
+    - docker-php-ext-install -j"$(nproc)" intl zip > /dev/null
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - composer install --no-interaction --prefer-dist --no-progress
+    - cp .env.example .env
+    - php artisan key:generate
+    - touch database/database.sqlite
+  script:
+    - php artisan test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH

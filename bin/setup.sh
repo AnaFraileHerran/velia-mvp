@@ -1,38 +1,18 @@
 #!/usr/bin/env bash
-# Instala Velia en local: crea el esqueleto de Laravel alrededor del código de este repo,
-# añade Filament, registra los paneles y carga los datos ficticios.
-# Requisitos: PHP 8.2+, Composer, Node no es necesario para Filament.
+# Instala Velia en local después de clonar el repositorio (GitLab o GitHub).
+# Requisitos: PHP 8.3+ con las extensiones intl, zip y pdo_sqlite, y Composer.
+# Node 20+ es opcional: sin él, Velia funciona con el aspecto base de Filament.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-if [ ! -f artisan ]; then
-  echo "→ Creando el esqueleto de Laravel 12…"
-  rm -rf .skeleton
-  # Laravel 11 ya no se instala: Composer bloquea sus versiones por avisos de seguridad.
-  composer create-project laravel/laravel:^12.0 .skeleton --no-interaction
-  # Copia solo lo que no existe en el repo (no pisa el código de Velia)
-  cp -Rn .skeleton/. . || true   # macOS devuelve error al saltar archivos que ya existen
-  rm -rf .skeleton
-fi
-
-echo "→ Instalando Filament 3…"
-composer require filament/filament:"^3.3" -W --no-interaction
-
-echo "→ Registrando los paneles de Velia…"
-php -r '
-$f = "bootstrap/providers.php";
-$c = file_get_contents($f);
-foreach (["App\\Providers\\Filament\\DireccionPanelProvider::class", "App\\Providers\\Filament\\TurnoPanelProvider::class"] as $p) {
-  if (strpos($c, $p) === false) { $c = str_replace("];", "    ".$p.",\n];", $c); }
-}
-file_put_contents($f, $c);
-'
+echo "→ Instalando dependencias de PHP (Laravel 13, Filament 5)…"
+composer install --no-interaction
 
 echo "→ Estilos de Velia (tema de Filament)…"
 if command -v npm >/dev/null 2>&1; then
-  npm install --silent && npm run build || echo "⚠︎ No se pudo compilar el tema: Velia funcionará con el aspecto base de Filament."
+  npm ci --silent && npm run build || echo "⚠︎ No se pudo compilar el tema: Velia funcionará con el aspecto base de Filament."
 else
-  echo "⚠︎ No hay Node/npm: Velia funcionará con el aspecto base de Filament. Instala Node (nodejs.org) y vuelve a lanzar el script."
+  echo "⚠︎ No hay Node/npm: Velia funcionará con el aspecto base de Filament. Instala Node 20+ (nodejs.org) y vuelve a lanzar el script."
 fi
 
 [ -f .env ] || cp .env.example .env
@@ -44,6 +24,6 @@ php artisan storage:link --force >/dev/null 2>&1 || true   # fotos de residentes
 php artisan filament:assets
 
 echo ""
-echo "Listo. Arranca con: php artisan serve"
+echo "Listo. Arranca con: php artisan serve   (o php artisan serve --port=8001 si el 8000 está ocupado)"
 echo "  Dirección: http://localhost:8000/direccion  ·  marta@losalmendros.es / velia2026"
 echo "  Turno (tablet o móvil): http://localhost:8000/turno  ·  PIN de Lucía: 1234 · PIN de Ana (responsable): 2468"
