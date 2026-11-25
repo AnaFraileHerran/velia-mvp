@@ -1,7 +1,7 @@
-{{-- Libro de ayuda por sección (patrón de Holded): qué es esta pantalla, dos consejos y la pregunta lista para Velia. --}}
+{{-- Ayuda por sección (patrón de Holded, con el icono de Ayuda del menú en vez del libro): qué es esta pantalla, dos consejos y la pregunta lista para Velia. --}}
 <x-filament::dropdown placement="bottom-end" width="sm" teleport>
     <x-slot name="trigger">
-        <x-filament::icon-button icon="heroicon-o-book-open" color="gray" size="lg" label="Ayuda de esta sección" tooltip="Ayuda de esta sección" />
+        <x-filament::button icon="heroicon-o-question-mark-circle" color="gray" outlined size="sm" tooltip="Qué es esta pantalla y cómo usarla">Ayuda</x-filament::button>
     </x-slot>
 
     <div class="velia-h-libro">
