@@ -14,6 +14,7 @@ Este repositorio es la fuente de los wireframes funcionales: cada pantalla de «
 - Migrado de Laravel 12 + Filament 3.3 el 23/11/2026 (rama `migracion-filament-5`). En páginas, `$view` ya no es estático; formularios y fichas usan `Schema`.
 - Dos paneles de Filament:
   - `direccion` en `/direccion`: web de la dirección, entra con email y contraseña.
+  - `direccion-h` en `/nueva-version`: «Nueva versión» de la web de dirección (patrones de Holded y comentarios del equipo del 25/11), en paralelo a `/direccion` para compararlas. Mismos recursos y datos; lo que cambia solo aquí se decide con `VersionH::activa()`.
   - `turno` en `/turno`: app de las auxiliares para tablet compartida o móvil, entra con PIN.
 - App de la auxiliar con **shadcn-vue** en `/auxiliar` (25/11/2026, decisión de Ana: el front de la auxiliar en tablet y móvil es shadcn-vue, no Filament). Inertia + Vue 3 sobre la misma app de Laravel, sesión del guard `turno`. Va en paralelo a `/turno` hasta validarla. Código: `routes/auxiliar.php`, `app/Http/Controllers/Auxiliar/`, `resources/js/auxiliar/` (pantallas y componentes) y `resources/js/components/ui/` (componentes de shadcn-vue, se añaden con `npx shadcn-vue@latest add …`). Tema: `resources/css/auxiliar.css` (tokens de `docs/tema-shadcn-vue.css`). Para esta parte, la regla «usa Filament» no aplica: usa los componentes de shadcn-vue.
 

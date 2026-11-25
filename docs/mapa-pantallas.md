@@ -129,7 +129,7 @@ Página «Velia · Pantallas por flujo (localhost · 23/11/2026)» (id `137:184`
 | AYU-02 | Ayuda · respuesta del asistente | `156:2` | `Ayuda.php · app/Support/Ia/Asistente.php` |
 | NAV-01 | Paleta «Ir a…» (⌘K) | `171:2` | `resources/views/filament/direccion/partials/ir-a.blade.php · ir-a-boton.blade.php · app/Support/Destinos.php` |
 
-## Versión H de dirección (25/11/2026) · `/direccion-h`
+## Nueva versión de dirección (versión H, 25/11/2026) · `/nueva-version` (antes `/direccion-h`)
 
 Mismas pantallas y datos que `/direccion`, con patrones de uso de Holded para compararlas en un test. Panel: `app/Providers/Filament/DireccionHPanelProvider.php`. Lo que cambia solo en H se decide con `App\Support\VersionH::activa()`.
 

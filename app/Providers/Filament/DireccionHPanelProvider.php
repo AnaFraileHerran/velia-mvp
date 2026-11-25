@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 /**
- * Versión H de la web de dirección (25/11/2026) en /direccion-h. Mismas pantallas, datos y sesión que /direccion
+ * Versión H de la web de dirección (25/11/2026) en /nueva-version (antes /direccion-h). Mismas pantallas, datos y sesión que /direccion
  * (mismo guard: si entras en una, entras en la otra), con los patrones de Holded que se quieren probar:
  * «+ Crear» en la barra superior, Inicio con pestañas, listas con pestañas de estado y ayuda por sección.
  */
@@ -43,7 +43,7 @@ class DireccionHPanelProvider extends PanelProvider
         return $panel
             ->id(VersionH::PANEL)
             ->authGuard('direccion')
-            ->path('direccion-h')
+            ->path('nueva-version')
             ->login()
             ->brandName('Velia')
             ->colors(TemaVelia::colores())
