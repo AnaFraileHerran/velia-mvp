@@ -30,6 +30,12 @@ class EstaSemana extends Widget implements HasActions, HasForms
 
     protected int|string|array $columnSpan = ['xl' => 1];
 
+    /** Versión H: cada pestaña del Inicio va a una columna, a todo el ancho. */
+    public function getColumnSpan(): int|string|array
+    {
+        return \App\Support\VersionH::activa() ? 'full' : $this->columnSpan;
+    }
+
     protected static ?int $sort = 2;
 
     /** Preguntas al turno: se leen las respuestas y se dan por resueltas, o se retira la que ya no hace falta. */

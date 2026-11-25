@@ -13,6 +13,12 @@ use App\Models\Residencia;
 use Filament\Actions\Action;
 use Filament\Pages\Dashboard;
 use Illuminate\Contracts\Support\Htmlable;
+use App\Filament\Direccion\Widgets\LoQueFaltaAuditoria;
+use App\Models\Aviso;
+use App\Support\VersionH;
+use Filament\Schemas\Components\View;
+use Filament\Schemas\Schema;
+use Livewire\Attributes\Url;
 
 /** 1 · Inicio (opción C, 23/11/2026): banda «Ahora» → «Hoy» y «Esta semana» en dos columnas (una en tablet) → «Últimos 7 días». */
 class Inicio extends Dashboard
@@ -24,6 +30,10 @@ class Inicio extends Dashboard
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-home';
 
     protected static ?int $navigationSort = 1;
+
+    /** Versión H: pestaña abierta del Inicio (hoy, semana o auditoria). En la versión actual no se usa. */
+    #[Url]
+    public string $pestana = 'hoy';
 
     /** Cabecera de una línea (opción C): la residencia; el saludo, pequeño en el subtítulo. */
     public function getHeading(): string|Htmlable
@@ -67,11 +77,51 @@ class Inicio extends Dashboard
 
     public function getWidgets(): array
     {
+        if (VersionH::activa()) {
+            return match ($this->pestana) {
+                'semana' => [EstaSemana::class, ComoVaLaSemana::class],
+                'auditoria' => [LoQueFaltaAuditoria::class],
+                default => [AlertaTurno::class, AhoraEnElCentro::class, HoyNecesitaTuDecision::class],
+            };
+        }
+
         return [AlertaTurno::class, AhoraEnElCentro::class, HoyNecesitaTuDecision::class, EstaSemana::class, ComoVaLaSemana::class];
     }
 
     public function getColumns(): int|array
     {
         return ['xl' => 3];
+    }
+
+    /** Versión H: pestañas encima de los widgets. */
+    public function content(Schema $schema): Schema
+    {
+        if (! VersionH::activa()) {
+            return parent::content($schema);
+        }
+
+        return $schema->components([
+            View::make('filament.direccion-h.pestanas-inicio')->viewData(fn () => ['pestanas' => $this->pestanasH(), 'activa' => $this->pestana]),
+            $this->getWidgetsContentComponent(),
+        ]);
+    }
+
+    /** @return array<string, array{etiqueta: string, icono: string, n: int, color: string}> */
+    public function pestanasH(): array
+    {
+        $avisos = Aviso::abiertos()->where('tipo', '!=', 'turno_sin_abrir')->count();
+
+        return [
+            'hoy' => ['etiqueta' => 'Hoy', 'icono' => 'heroicon-o-sun', 'n' => $avisos, 'color' => 'danger'],
+            'semana' => ['etiqueta' => 'Esta semana', 'icono' => 'heroicon-o-calendar-days', 'n' => 0, 'color' => 'gray'],
+            'auditoria' => ['etiqueta' => 'Auditoría', 'icono' => 'heroicon-o-shield-check', 'n' => PendientesAuditoria::resumen()['total'], 'color' => 'warning'],
+        ];
+    }
+
+    public function updatedPestana(): void
+    {
+        if (! in_array($this->pestana, ['hoy', 'semana', 'auditoria'], true)) {
+            $this->pestana = 'hoy';
+        }
     }
 }

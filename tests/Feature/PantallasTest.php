@@ -16,7 +16,7 @@ class PantallasTest extends TestCase
     {
         $this->seed();
         $fallos = [];
-        foreach (['direccion' => User::where('rol', 'direccion')->first(), 'turno' => User::where('rol', 'auxiliar')->whereNotNull('pin')->first()] as $panel => $user) {
+        foreach (['direccion' => User::where('rol', 'direccion')->first(), 'direccion-h' => User::where('rol', 'direccion')->first(), 'turno' => User::where('rol', 'auxiliar')->whereNotNull('pin')->first()] as $panel => $user) {
             foreach (Route::getRoutes() as $r) {
                 $nombre = $r->getName() ?? '';
                 if (! str_starts_with($nombre, "filament.$panel.") || ! in_array('GET', $r->methods())) {
@@ -38,7 +38,7 @@ class PantallasTest extends TestCase
                     $params['residente'] = \App\Models\Residente::value('id');
                 }
                 $this->app['auth']->forgetGuards();
-                $res = $this->actingAs($user, $panel)->get(route($nombre, $params));
+                $res = $this->actingAs($user, $panel === 'direccion-h' ? 'direccion' : $panel)->get(route($nombre, $params));
                 $estado = $res->getStatusCode();
                 if ($estado >= 400) {
                     $msg = $res->exception ? get_class($res->exception).': '.$res->exception->getMessage().' @ '.str_replace(base_path().'/', '', $res->exception->getFile()).':'.$res->exception->getLine() : '';

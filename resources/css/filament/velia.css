@@ -90,3 +90,19 @@
 .velia-chat-burbuja { border-radius: 1rem; padding: 0.75rem 1rem; font-size: 0.9375rem; line-height: 1.5; }
 .velia-chat-yo { background: #0F3D95; color: #fff; margin-left: auto; max-width: 80%; }
 .velia-chat-velia { background: #F3F4F6; color: #111827; max-width: 90%; }
+
+/* Versión H (25/11/2026, /direccion-h): patrones de Holded */
+.velia-h-version { display: inline-flex; align-items: center; gap: 0.5rem; margin-right: 0.25rem; border-radius: 999px; background: #FEF3C7; color: #92400E; padding: 0.25rem 0.75rem; font-size: 0.8125rem; font-weight: 600; white-space: nowrap; }
+.velia-h-version-punto { width: 0.5rem; height: 0.5rem; border-radius: 999px; background: #D97706; }
+.velia-h-version-enlace { font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
+.velia-h-crear { margin-right: 0.25rem; }
+.velia-h-libro { padding: 1rem; display: flex; flex-direction: column; gap: 0.625rem; font-size: 0.875rem; line-height: 1.5; color: #374151; }
+.velia-h-libro-titulo { font-weight: 600; font-size: 0.9375rem; color: #111827; }
+.velia-h-libro ul { list-style: disc; padding-left: 1.125rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.velia-h-libro-velia { display: flex; align-items: flex-start; gap: 0.5rem; border-radius: 0.5rem; background: #EEF2FA; color: #0F3D95; padding: 0.625rem 0.75rem; font-weight: 500; }
+.velia-h-libro-velia svg { margin-top: 0.15rem; flex-shrink: 0; }
+.velia-h-pestanas { margin-bottom: 0.25rem; }
+.velia-h-lista { display: flex; flex-direction: column; font-size: 0.875rem; }
+.velia-h-lista li { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid #F3F4F6; }
+.velia-h-lista li:last-child { border-bottom: 0; }
+@media (max-width: 767px) { .velia-h-version-enlace { display: none; } }

@@ -7,6 +7,9 @@ use App\Filament\Direccion\Pages\Ocupacion;
 use App\Filament\Direccion\Resources\ResumenResource;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\ManageRecords;
+use App\Models\Resumen;
+use App\Support\VersionH;
+use Filament\Schemas\Components\Tabs\Tab;
 
 class ManageResumenes extends ManageRecords
 {
@@ -21,5 +24,27 @@ class ManageResumenes extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [Action::make('ocupacion')->label('Residencia y ocupación')->color('gray')->url(Ocupacion::getUrl())];
+    }
+
+    /** Versión H: estados separados en pestañas con contador (arregla los estados mezclados, T4 de la auditoría del 23/11). */
+    public function getTabs(): array
+    {
+        if (! VersionH::activa()) {
+            return [];
+        }
+
+        $n = fn (string $estado) => Resumen::where('estado', $estado)->count();
+
+        return [
+            'por_revisar' => Tab::make('Por revisar')->modifyQueryUsing(fn ($query) => $query->where('estado', 'por_revisar'))->badge($n('por_revisar') ?: null)->badgeColor('warning'),
+            'aprobado' => Tab::make('Aprobados')->modifyQueryUsing(fn ($query) => $query->where('estado', 'aprobado'))->badge($n('aprobado') ?: null),
+            'enviado' => Tab::make('Enviados')->modifyQueryUsing(fn ($query) => $query->where('estado', 'enviado'))->badge($n('enviado') ?: null)->badgeColor('success'),
+            'todos' => Tab::make('Todos'),
+        ];
+    }
+
+    public function getDefaultActiveTab(): string|int|null
+    {
+        return VersionH::activa() ? 'por_revisar' : null;
     }
 }

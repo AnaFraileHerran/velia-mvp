@@ -45,7 +45,7 @@ class User extends Authenticatable implements FilamentUser, HasName
         }
 
         return match ($panel->getId()) {
-            'direccion' => $this->rol === 'direccion',
+            'direccion', 'direccion-h' => $this->rol === 'direccion',
             'turno' => $this->rol === 'auxiliar',
             default => false,
         };

@@ -128,3 +128,15 @@ Página «Velia · Pantallas por flujo (localhost · 23/11/2026)» (id `137:184`
 | AYU-01 | Ayuda · Pregúntale a Velia | `155:2` | `app/Filament/Direccion/Pages/Ayuda.php · resources/views/filament/direccion/pages/ayuda.blade.php · resources/views/filament/marca/dictado.blade.php` |
 | AYU-02 | Ayuda · respuesta del asistente | `156:2` | `Ayuda.php · app/Support/Ia/Asistente.php` |
 | NAV-01 | Paleta «Ir a…» (⌘K) | `171:2` | `resources/views/filament/direccion/partials/ir-a.blade.php · ir-a-boton.blade.php · app/Support/Destinos.php` |
+
+## Versión H de dirección (25/11/2026) · `/direccion-h`
+
+Mismas pantallas y datos que `/direccion`, con patrones de uso de Holded para compararlas en un test. Panel: `app/Providers/Filament/DireccionHPanelProvider.php`. Lo que cambia solo en H se decide con `App\Support\VersionH::activa()`.
+
+| Patrón | Dónde | Archivo |
+|---|---|---|
+| Aviso «Versión H · prueba» y enlace a la misma pantalla en la actual | Barra superior | `resources/views/filament/direccion-h/version.blade.php` |
+| «+ Crear» global: residente, salida, auxiliar, enfermería o medicina | Barra superior | `resources/views/filament/direccion-h/crear.blade.php` |
+| Inicio con pestañas Hoy · Esta semana · Auditoría, con contador | Inicio | `Pages/Inicio.php` (`content()`, `getWidgets()`), `direccion-h/pestanas-inicio.blade.php`, `Widgets/LoQueFaltaAuditoria.php` |
+| Listas con pestañas de estado y contador | Residentes, Familias | `ListResidentes.php`, `ManageResumenes.php` (`getTabs()`) |
+| Libro de ayuda por sección, con la pregunta lista para Velia | Cabecera de cada pantalla | `direccion-h/ayuda-seccion.blade.php`, textos en `VersionH::ayudaSeccion()` |
