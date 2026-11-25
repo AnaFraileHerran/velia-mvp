@@ -140,3 +140,19 @@ Mismas pantallas y datos que `/direccion`, con patrones de uso de Holded para co
 | Inicio con pestañas Hoy · Esta semana · Auditoría, con contador | Inicio | `Pages/Inicio.php` (`content()`, `getWidgets()`), `direccion-h/pestanas-inicio.blade.php`, `Widgets/LoQueFaltaAuditoria.php` |
 | Listas con pestañas de estado y contador | Residentes, Familias | `ListResidentes.php`, `ManageResumenes.php` (`getTabs()`) |
 | Botón «Ayuda» por sección (icono de interrogación, el mismo del menú), con la pregunta lista para Velia | Cabecera de cada pantalla | `direccion-h/ayuda-seccion.blade.php`, textos en `VersionH::ayudaSeccion()` |
+
+### Flujo nuevo del Inicio y comentarios de Figma (25/11/2026)
+
+| Cambio | Comentario | Archivo |
+|---|---|---|
+| Inicio H: «Ahora» compacto con la alerta de turno dentro (sin banda roja) | Pablo · INI-01 | `Widgets/AhoraH.php`, `widgets/ahora-h.blade.php` |
+| Inicio H: «Próximamente» Semana · Mes · Trimestre, auditoría como hito con importancia | Pablo · INI-01 | `Widgets/ProximamenteH.php`, `widgets/proximamente-h.blade.php` |
+| Inicio H: «Cómo va tu residencia con Velia» (servicio + valor; «Ejemplo» donde no hay dato) | Pablo · INI-01 | `Widgets/ValorVeliaH.php`, `widgets/valor-velia-h.blade.php` |
+| «Velia sugiere» en una línea (H) | Pablo · INI-01 | `components/velia-sugiere-linea.blade.php` |
+| Avisos de dirección: equipo, familia, organización, patrones de planta | Pablo · INI-01 | `Models/Aviso.php`, `Support/Demo/AvisosTransversales.php` |
+| Un solo buscador «Buscar o preguntar a Velia» con respuesta rápida (H) | Pablo y Antonio · cabecera | `direccion-h/buscar.blade.php`, `partials/ir-a.blade.php`, ruta `respuesta-rapida` |
+| Menú lateral de 14rem, siempre abierto (H) | Pablo y Antonio · INI-01 | `DireccionHPanelProvider.php` |
+| Equipo: «Añadir otro rol» (áreas como Ocio; rol `otro`, sin acceso a la app) | Ana · EQ-01 | `AuxiliarResource.php`, `ListAuxiliares.php`, `Models/AreaEquipo.php` |
+| Turno: botón flotante de micrófono → elegir residente → graba | Antonio · A1-02 | `turno/partials/boton-grabar.blade.php`, `Turno/Pages/Registrar.php` |
+| Cómo atender: icono junto a cada dato | Antonio · A1-04 | `turno/partials/como-atender.blade.php` |
+| Landing de dirección: pantalla de éxito al enviar | Ana · LAND-D | `public/landing/direccion.html` |

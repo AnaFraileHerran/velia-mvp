@@ -25,6 +25,12 @@ class Registrar extends Page
     #[Url]
     public ?int $residente = null;
 
+    /** Viene del botón flotante de micrófono: la grabación empieza sola (si el navegador lo permite). */
+    #[Url]
+    public bool $grabar = false;
+
+    public bool $autoGrabar = false;
+
     /** grabar | escribir | revisar */
     public string $paso = 'grabar';
 
@@ -50,6 +56,8 @@ class Registrar extends Page
     public function mount(): void
     {
         abort_unless($this->residente && $this->r(), 404);
+        $this->autoGrabar = $this->grabar;
+        $this->grabar = false;
         // Si dejó un borrador en este turno, se retoma en «Revisar».
         $b = Registro::where('residente_id', $this->residente)->where('turno_id', Filament::auth()->user()->turnoAbierto()?->id)
             ->where('estado', 'borrador')->latest()->first();

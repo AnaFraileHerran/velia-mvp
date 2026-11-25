@@ -294,7 +294,7 @@ article,[style*="border-radius: 18px"],[style*="border-radius: 20px"]{transition
 </ul>
 <p style="margin: 8px 0 0; font-size: 16px; color: #C9D4EE">¿Prefieres escribirnos? <a href="mailto:[EMAIL]" style="color: #F5F5F2">[EMAIL]</a></p>
 </div>
-<form action="mailto:[EMAIL]" method="post" aria-label="Solicitud de plaza en el piloto" style="flex: 1 1 520px; min-width: 0; background: #FFFFFF; color: #141413; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 18px">
+<form id="solicitud-form" action="mailto:[EMAIL]" method="post" aria-label="Solicitud de plaza en el piloto" style="flex: 1 1 520px; min-width: 0; background: #FFFFFF; color: #141413; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 18px">
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px">
 <label style="display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 16px">Tu nombre<input name="nombre" autocomplete="name" style="width: 100%; box-sizing: border-box; min-height: 48px; padding: 10px 14px; border: 1.5px solid #6B6A66; border-radius: 10px; font: inherit; font-size: 17px; font-weight: 400; background: #FFFFFF; color: #141413"></label>
 <label style="display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 16px">Teléfono o email<input name="contacto" autocomplete="email" style="width: 100%; box-sizing: border-box; min-height: 48px; padding: 10px 14px; border: 1.5px solid #6B6A66; border-radius: 10px; font: inherit; font-size: 17px; font-weight: 400; background: #FFFFFF; color: #141413"></label>
@@ -304,13 +304,25 @@ article,[style*="border-radius: 18px"],[style*="border-radius: 20px"]{transition
 <label style="display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 16px">¿En qué punto estáis con la UNE 158101?<select name="une" style="width: 100%; box-sizing: border-box; min-height: 48px; padding: 10px 14px; border: 1.5px solid #6B6A66; border-radius: 10px; font: inherit; font-size: 17px; font-weight: 400; background: #FFFFFF; color: #141413"><option>Ya certificados</option><option selected="">Preparando la certificación</option><option>Todavía no hemos empezado</option><option>No nos aplica</option></select></label>
 <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px"><legend style="font-weight: 700; font-size: 16px; margin-bottom: 10px">¿Qué te gustaría resolver primero?</legend>
 <div style="display: flex; flex-wrap: wrap; gap: 10px">
-<label style="display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid #6B6A66; border-radius: 999px; padding: 8px 14px; min-height: 44px; box-sizing: border-box; background: #FFFFFF"><input type="radio" name="prioridad" value="auditoria" checked=""> Llegar preparada a la auditoría</label>
+<label style="display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid #6B6A66; border-radius: 999px; padding: 8px 14px; min-height: 44px; box-sizing: border-box; background: #FFFFFF"><input type="radio" name="prioridad" value="auditoria" checked=""> Llegar con todo listo a la auditoría</label>
 <label style="display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid #6B6A66; border-radius: 999px; padding: 8px 14px; min-height: 44px; box-sizing: border-box; background: #FFFFFF"><input type="radio" name="prioridad" value="relevo"> Que el relevo no dependa del papel</label>
 <label style="display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid #6B6A66; border-radius: 999px; padding: 8px 14px; min-height: 44px; box-sizing: border-box; background: #FFFFFF"><input type="radio" name="prioridad" value="familias"> Tener informadas a las familias</label>
 </div></fieldset>
 <button type="submit" style="background: #0F3D95; color: #FFFFFF; font-weight: 700; padding: 14px 24px; border-radius: 999px; min-height: 52px; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 0; font-family: inherit; font-size: 18px; cursor: pointer">Solicitar mi plaza <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
 <p style="margin: 0; font-size: 14px; color: #5E5D59">Solo usaremos estos datos para contactarte sobre el piloto.</p>
 </form>
+<!-- Pantalla de éxito (25/11/2026, comentario de Ana en LAND-D): sustituye al formulario al enviarlo. -->
+<div id="solicitud-exito" role="status" aria-live="polite" tabindex="-1" hidden style="flex: 1 1 520px; min-width: 0; background: #FFFFFF; color: #141413; border-radius: 20px; padding: 40px 30px; flex-direction: column; gap: 14px; align-items: flex-start">
+<span aria-hidden="true" style="width: 56px; height: 56px; border-radius: 999px; background: #E6ECF8; display: inline-flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0F3D95" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"></path></svg></span>
+<h3 style="margin: 0; font-family: Figtree, sans-serif; font-weight: 700; font-size: 28px; line-height: 1.2">Solicitud recibida</h3>
+<p style="margin: 0; font-size: 18px; color: #3A3936">Gracias, <span id="solicitud-nombre">te</span> escribiremos en unos días para contarte cómo empezar el piloto en <span id="solicitud-residencia">tu residencia</span>.</p>
+<ol style="margin: 4px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 16px; color: #3A3936">
+<li>Una llamada corta para conocer tu residencia.</li>
+<li>Ponemos Velia en marcha contigo y con tu equipo.</li>
+<li>Durante el piloto, sin coste y sin permanencia.</li>
+</ol>
+<a href="#inicio" style="margin-top: 6px; color: #0F3D95; font-weight: 700">Volver al inicio</a>
+</div>
 </div>
 </section>
 
@@ -322,4 +334,18 @@ article,[style*="border-radius: 18px"],[style*="border-radius: 20px"]{transition
 </footer>
 
 </div>
+<script>
+// Pantalla de éxito: el formulario se sustituye por la confirmación. [SUPOSICIÓN] Falta decidir a dónde se envía (hoy, mailto con [EMAIL]).
+(() => {
+  const f = document.getElementById('solicitud-form'), ok = document.getElementById('solicitud-exito');
+  if (!f || !ok) return;
+  f.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nombre = (f.nombre.value || '').trim().split(' ')[0], res = (f.residencia.value || '').trim().split(',')[0];
+    if (nombre) document.getElementById('solicitud-nombre').textContent = nombre + ', te';
+    if (res) document.getElementById('solicitud-residencia').textContent = res;
+    f.hidden = true; f.style.display = 'none'; ok.hidden = false; ok.style.display = 'flex'; ok.focus();
+  });
+})();
+</script>
 </body></html>

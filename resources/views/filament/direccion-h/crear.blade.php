@@ -27,5 +27,8 @@
         <x-filament::dropdown.list.item tag="a" :href="AuxiliarResource::getUrl('create', ['rol' => 'sanitario'])" icon="heroicon-o-heart">
             Enfermería o medicina
         </x-filament::dropdown.list.item>
+        <x-filament::dropdown.list.item tag="a" :href="AuxiliarResource::getUrl('index', ['action' => 'anadirRol'])" icon="heroicon-o-squares-plus">
+            Otro rol (ocio, fisioterapia…)
+        </x-filament::dropdown.list.item>
     </x-filament::dropdown.list>
 </x-filament::dropdown>

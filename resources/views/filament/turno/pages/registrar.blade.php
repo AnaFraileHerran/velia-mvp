@@ -4,7 +4,7 @@
             function dictado() {
                 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
                 return {
-                    grabando: false, parcial: '', finalTxt: '', inicio: 0, reloj: '00:00', rec: null, t: null,
+                    grabando: false, parcial: '', finalTxt: '', inicio: 0, reloj: '00:00', rec: null, t: null, auto: false,
                     alternar() { this.grabando ? this.parar() : this.empezar(); },
                     empezar() {
                         if (!SR) { this.$wire.set('paso', 'escribir'); return; }
@@ -17,7 +17,8 @@
                             }
                             this.parcial = this.finalTxt + p;
                         };
-                        this.rec.onerror = () => { this.grabando = false; clearInterval(this.t); this.$wire.set('paso', 'escribir'); };
+                        // Si el navegador no deja empezar sin un toque (grabación automática), se queda el botón grande; si falla el micrófono, a escribir.
+                        this.rec.onerror = (e) => { this.grabando = false; clearInterval(this.t); if (!(this.auto && e.error === 'not-allowed')) this.$wire.set('paso', 'escribir'); this.auto = false; };
                         this.rec.start(); this.grabando = true; this.inicio = Date.now();
                         this.t = setInterval(() => { const s = Math.floor((Date.now() - this.inicio) / 1000); this.reloj = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }, 500);
                     },
@@ -56,7 +57,7 @@
         </script>
     @if ($paso === 'grabar')
         {{-- Grabar: un botón enorme. Si el micrófono falla, pasa a escribir sin perder nada. --}}
-        <div x-data="dictado()" class="flex flex-col items-center gap-6 py-6 text-center">
+        <div x-data="dictado()" @if ($autoGrabar) x-init="auto = true; $wire.autoGrabar = false; $nextTick(() => empezar())" @endif class="flex flex-col items-center gap-6 py-6 text-center">
             <button type="button" x-on:click="alternar()"
                 :class="grabando ? 'bg-danger-600 animate-pulse' : 'bg-primary-600'"
                 class="flex h-36 w-36 items-center justify-center rounded-full text-white shadow-lg"

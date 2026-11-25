@@ -64,21 +64,23 @@ class AuxiliarResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->whereIn('rol', ['auxiliar', 'sanitario']);
+        return parent::getEloquentQuery()->whereIn('rol', ['auxiliar', 'sanitario', 'otro']);
     }
 
     public static function form(Schema $schema): Schema
     {
-        $aux = fn (Get $get) => $get('rol') !== 'sanitario';
+        $aux = fn (Get $get) => $get('rol') === 'auxiliar';
 
         return $schema->components([
-            Hidden::make('rol')->default(fn () => request()->query('rol') === 'sanitario' ? 'sanitario' : 'auxiliar'),
+            Hidden::make('rol')->default(fn () => in_array(request()->query('rol'), ['sanitario', 'otro'], true) ? request()->query('rol') : 'auxiliar'),
+            // Otros roles (Ocio, Fisioterapia…): el área viene de «Añadir rol» en Equipo
+            Hidden::make('area_equipo_id')->default(fn () => request()->query('area')),
             Section::make('Datos personales')->columns(2)->schema([
                 FileUpload::make('foto')->label('Foto')->avatar()->image()->imageEditor()->directory('fotos')
-                    ->helperText('Ayuda a reconocerse en la tablet, sobre todo el primer día.')->columnSpanFull(),
+                    ->helperText(fn (Get $get) => $get('rol') === 'auxiliar' ? 'Ayuda a reconocerse en la tablet, sobre todo el primer día.' : 'Ayuda a reconocerle, sobre todo a quien acaba de llegar.')->columnSpanFull(),
                 TextInput::make('name')->label('Nombre y apellidos')->required()->columnSpanFull(),
             ]),
-            Section::make(fn (Get $get) => $get('rol') === 'sanitario' ? 'Puesto y horario' : 'Planta y turno')->columns(2)->schema([
+            Section::make(fn (Get $get) => match ($get('rol')) { 'sanitario' => 'Puesto y horario', 'otro' => 'Horario', default => 'Planta y turno' })->columns(2)->schema([
             Select::make('planta_id')->label('Planta')->options(Planta::pluck('nombre', 'id'))->placeholder('Todas las plantas')->visible($aux),
             Select::make('turno_habitual')->label('Turno habitual')->options(['manana' => 'Mañana', 'tarde' => 'Tarde', 'noche' => 'Noche'])->required($aux)->visible($aux),
             TextInput::make('telefono')->label('Teléfono o extensión de trabajo')->placeholder('Ext. 120 o móvil de empresa')->visible($aux)
@@ -94,7 +96,7 @@ class AuxiliarResource extends Resource
     public static function infolist(Schema $schema): Schema
     {
         $aux = fn (User $r) => $r->rol === 'auxiliar';
-        $san = fn (User $r) => $r->rol === 'sanitario';
+        $san = fn (User $r) => in_array($r->rol, ['sanitario', 'otro'], true);
 
         return $schema->components([
             // 1. Cabecera: quién es, dónde y cuándo trabaja, y si está ahora
@@ -103,7 +105,7 @@ class AuxiliarResource extends Resource
                     ->state(fn (User $r) => Avatar::url($r->foto, $r->name)),
                 Grid::make(1)->schema([
                     TextEntry::make('rol')->hiddenLabel()->badge()->color('gray')
-                        ->formatStateUsing(fn (User $r) => $r->rol === 'sanitario' ? $r->etiquetaPuesto() : ($r->responsable_turno ? 'Auxiliar · responsable de turno' : 'Auxiliar')),
+                        ->formatStateUsing(fn (User $r) => $r->rol !== 'auxiliar' ? $r->etiquetaPuesto() : ($r->responsable_turno ? 'Auxiliar · responsable de turno' : 'Auxiliar')),
                     TextEntry::make('donde')->hiddenLabel()->visible($aux)
                         ->state(fn (User $r) => ($r->planta?->nombre ?? 'Todas las plantas').' · turno de '.mb_strtolower($r->etiquetaTurno())),
                     TextEntry::make('ahora')->hiddenLabel()->visible($aux)->badge()
@@ -135,10 +137,10 @@ class AuxiliarResource extends Resource
 
             // Enfermería y medicina: no usan la app
             Section::make('Puesto y horario')->columns(2)->visible($san)->schema([
-                TextEntry::make('puesto')->label('Puesto')->formatStateUsing(fn (User $r) => $r->etiquetaPuesto()),
+                TextEntry::make('puesto')->label(fn (User $r) => $r->rol === 'otro' ? 'Área' : 'Puesto')->state(fn (User $r) => $r->etiquetaPuesto()),
                 TextEntry::make('horario')->label('Días y horario')->state(fn (User $r) => $r->etiquetaHorario()),
                 TextEntry::make('contacto')->label('Cómo localizarle')->placeholder('—')->copyable()->icon('heroicon-o-phone'),
-                TextEntry::make('app')->label('En Velia')->state('No entra en la app. Las auxiliares le ven en «Mi turno».'),
+                TextEntry::make('app')->label('En Velia')->state(fn (User $r) => $r->rol === 'otro' ? 'No entra en la app. Su ficha queda en Equipo, en su área.' : 'No entra en la app. Las auxiliares le ven en «Mi turno».'),
             ]),
             Section::make('Baja')->visible(fn (User $r) => ! $r->activo)->schema([
                 TextEntry::make('baja_motivo')->label('Motivo')->placeholder('—'),
@@ -149,10 +151,11 @@ class AuxiliarResource extends Resource
     /** Puesto, días, horario y cómo localizarle: lo que ve la auxiliar en «Mi turno». */
     public static function camposSanitario(): array
     {
-        $san = fn (Get $get) => $get('rol') === 'sanitario';
+        $san = fn (Get $get) => in_array($get('rol'), ['sanitario', 'otro'], true);
+        $soloSanitario = fn (Get $get) => $get('rol') === 'sanitario';
 
         return [
-            Select::make('puesto')->label('Puesto')->options(Residencia::PUESTOS)->required($san)->visible($san),
+            Select::make('puesto')->label('Puesto')->options(Residencia::PUESTOS)->required($soloSanitario)->visible($soloSanitario),
             CheckboxList::make('dias')->label('Días que viene')->visible($san)
                 ->options([1 => 'L', 2 => 'M', 3 => 'X', 4 => 'J', 5 => 'V', 6 => 'S', 7 => 'D'])->columns(7)->gridDirection('row'),
             TimePicker::make('desde')->label('Desde')->seconds(false)->visible($san),
@@ -266,7 +269,7 @@ class AuxiliarResource extends Resource
 
     public static function lineaEstado(User $r): string
     {
-        if ($r->rol === 'sanitario') {
+        if ($r->rol !== 'auxiliar') {
             return implode(' · ', array_filter([$r->etiquetaPuesto(), $r->etiquetaHorario(), $r->contacto, $r->activo ? null : 'De baja']));
         }
         $partes = [$r->planta?->nombre ?? 'Todas las plantas', $r->etiquetaTurno()];

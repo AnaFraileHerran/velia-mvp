@@ -65,7 +65,7 @@ class TurnoPanelProvider extends PanelProvider
                 Route::get('/primer-acceso', PrimerAcceso::class)->name('primer-acceso');
                 Route::get('/restablecer-pin', RestablecerPin::class)->name('restablecer-pin');
             })
-            ->renderHook(PanelsRenderHook::BODY_END, fn () => Filament::auth()->check() ? Blade::render("@include('filament.turno.partials.barra-inferior')") : '')
+            ->renderHook(PanelsRenderHook::BODY_END, fn () => Filament::auth()->check() ? Blade::render("@include('filament.turno.partials.barra-inferior')@include('filament.turno.partials.boton-grabar')") : '')
             // Botones y textos más grandes: se usa de pie, con prisa y a veces con guantes.
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => Blade::render("@include('filament.turno.partials.estilos')" . "@include('filament.marca.hover-accion')"))
             ->middleware([

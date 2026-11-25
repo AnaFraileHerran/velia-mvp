@@ -108,6 +108,7 @@ class DatabaseSeeder extends Seeder
         foreach ($avisos as [$tipo, $titulo, $r, $u]) {
             Aviso::create(['tipo' => $tipo, 'titulo' => $titulo, 'residente_id' => $r ? $res[$r]->id : null, 'urgencia' => $u]);
         }
+        \App\Support\Demo\AvisosTransversales::sembrar();
 
         Pregunta::create(['residente_id' => $res['Dolores Ramos']->id, 'texto' => '¿La rojez del talón de Dolores ha mejorado desde ayer?']);
 

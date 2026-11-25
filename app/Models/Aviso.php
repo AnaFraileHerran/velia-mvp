@@ -21,6 +21,10 @@ class Aviso extends Model
         'patron' => 'Se repite',
         'incidencia' => 'Incidencia',
         'turno_con_motivo' => 'Turno incompleto',
+        // Decisiones transversales de la dirección (25/11/2026, comentario de Pablo en INI-01)
+        'equipo' => 'Equipo',
+        'familia' => 'Familia',
+        'organizacion' => 'Organización',
     ];
 
     protected $fillable = ['tipo', 'titulo', 'residente_id', 'detalle', 'urgencia', 'estado', 'responsable_id', 'vence_el', 'hecho_at', 'revisado_por', 'revisado_at', 'motivo_descarte'];

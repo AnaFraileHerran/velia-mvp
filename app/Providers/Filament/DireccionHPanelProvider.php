@@ -54,8 +54,11 @@ class DireccionHPanelProvider extends PanelProvider
             ->favicon(asset('favicon.svg'))
             // Listas a todo el ancho, como Holded.
             ->maxContentWidth('full')
-            ->sidebarWidth('15rem')
-            ->sidebarCollapsibleOnDesktop()
+            // Menú lateral más estrecho y siempre abierto (comentarios de Pablo y Antonio): los nombres son cortos
+            // y en estas herramientas la altura es lo que más falta; la navegación arriba restaría alto.
+            ->sidebarWidth('14rem')
+            // Un solo buscador (el de Velia); se quita el de Filament para no tener dos campos.
+            ->globalSearch(false)
             ->discoverResources(in: app_path('Filament/Direccion/Resources'), for: 'App\\Filament\\Direccion\\Resources')
             ->pages([Inicio::class, Calidad::class, MiResidencia::class, Ocupacion::class, Ayuda::class])
             ->discoverWidgets(in: app_path('Filament/Direccion/Widgets'), for: 'App\\Filament\\Direccion\\Widgets')
@@ -72,10 +75,22 @@ class DireccionHPanelProvider extends PanelProvider
             ])
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => Blade::render("@include('filament.marca.ajustes-finos')" . "@include('filament.marca.hover-accion')" . "@include('filament.marca.dictado')"))
             // Barra superior al estilo Holded: aviso de versión, «+ Crear» e «Ir a… ⌘K».
-            ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => VersionH::activa() ? Blade::render("@include('filament.direccion-h.version')@include('filament.direccion-h.crear')@include('filament.direccion.partials.ir-a-boton')") : '')
+            ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => VersionH::activa() ? Blade::render("@include('filament.direccion-h.version')@include('filament.direccion-h.crear')@include('filament.direccion-h.buscar')") : '')
             // Libro de ayuda de la sección, junto a las acciones de cada pantalla.
             ->renderHook(PanelsRenderHook::PAGE_HEADER_ACTIONS_BEFORE, fn (array $scopes) => VersionH::activa() && ($ayuda = VersionH::ayudaSeccion($scopes)) ? view('filament.direccion-h.ayuda-seccion', ['ayuda' => $ayuda])->render() : '')
             ->renderHook(PanelsRenderHook::BODY_END, fn () => VersionH::activa() && filament()->auth()->check() ? Blade::render("@include('filament.direccion.partials.ir-a')") : '')
+            ->authenticatedRoutes(function () {
+                // Respuesta rápida del buscador: solo recibe la pregunta escrita, nunca datos de residentes (regla 10).
+                \Illuminate\Support\Facades\Route::get('respuesta-rapida', function (\Illuminate\Http\Request $request) {
+                    $q = trim((string) $request->query('q', ''));
+                    if (mb_strlen($q) < 3) {
+                        return response()->json(null);
+                    }
+                    $r = \App\Support\Ia\Asistente::responder($q);
+
+                    return response()->json(['texto' => $r['texto'], 'enlaces' => array_slice($r['enlaces'] ?? [], 0, 3), 'ejemplo' => \App\Support\Ia\Asistente::esSimulado()]);
+                })->name('respuesta-rapida');
+            })
             ->authMiddleware([Authenticate::class]);
     }
 }

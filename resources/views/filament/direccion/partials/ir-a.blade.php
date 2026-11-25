@@ -6,9 +6,24 @@
 @php
     $destinos = \App\Support\Destinos::paraPaleta();
     $ayuda = \App\Filament\Direccion\Pages\Ayuda::getUrl();
+    // Flujo nuevo (versión H, comentario de Pablo): respuesta rápida del asistente encima de los resultados, como el modo IA de un buscador.
+    // Solo se envía la pregunta escrita, nunca datos de residentes (regla 10). La búsqueda por significado queda para más adelante.
+    $rapida = \App\Support\VersionH::activa() ? route('filament.direccion-h.respuesta-rapida') : null;
 @endphp
 <div x-data="{
-        abierta: false, q: '', sel: 0,
+        abierta: false, q: '', sel: 0, respuesta: null, pensando: false, temporizador: null,
+        rapida: @js($rapida),
+        esPregunta(t) { t = this.norm(t.trim()); return t.length > 8 && (t.includes('?') || /^(como|que|donde|cuando|por que|quien|cual|puedo|hay)\b/.test(t) || t.split(' ').length >= 4); },
+        pedirRespuesta() {
+            clearTimeout(this.temporizador); this.respuesta = null;
+            if (!this.rapida || !this.esPregunta(this.q)) return;
+            const q = this.q.trim();
+            this.temporizador = setTimeout(async () => {
+                this.pensando = true;
+                try { const r = await fetch(this.rapida + '?q=' + encodeURIComponent(q), { headers: { Accept: 'application/json' } }); if (q === this.q.trim()) this.respuesta = await r.json(); } catch (e) {}
+                this.pensando = false;
+            }, 500);
+        },
         destinos: @js($destinos),
         norm(s) { return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); },
         get resultados() {
@@ -29,9 +44,20 @@
     <template x-teleport="body">
         <div x-show="abierta" x-cloak class="velia-ir-a-fondo" x-on:click.self="abierta = false" x-on:keydown.escape.window="abierta = false">
             <div class="velia-ir-a-caja" role="dialog" aria-modal="true" aria-label="Ir a">
-                <input x-ref="q" x-model="q" x-on:input="sel = 0" type="text" placeholder="¿Adónde quieres ir? Una pantalla, un residente, una tarea…"
+                <input x-ref="q" x-model="q" x-on:input="sel = 0; pedirRespuesta()" type="text" placeholder="{{ $rapida ? 'Busca o pregunta: un residente, una pantalla, «¿cómo restablezco un PIN?»…' : '¿Adónde quieres ir? Una pantalla, un residente, una tarea…' }}"
                     x-on:keydown.down.prevent="mover(1)" x-on:keydown.up.prevent="mover(-1)" x-on:keydown.enter.prevent="ir(resultados[sel])"
                     role="combobox" aria-controls="velia-ir-a-lista" aria-autocomplete="list">
+                <div x-show="rapida && (pensando || respuesta)" x-cloak class="velia-ir-a-respuesta" aria-live="polite">
+                    <p class="velia-ir-a-respuesta-cabecera">
+                        Velia responde
+                        <span x-show="respuesta && respuesta.ejemplo" class="velia-sugiere-ejemplo">Ejemplo</span>
+                    </p>
+                    <p x-show="pensando" class="text-sm text-gray-500">Pensando…</p>
+                    <p x-show="respuesta" x-text="respuesta && respuesta.texto" class="text-sm text-gray-800"></p>
+                    <div x-show="respuesta && respuesta.enlaces && respuesta.enlaces.length" class="flex flex-wrap gap-x-3 gap-y-1 pt-1">
+                        <template x-for="e in (respuesta ? respuesta.enlaces : [])" :key="e.url"><a :href="e.url" class="text-sm font-medium text-primary-700 hover:underline" x-text="e.titulo + ' →'"></a></template>
+                    </div>
+                </div>
                 <div id="velia-ir-a-lista" class="velia-ir-a-lista" role="listbox">
                     <template x-for="(d, i) in resultados" :key="d.id">
                         <div>

@@ -23,14 +23,22 @@ class CreateAuxiliar extends CreateRecord
 
     public function getTitle(): string
     {
-        return request()->query('rol') === 'sanitario' || ($this->data['rol'] ?? null) === 'sanitario' ? 'Añadir enfermería o medicina' : 'Añadir auxiliar';
+        $rol = $this->data['rol'] ?? request()->query('rol');
+        if ($rol === 'otro') {
+            $area = \App\Models\AreaEquipo::find($this->data['area_equipo_id'] ?? request()->query('area'));
+
+            return 'Añadir a '.($area?->nombre ?? 'otro rol');
+        }
+
+        return $rol === 'sanitario' ? 'Añadir enfermería o medicina' : 'Añadir auxiliar';
     }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        if (($data['rol'] ?? null) === 'sanitario') {
+        if (in_array($data['rol'] ?? null, ['sanitario', 'otro'], true)) {
             return $data; // no entra en la app: sin PIN ni código
         }
+        $data['area_equipo_id'] = null;
         $data['rol'] = 'auxiliar';
         $data['codigo_invitacion'] = Str::upper(Str::random(3)).random_int(100, 999);
 
@@ -39,6 +47,11 @@ class CreateAuxiliar extends CreateRecord
 
     protected function afterCreate(): void
     {
+        if ($this->record->rol === 'otro') {
+            Notification::make()->title("{$this->record->name} ya está en {$this->record->etiquetaPuesto()}.")->success()->send();
+
+            return;
+        }
         if ($this->record->rol === 'sanitario') {
             Notification::make()->title("{$this->record->name} ya aparece en «Mi turno» de las auxiliares.")->success()->send();
 
@@ -58,6 +71,10 @@ class CreateAuxiliar extends CreateRecord
 
     protected function getRedirectUrl(): string
     {
-        return static::getResource()::getUrl('index', $this->record->rol === 'sanitario' ? ['activeTab' => 'sanitarios'] : []);
+        return static::getResource()::getUrl('index', match ($this->record->rol) {
+            'sanitario' => ['activeTab' => 'sanitarios'],
+            'otro' => ['activeTab' => 'area-'.$this->record->area_equipo_id],
+            default => [],
+        });
     }
 }

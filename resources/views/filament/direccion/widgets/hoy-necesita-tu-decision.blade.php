@@ -28,6 +28,10 @@
                             {{ ($this->quienFaltaAction)(['planta' => (int) $aviso->detalle]) }}
                         @elseif ($aviso->tipo === 'revision_vencida')
                             {{ ($this->asignarAction)(['aviso' => $aviso->id]) }}
+                        @elseif (in_array($aviso->tipo, ['equipo', 'familia', 'organizacion']))
+                            {{-- Decisiones de dirección: se encargan a alguien con plazo o se dan por revisadas --}}
+                            {{ ($this->revisadoAction)(['aviso' => $aviso->id]) }}
+                            {{ ($this->asignarAction)(['aviso' => $aviso->id]) }}
                         @else
                             {{ ($this->revisadoAction)(['aviso' => $aviso->id]) }}
                             {{ ($this->preguntarAction)(['aviso' => $aviso->id]) }}
@@ -35,7 +39,12 @@
                         {{ ($this->noProcedeAction)(['aviso' => $aviso->id]) }}
                     </div>
                     </div>
-                    @if ($s = $this->sugerencia($aviso))
+                    @if (($s = $this->sugerencia($aviso)) && \App\Support\VersionH::activa())
+                        <x-velia-sugiere-linea :texto="$s['texto']" :porque="$s['porque']">
+                            <x-filament::link tag="button" size="sm" wire:click="aceptarSugerencia({{ $aviso->id }})">Aceptar</x-filament::link>
+                            <x-filament::link tag="button" color="gray" size="sm" wire:click="descartarSugerencia({{ $aviso->id }})" aria-label="Descartar la sugerencia">No</x-filament::link>
+                        </x-velia-sugiere-linea>
+                    @elseif ($s)
                         <x-velia-sugiere :texto="$s['texto']" :porque="$s['porque']">
                             <x-filament::button size="sm" wire:click="aceptarSugerencia({{ $aviso->id }})" icon="heroicon-o-check">Aceptar</x-filament::button>
                             <span class="text-xs text-gray-500">o cámbialo con «{{ $s['tipo'] === 'asignar' ? 'Asignar' : 'Preguntar al turno' }}»</span>
