@@ -156,3 +156,21 @@ Mismas pantallas y datos que `/direccion`, con patrones de uso de Holded para co
 | Turno: botón flotante de micrófono → elegir residente → graba | Antonio · A1-02 | `turno/partials/boton-grabar.blade.php`, `Turno/Pages/Registrar.php` |
 | Cómo atender: icono junto a cada dato | Antonio · A1-04 | `turno/partials/como-atender.blade.php` |
 | Landing de dirección: pantalla de éxito al enviar | Ana · LAND-D | `public/landing/direccion.html` |
+
+## App de la auxiliar con shadcn-vue · `/auxiliar` (25/11/2026)
+
+Inertia + Vue 3 + shadcn-vue. Mismo flujo y misma lógica que `/turno` (TurnoActual, OrdenarRegistro, Sugerencias); solo cambia la interfaz.
+
+| Pantalla | Ruta | Archivo |
+|---|---|---|
+| Entrar con PIN | `/auxiliar/entrar` | `resources/js/auxiliar/Pages/Entrar.vue` |
+| Resumen del turno | `/auxiliar` | `Pages/Resumen.vue` |
+| Cómo atender (hoja lateral) | desde Resumen y Residentes | `components/ComoAtender.vue` |
+| Residentes | `/auxiliar/residentes` | `Pages/Residentes.vue` |
+| Registrar: grabar · escribir · revisar | `/auxiliar/registrar/{id}` | `Pages/Registrar.vue` |
+| Micro flotante | Resumen y Mi turno | `components/BotonGrabar.vue` |
+| Mi turno | `/auxiliar/mi-turno` | `Pages/MiTurno.vue` |
+| Cerrar el turno | `/auxiliar/cerrar` | `Pages/CerrarTurno.vue` |
+| Marco: barra inferior, sin conexión, bloqueo a 5 min | — | `components/AuxiliarLayout.vue` |
+
+Sigue en Filament: primer acceso (crear PIN) y restablecer PIN.

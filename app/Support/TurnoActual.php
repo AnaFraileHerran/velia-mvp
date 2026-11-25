@@ -21,8 +21,12 @@ class TurnoActual
 
     public static function make(): self
     {
-        $u = Filament::auth()->user();
+        return self::para(Filament::auth()->user());
+    }
 
+    /** Para la app de la auxiliar en shadcn-vue (/auxiliar), que no pasa por Filament. */
+    public static function para(User $u): self
+    {
         return new self($u, $u->turnoAbierto());
     }
 
