@@ -1,7 +1,6 @@
 <x-filament-widgets::widget class="velia-alto">
-    <x-filament::section>
+    <x-filament::section compact>
         <x-slot name="heading">Próximamente</x-slot>
-        <x-slot name="description">Lo que vence hasta el {{ $hasta->locale('es')->isoFormat('D [de] MMMM') }}, por importancia.</x-slot>
         <x-slot name="afterHeader">
             {{-- Horizonte: la dirección planifica por semana, mes o trimestre --}}
             <div class="velia-segmentado" role="group" aria-label="Horizonte">
@@ -31,7 +30,7 @@
         @endif
 
         <ul class="velia-prox">
-            @forelse ($items as $i)
+            @forelse ($todos ? $items : array_slice($items, 0, \App\Filament\Direccion\Widgets\ProximamenteH::VISIBLES) as $i)
                 <li>
                     <span class="velia-punto velia-nivel-{{ $i['nivel'] }}" title="Importancia {{ $i['nivel'] }}" aria-label="Importancia {{ $i['nivel'] }}"></span>
                     <a href="{{ $i['url'] }}" class="min-w-0 flex-1 text-sm text-gray-950 hover:underline">{{ $i['titulo'] }}</a>
@@ -41,6 +40,13 @@
                 <li class="text-sm text-gray-500">Nada más en este horizonte.</li>
             @endforelse
         </ul>
+        {{-- Por defecto, los 5 más importantes: el Inicio cabe sin scroll. El resto, a un clic y en el mismo sitio. --}}
+        <div class="flex items-center justify-between gap-2 pt-2 text-xs text-gray-500">
+            <span>Hasta el {{ $hasta->locale('es')->isoFormat('D [de] MMMM') }} · por importancia</span>
+            @if (count($items) > \App\Filament\Direccion\Widgets\ProximamenteH::VISIBLES)
+                <x-filament::link tag="button" size="sm" wire:click="$toggle('todos')">{{ $todos ? 'Ver menos' : 'Ver '.(count($items) - \App\Filament\Direccion\Widgets\ProximamenteH::VISIBLES).' más' }}</x-filament::link>
+            @endif
+        </div>
     </x-filament::section>
     <x-filament-actions::modals />
 </x-filament-widgets::widget>

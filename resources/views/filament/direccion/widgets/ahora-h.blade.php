@@ -10,7 +10,11 @@
         <div class="velia-ahora-rejilla">
             @foreach ($plantas as $p)
                 <div @class(['velia-ahora-item', 'velia-ahora-item-aviso' => $p['aviso']])>
-                    <p class="velia-ahora-etiqueta">{{ $p['planta'] }}</p>
+                    {{-- Se pulsa la planta y se abre lo que pasa ahora en ella (panel lateral) --}}
+                    <button type="button" class="velia-ahora-planta" wire:click="mountAction('verPlanta', { planta: {{ $p['id'] }} })" aria-label="Ver {{ $p['planta'] }} ahora">
+                        {{ $p['planta'] }}
+                        <x-filament::icon icon="heroicon-m-chevron-right" class="h-3.5 w-3.5" aria-hidden="true" />
+                    </button>
                     @if ($p['personas']->isNotEmpty())
                         <div class="flex items-center gap-1">
                             @foreach ($p['personas']->take(3) as $u)
@@ -29,10 +33,10 @@
                     @else
                         <p class="text-sm text-gray-500">Sin turno abierto</p>
                     @endif
-                    <p class="text-xs text-gray-500">
+                    <button type="button" class="text-left text-xs text-gray-500 hover:text-gray-700" wire:click="mountAction('verPlanta', { planta: {{ $p['id'] }} })">
                         <span class="velia-ahora-barra" aria-hidden="true"><span style="width: {{ $p['total'] ? round($p['registrados'] / $p['total'] * 100) : 0 }}%"></span></span>
                         {{ $p['registrados'] }} de {{ $p['total'] }} registrados
-                    </p>
+                    </button>
                 </div>
             @endforeach
 

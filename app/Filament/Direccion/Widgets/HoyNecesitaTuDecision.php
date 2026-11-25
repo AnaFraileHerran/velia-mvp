@@ -133,7 +133,7 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
     public function preguntarAction(): Action
     {
         return Action::make('preguntar')
-            ->label('Preguntar al turno')
+            ->label(fn () => \App\Support\VersionH::activa() ? 'Preguntar' : 'Preguntar al turno')
             ->color('gray')
             ->fillForm(fn (array $arguments) => (($s = Sugerencias::paraAviso(Aviso::find($arguments['aviso']))) && $s['tipo'] === 'preguntar') ? $s['datos'] : [])
             ->schema([Textarea::make('texto')->label('Pregunta')->required()->rows(2)])
@@ -150,7 +150,7 @@ class HoyNecesitaTuDecision extends Widget implements HasActions, HasForms
     public function revisadoAction(): Action
     {
         return Action::make('revisado')
-            ->label('Ya lo he revisado')
+            ->label(fn () => \App\Support\VersionH::activa() ? 'Revisado' : 'Ya lo he revisado')
             ->icon('heroicon-o-check')
             ->color('gray')
             ->action(function (array $arguments) {

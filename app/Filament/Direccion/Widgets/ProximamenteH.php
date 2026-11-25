@@ -28,18 +28,24 @@ class ProximamenteH extends EstaSemana
 
     public string $horizonte = 'semana';
 
+    /** Cuántas cosas se ven sin pulsar «Ver más»: con 5 el Inicio cabe sin scroll a 1440 × 900. */
+    public const VISIBLES = 5;
+
+    public bool $todos = false;
+
     public const HORIZONTES = ['semana' => ['Semana', 7], 'mes' => ['Mes', 30], 'trimestre' => ['Trimestre', 90]];
 
     public function verHorizonte(string $h): void
     {
         $this->horizonte = array_key_exists($h, self::HORIZONTES) ? $h : 'semana';
+        $this->todos = false;
     }
 
     protected function getViewData(): array
     {
         $hasta = today()->addDays(self::HORIZONTES[$this->horizonte][1]);
 
-        return ['hito' => $this->hito(), 'items' => $this->items($hasta), 'hasta' => $hasta,
+        return ['hito' => $this->hito(), 'items' => $this->items($hasta), 'hasta' => $hasta, 'todos' => $this->todos,
             'hayPreguntas' => Pregunta::abiertas()->exists()];
     }
 

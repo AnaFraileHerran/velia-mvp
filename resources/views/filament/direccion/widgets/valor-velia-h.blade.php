@@ -1,43 +1,81 @@
 <x-filament-widgets::widget>
-    @php($semana = \App\Support\Semana::resumen())
-    <x-filament::section heading="Cómo va tu residencia con Velia" description="El servicio en los últimos 7 días y lo que Velia ha hecho en los últimos 30.">
-        <dl class="velia-valor">
-            <div>
-                <dt>Turnos cerrados completos · 7 días</dt>
-                <dd class="velia-valor-cifra">{{ $semana['completos'] }} de {{ $semana['turnos'] }}</dd>
-                @if ($semana['con_pendientes'])
-                    <dd class="flex flex-wrap items-center gap-2 text-sm text-gray-600">{{ $semana['con_pendientes'] }} con pendientes {{ $this->verTurnosAction }}</dd>
-                @endif
+    @php
+        $semana = \App\Support\Semana::resumen();
+        $pctTurnos = $semana['turnos'] ? round($semana['completos'] / $semana['turnos'] * 100) : 0;
+        $dif = $semana['diferencia'];
+    @endphp
+    {{--
+        Cómo va tu residencia con Velia (Nueva versión, 25/11/2026). Dos grupos para que se lea la historia:
+        el servicio (7 días, gris y verde) y lo que ha hecho Velia (30 días, cobalto). Cada cifra con su icono, una
+        señal visual (barra o tendencia) y una línea. Lo que no se mide aún, honesto: «Ejemplo» o «—» (regla 11).
+    --}}
+    {{-- Sin cabecera de sección: los dos títulos de grupo ya cuentan la historia y así el Inicio cabe sin scroll --}}
+    <x-filament::section compact aria-label="Cómo va tu residencia con Velia">
+
+        <div class="velia-valor-grupos">
+            <div class="velia-valor-grupo">
+                <p class="velia-valor-titulo">Cómo va tu residencia · últimos 7 días</p>
+                <div class="velia-valor-fila">
+                    <div class="velia-kpi">
+                        <span class="velia-kpi-icono velia-kpi-icono-verde"><x-filament::icon icon="heroicon-o-clipboard-document-check" class="h-5 w-5" /></span>
+                        <div class="min-w-0 flex-1">
+                            <p class="velia-kpi-etiqueta">Turnos completos</p>
+                            <p class="velia-kpi-cifra">{{ $semana['completos'] }}<span class="velia-kpi-de">/{{ $semana['turnos'] }}</span></p>
+                            <span class="velia-kpi-barra" aria-hidden="true"><span style="width: {{ $pctTurnos }}%"></span></span>
+                            <p class="velia-kpi-nota">@if ($semana['con_pendientes']){{ $semana['con_pendientes'] }} con pendientes · {{ $this->verTurnosAction }}@else Todos sin pendientes @endif</p>
+                        </div>
+                    </div>
+                    <div class="velia-kpi">
+                        <span class="velia-kpi-icono {{ $dif > 0 ? 'velia-kpi-icono-rojo' : 'velia-kpi-icono-gris' }}"><x-filament::icon icon="heroicon-o-exclamation-triangle" class="h-5 w-5" /></span>
+                        <div class="min-w-0 flex-1">
+                            <p class="velia-kpi-etiqueta">Incidencias</p>
+                            <p class="velia-kpi-cifra">{{ $semana['incidencias'] }}
+                                <span class="velia-tendencia {{ $dif > 0 ? 'velia-tendencia-mal' : ($dif < 0 ? 'velia-tendencia-bien' : '') }}">{{ $dif > 0 ? '↑ '.$dif : ($dif < 0 ? '↓ '.abs($dif) : '=') }}</span>
+                            </p>
+                            <p class="velia-kpi-nota">frente a la semana anterior @if ($semana['incidencias'])· {{ $this->verIncidenciasAction }}@endif</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <dt>Incidencias · 7 días</dt>
-                <dd class="velia-valor-cifra">{{ $semana['incidencias'] }}</dd>
-                <dd class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-                    {{ $semana['diferencia'] > 0 ? $semana['diferencia'].' más' : ($semana['diferencia'] < 0 ? abs($semana['diferencia']).' menos' : 'Igual') }} que la semana anterior
-                    @if ($semana['incidencias']){{ $this->verIncidenciasAction }}@endif
-                </dd>
+
+            <div class="velia-valor-grupo velia-valor-grupo-velia">
+                <p class="velia-valor-titulo"><x-filament::icon icon="heroicon-o-sparkles" class="h-3.5 w-3.5" /> Lo que ha hecho Velia · últimos 30 días</p>
+                <div class="velia-valor-fila">
+                    <div class="velia-kpi">
+                        <span class="velia-kpi-icono"><x-filament::icon icon="heroicon-o-pencil-square" class="h-5 w-5" /></span>
+                        <div class="min-w-0 flex-1">
+                            <p class="velia-kpi-etiqueta">Registros</p>
+                            <p class="velia-kpi-cifra">{{ $registros }}</p>
+                            <p class="velia-kpi-nota" title="Cada registro confirmado cuenta como evidencia para la UNE 158101">{{ str_replace('.', ',', $porResidente) }} por residente y día</p>
+                        </div>
+                    </div>
+                    <div class="velia-kpi">
+                        <span class="velia-kpi-icono"><x-filament::icon icon="heroicon-o-envelope" class="h-5 w-5" /></span>
+                        <div class="min-w-0 flex-1">
+                            <p class="velia-kpi-etiqueta">Resúmenes enviados</p>
+                            <p class="velia-kpi-cifra">{{ $enviados }}</p>
+                            <p class="velia-kpi-nota">a las familias, sin escribirlos</p>
+                        </div>
+                    </div>
+                    <div class="velia-kpi">
+                        <span class="velia-kpi-icono"><x-filament::icon icon="heroicon-o-clock" class="h-5 w-5" /></span>
+                        <div class="min-w-0 flex-1">
+                            <p class="velia-kpi-etiqueta">Tiempo devuelto</p>
+                            <p class="velia-kpi-cifra">≈ {{ $horas }} h <span class="velia-sugiere-ejemplo" title="Estimación: {{ \App\Filament\Direccion\Widgets\ValorVeliaH::MINUTOS_POR_REGISTRO }} minutos menos por registro frente al papel. Se medirá en el piloto.">Ejemplo</span></p>
+                            <p class="velia-kpi-nota">al cuidado de los residentes</p>
+                        </div>
+                    </div>
+                    <div class="velia-kpi velia-kpi-pendiente">
+                        <span class="velia-kpi-icono velia-kpi-icono-gris"><x-filament::icon icon="heroicon-o-heart" class="h-5 w-5" /></span>
+                        <div class="min-w-0 flex-1">
+                            <p class="velia-kpi-etiqueta">Satisfacción</p>
+                            <p class="velia-kpi-cifra text-gray-400">—</p>
+                            <p class="velia-kpi-nota">de las familias · aún no se mide</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <dt>Registros del equipo · 30 días</dt>
-                <dd class="velia-valor-cifra">{{ $registros }}</dd>
-                <dd class="text-sm text-gray-600">{{ str_replace('.', ',', $porResidente) }} por residente y día · cuentan como evidencia UNE</dd>
-            </div>
-            <div>
-                <dt>Resúmenes enviados a familias</dt>
-                <dd class="velia-valor-cifra">{{ $enviados }}</dd>
-                <dd class="text-sm text-gray-600">Sin escribirlos a mano</dd>
-            </div>
-            <div>
-                <dt>Tiempo devuelto al cuidado · 30 días <span class="velia-sugiere-ejemplo" title="Estimación: {{ \App\Filament\Direccion\Widgets\ValorVeliaH::MINUTOS_POR_REGISTRO }} minutos menos por registro frente al papel. Se medirá en el piloto.">Ejemplo</span></dt>
-                <dd class="velia-valor-cifra">≈ {{ $horas }} h</dd>
-                <dd class="text-sm text-gray-600">Estimado, hasta medirlo en el piloto</dd>
-            </div>
-            <div>
-                <dt>Satisfacción de las familias</dt>
-                <dd class="velia-valor-cifra text-gray-400">Sin datos aún</dd>
-                <dd class="text-sm text-gray-600">Aún no se mide: falta decidir cómo</dd>
-            </div>
-        </dl>
+        </div>
     </x-filament::section>
     <x-filament-actions::modals />
 </x-filament-widgets::widget>
