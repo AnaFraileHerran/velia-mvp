@@ -76,8 +76,9 @@ class DireccionHPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => Blade::render("@include('filament.marca.ajustes-finos')" . "@include('filament.marca.hover-accion')" . "@include('filament.marca.dictado')"))
             // Barra superior al estilo Holded: aviso de versión, «+ Crear» e «Ir a… ⌘K».
             ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => VersionH::activa() ? Blade::render("@include('filament.direccion-h.version')@include('filament.direccion-h.crear')@include('filament.direccion-h.buscar')") : '')
-            // Libro de ayuda de la sección, junto a las acciones de cada pantalla.
-            ->renderHook(PanelsRenderHook::PAGE_HEADER_ACTIONS_BEFORE, fn (array $scopes) => VersionH::activa() && ($ayuda = VersionH::ayudaSeccion($scopes)) ? view('filament.direccion-h.ayuda-seccion', ['ayuda' => $ayuda])->render() : '')
+            // Ayuda de la pantalla: un «?» pegado al título (25/11/2026). No junto a las acciones (esa zona es para lo frecuente,
+            // comentario de Pablo) ni flotante (el flotante es para la acción principal y en la auxiliar ya es el micro).
+            ->renderHook(PanelsRenderHook::PAGE_HEADER_HEADING_AFTER, fn (array $scopes) => VersionH::activa() && ($ayuda = VersionH::ayudaSeccion($scopes)) ? view('filament.direccion-h.ayuda-seccion', ['ayuda' => $ayuda])->render() : '')
             ->renderHook(PanelsRenderHook::BODY_END, fn () => VersionH::activa() && filament()->auth()->check() ? Blade::render("@include('filament.direccion.partials.ir-a')") : '')
             ->authenticatedRoutes(function () {
                 // Respuesta rápida del buscador: solo recibe la pregunta escrita, nunca datos de residentes (regla 10).

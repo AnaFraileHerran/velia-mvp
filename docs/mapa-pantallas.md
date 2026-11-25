@@ -139,7 +139,7 @@ Mismas pantallas y datos que `/direccion`, con patrones de uso de Holded para co
 | «+ Crear» global: residente, salida, auxiliar, enfermería o medicina | Barra superior | `resources/views/filament/direccion-h/crear.blade.php` |
 | Inicio con pestañas Hoy · Esta semana · Auditoría, con contador | Inicio | `Pages/Inicio.php` (`content()`, `getWidgets()`), `direccion-h/pestanas-inicio.blade.php`, `Widgets/LoQueFaltaAuditoria.php` |
 | Listas con pestañas de estado y contador | Residentes, Familias | `ListResidentes.php`, `ManageResumenes.php` (`getTabs()`) |
-| Botón «Ayuda» por sección (icono de interrogación, el mismo del menú), con la pregunta lista para Velia | Cabecera de cada pantalla | `direccion-h/ayuda-seccion.blade.php`, textos en `VersionH::ayudaSeccion()` |
+| «?» de ayuda pegado al título de cada pantalla (icono de interrogación, el mismo del menú), con la pregunta lista para Velia | Junto al título | `direccion-h/ayuda-seccion.blade.php`, textos en `VersionH::ayudaSeccion()` |
 
 ### Flujo nuevo del Inicio y comentarios de Figma (25/11/2026)
 

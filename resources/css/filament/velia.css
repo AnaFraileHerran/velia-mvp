@@ -164,3 +164,7 @@
 .velia-dato-icono { width: 2rem; height: 2rem; flex-shrink: 0; border-radius: 0.5rem; background: var(--gray-100); color: var(--gray-700); display: flex; align-items: center; justify-content: center; }
 .velia-dato-icono svg { width: 1.125rem; height: 1.125rem; }
 body:has(.velia-fab) .fi-main { padding-bottom: 10rem; }
+/* Ayuda de la pantalla junto al título (Nueva versión): título y «?» en la misma línea; migas y subtítulo, a lo ancho */
+div:has(> .velia-ayuda-titulo) { display: flex; flex-wrap: wrap; align-items: center; column-gap: 0.25rem; }
+div:has(> .velia-ayuda-titulo) > .fi-breadcrumbs, div:has(> .velia-ayuda-titulo) > .fi-header-subheading { flex-basis: 100%; }
+.velia-ayuda-titulo { display: inline-flex; }
