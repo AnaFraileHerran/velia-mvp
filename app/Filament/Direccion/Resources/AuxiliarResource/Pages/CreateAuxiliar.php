@@ -72,8 +72,8 @@ class CreateAuxiliar extends CreateRecord
     protected function getRedirectUrl(): string
     {
         return static::getResource()::getUrl('index', match ($this->record->rol) {
-            'sanitario' => ['activeTab' => 'sanitarios'],
-            'otro' => ['activeTab' => 'area-'.$this->record->area_equipo_id],
+            'sanitario' => ['tab' => 'sanitarios'],
+            'otro' => ['tab' => 'area-'.$this->record->area_equipo_id],
             default => [],
         });
     }

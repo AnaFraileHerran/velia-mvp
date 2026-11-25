@@ -75,7 +75,7 @@ class Ayuda extends Page
         return [
             'Empezar' => [
                 ['Dar de alta a una auxiliar', 'En Equipo, «Añadir auxiliar». Velia genera un PIN provisional y un código para su móvil: díselos en persona. El primer día crea su propio PIN.', AuxiliarResource::getUrl('create'), 'Ir a Equipo'],
-                ['Añadir enfermería o medicina', 'En Equipo, pestaña «Enfermería y medicina». Indica días y horario: las auxiliares verán en «Mi turno» quién está y cómo localizarle.', AuxiliarResource::getUrl('index', ['activeTab' => 'sanitarios']), 'Ir a Equipo'],
+                ['Añadir enfermería o medicina', 'En Equipo, pestaña «Enfermería y medicina». Indica días y horario: las auxiliares verán en «Mi turno» quién está y cómo localizarle.', AuxiliarResource::getUrl('index', ['tab' => 'sanitarios']), 'Ir a Equipo'],
                 ['Dar de alta a un residente', 'En Residentes, «Añadir residente». Rellena al menos la ficha de cuidados: sin ella, una auxiliar nueva no sabrá cómo atenderle.', ResidenteResource::getUrl('create'), 'Añadir residente'],
                 ['Añadir a la familia', 'En la ficha del residente, pestaña «Autorizados de la familia». Sin contacto, no se puede enviar el resumen semanal.', ResidenteResource::getUrl(), 'Ir a Residentes'],
             ],

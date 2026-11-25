@@ -33,7 +33,7 @@ class Destinos
             ['id' => 'inicio', 'titulo' => 'Inicio · Hoy necesita tu decisión', 'grupo' => 'Ir a', 'url' => Inicio::getUrl(), 'claves' => 'inicio avisos hoy decidir pendiente portada'],
             ['id' => 'equipo', 'titulo' => 'Equipo', 'grupo' => 'Ir a', 'url' => AuxiliarResource::getUrl(), 'claves' => 'equipo auxiliares tecnicos cuidados personal trabajadoras'],
             ['id' => 'equipo-nueva', 'titulo' => 'Dar de alta a una auxiliar', 'grupo' => 'Hacer', 'url' => AuxiliarResource::getUrl('create'), 'claves' => 'alta nueva auxiliar añadir contratar pin codigo movil'],
-            ['id' => 'equipo-sanitarios', 'titulo' => 'Enfermería y medicina', 'grupo' => 'Ir a', 'url' => AuxiliarResource::getUrl('index', ['activeTab' => 'sanitarios']), 'claves' => 'enfermeria enfermera medico medicina sanitarios horario'],
+            ['id' => 'equipo-sanitarios', 'titulo' => 'Enfermería y medicina', 'grupo' => 'Ir a', 'url' => AuxiliarResource::getUrl('index', ['tab' => 'sanitarios']), 'claves' => 'enfermeria enfermera medico medicina sanitarios horario'],
             ['id' => 'residentes', 'titulo' => 'Residentes', 'grupo' => 'Ir a', 'url' => ResidenteResource::getUrl(), 'claves' => 'residentes mayores fichas habitaciones'],
             ['id' => 'residente-nuevo', 'titulo' => 'Dar de alta a un residente', 'grupo' => 'Hacer', 'url' => ResidenteResource::getUrl('create'), 'claves' => 'alta nuevo residente ingreso añadir dictar ficha'],
             ['id' => 'planes-vencidos', 'titulo' => 'Planes personales vencidos', 'grupo' => 'Pendiente', 'url' => $filtro('plan_vencido'), 'claves' => 'plan personal vencido revision pai seis meses'],
