@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Facades\Filament;
 use App\Filament\Turno\Pages\Auth\PinLogin;
 use App\Filament\Turno\Acceso\PrimerAcceso;
 use App\Filament\Turno\Acceso\RestablecerPin;
@@ -26,7 +27,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 /**
  * App de las auxiliares (tablet compartida o móvil). Sin menú lateral: barra inferior de 3 pestañas
- * (Relevo · Residentes · Mi turno), como en «Wireframes v2 · propuesta UX». Debe funcionar a 390 px.
+ * (Resumen · Residentes · Mi turno), como en «Wireframes v2 · propuesta UX». Debe funcionar a 390 px.
  */
 class TurnoPanelProvider extends PanelProvider
 {
@@ -64,9 +65,9 @@ class TurnoPanelProvider extends PanelProvider
                 Route::get('/primer-acceso', PrimerAcceso::class)->name('primer-acceso');
                 Route::get('/restablecer-pin', RestablecerPin::class)->name('restablecer-pin');
             })
-            ->renderHook(PanelsRenderHook::BODY_END, fn () => \Filament\Facades\Filament::auth()->check() ? Blade::render("@include('filament.turno.partials.barra-inferior')") : '')
+            ->renderHook(PanelsRenderHook::BODY_END, fn () => Filament::auth()->check() ? Blade::render("@include('filament.turno.partials.barra-inferior')@include('filament.turno.partials.boton-grabar')") : '')
             // Botones y textos más grandes: se usa de pie, con prisa y a veces con guantes.
-            ->renderHook(PanelsRenderHook::HEAD_END, fn () => Blade::render("@include('filament.turno.partials.estilos')"))
+            ->renderHook(PanelsRenderHook::HEAD_END, fn () => Blade::render("@include('filament.turno.partials.estilos')" . "@include('filament.marca.hover-accion')"))
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
  */
 class RestablecerPin extends SimplePage
 {
-    protected static string $view = 'filament.turno.auth.restablecer-pin';
+    protected string $view = 'filament.turno.auth.restablecer-pin';
 
     protected static string $layout = 'filament-panels::components.layout.simple';
 

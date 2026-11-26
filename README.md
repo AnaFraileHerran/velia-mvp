@@ -1,11 +1,13 @@
 # Velia · MVP
 
-Wireframes funcionales del MVP de Velia montados con Laravel y [Filament](https://filamentphp.com). Siguen la página «Wireframes v2 · propuesta UX» de Figma y los flujos del FigJam.
+Wireframes funcionales del MVP de Velia montados con Laravel 13 y [Filament 5](https://filamentphp.com) (Livewire 4, Tailwind 4, SQLite en local). Siguen la página «Wireframes v2 · propuesta UX» de Figma y los flujos del FigJam.
 
 ## Arrancar en local
 
+Necesitas PHP 8.3+ (con las extensiones intl, zip y pdo_sqlite) y Composer. Node 20+ es opcional: compila el tema de Velia.
+
 ```bash
-git clone https://github.com/AnaFraileHerran/velia-mvp
+git clone <URL del repositorio en GitLab>
 cd velia-mvp
 bash bin/setup.sh
 php artisan serve

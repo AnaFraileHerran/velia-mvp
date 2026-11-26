@@ -13,7 +13,7 @@ class Residente extends Model
     protected $fillable = [
         'nombre', 'dni', 'fecha_nacimiento', 'fecha_ingreso', 'planta_id', 'habitacion', 'tipo_habitacion',
         'estado', 'baja_motivo', 'baja_fecha', 'alergias', 'riesgos', 'movilidad', 'sujecion', 'dieta',
-        'como_tratarle', 'notas', 'informes', 'plan_ultima_revision', 'plan_proxima_revision', 'plan_responsable_id', 'foto',
+        'como_tratarle', 'notas', 'informes', 'plan_ultima_revision', 'plan_proxima_revision', 'plan_responsable_id', 'foto', 'sujecion_anotada',
     ];
 
     protected function casts(): array
@@ -39,9 +39,25 @@ class Residente extends Model
         return $this->belongsTo(User::class, 'plan_responsable_id');
     }
 
+    protected static function booted(): void
+    {
+        // Si alguien guarda el dato de sujeción (sí o no), deja de estar «sin anotar».
+        static::saving(function (self $r) {
+            if ($r->isDirty('sujecion')) {
+                $r->sujecion_anotada = true;
+            }
+        });
+    }
+
     public function contactos(): HasMany
     {
         return $this->hasMany(Contacto::class);
+    }
+
+    /** Comunicaciones con la familia (26/11/2026): evidencia para la inspección. */
+    public function comunicaciones(): HasMany
+    {
+        return $this->hasMany(Comunicacion::class)->latest('fecha');
     }
 
     public function registros(): HasMany

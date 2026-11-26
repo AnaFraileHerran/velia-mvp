@@ -108,6 +108,7 @@ class DatabaseSeeder extends Seeder
         foreach ($avisos as [$tipo, $titulo, $r, $u]) {
             Aviso::create(['tipo' => $tipo, 'titulo' => $titulo, 'residente_id' => $r ? $res[$r]->id : null, 'urgencia' => $u]);
         }
+        \App\Support\Demo\AvisosTransversales::sembrar();
 
         Pregunta::create(['residente_id' => $res['Dolores Ramos']->id, 'texto' => '¿La rojez del talón de Dolores ha mejorado desde ayer?']);
 
@@ -122,6 +123,16 @@ class DatabaseSeeder extends Seeder
                     ? explode(' ', $r)[0].' ha tenido una semana tranquila en general. Hubo una incidencia que el equipo está siguiendo de cerca.'
                     : explode(' ', $r)[0].' ha tenido una semana tranquila. Ha comido bien y ha participado en las actividades.',
             ]);
+        }
+    
+        // Fotos ficticias de la demo (retratos de stock); en una residencia real las sube la dirección.
+        foreach (\App\Models\User::whereIn('rol', ['auxiliar', 'sanitario', 'direccion'])->whereNull('foto')->get() as $u) {
+            $u->update(['foto' => \App\Support\FotosDemo::para($u->name, $u->id)]);
+        }
+        $contador = ['m' => 0, 'h' => 0];
+        foreach (Residente::whereNull('foto')->orderBy('id')->get() as $r) {
+            $k = \App\Support\FotosDemo::esMujer($r->nombre) ? 'm' : 'h';
+            $r->update(['foto' => \App\Support\FotosDemo::residente($r->nombre, $contador[$k]++)]);
         }
     }
 }

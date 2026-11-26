@@ -19,12 +19,22 @@
     @if (session('velia_consejos'))
         <x-filament::section heading="Tres cosas para empezar" icon="heroicon-o-light-bulb">
             <ol class="list-decimal space-y-1 ps-5 text-sm">
-                <li>Lee el relevo: lo importante del turno anterior está aquí.</li>
+                <li>Lee el resumen: lo importante del turno anterior está aquí.</li>
                 <li>Registra desde «Residentes»: habla y la IA lo ordena. Tú confirmas.</li>
                 <li>Al acabar, cierra el turno en «Mi turno».</li>
             </ol>
         </x-filament::section>
     @endif
+
+    {{-- 0. Te lo ha asignado la dirección: con plazo y botón «Hecho» --}}
+    @foreach ($asignados as $av)
+        <div style="border:2px solid rgb(150 169 212);background:rgb(240 243 250);border-radius:12px;padding:16px">
+            <p style="font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:rgb(15 61 149)">Te lo ha asignado la dirección</p>
+            <p class="mt-1 font-semibold text-gray-950 dark:text-white">{{ $av->titulo }}@if ($av->residente) · {{ $av->residente->nombre }}@endif</p>
+            <p class="text-sm {{ $av->vencido() ? 'text-danger-700 font-semibold' : 'text-gray-500' }}">{{ $av->vencido() ? 'Vencido el '.$av->vence_el->format('d/m') : ($av->vence_el ? 'Para el '.$av->vence_el->format('d/m') : 'Sin plazo') }}</p>
+            <div class="mt-3"><x-filament::button wire:click="hecho({{ $av->id }})" icon="heroicon-o-check">Hecho</x-filament::button></div>
+        </div>
+    @endforeach
 
     {{-- 1. Preguntas de la dirección: esperan respuesta --}}
     @foreach ($preguntas as $p)

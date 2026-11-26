@@ -2,6 +2,8 @@
 
 namespace App\Filament\Turno\Pages;
 
+use Filament\Facades\Filament;
+use Filament\Actions\Action;
 use App\Filament\Turno\Concerns\ComoAtender;
 use App\Models\Residente;
 use App\Support\Dispositivo;
@@ -9,6 +11,9 @@ use App\Support\TurnoActual;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Pages\Page;
+use App\Models\Registro;
+use Filament\Notifications\Notification;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 
 /**
@@ -25,7 +30,7 @@ class Residentes extends Page implements HasActions
 
     protected static ?string $slug = 'residentes';
 
-    protected static string $view = 'filament.turno.pages.residentes';
+    protected string $view = 'filament.turno.pages.residentes';
 
     #[Url]
     public string $vista = 'lista';
@@ -48,7 +53,41 @@ class Residentes extends Page implements HasActions
         $g = $t->agrupados();
         $total = $g['por_registrar']->count() + $g['registrados']->count();
 
-        return (\Filament\Facades\Filament::auth()->user()->planta?->nombre ?? 'Todas las plantas').' · '.$g['registrados']->count().' de '.$total.' registrados';
+        return (Filament::auth()->user()->planta?->nombre ?? 'Todas las plantas').' · '.$g['registrados']->count().' de '.$total.' registrados';
+    }
+
+    /** «Sin novedad» a un toque desde la tarjeta (decisión UX 23/11/2026), con deshacer por si fue sin querer. */
+    public function sinNovedad(int $residente): void
+    {
+        $r = Residente::findOrFail($residente);
+        $registro = Registro::create([
+            'residente_id' => $r->id,
+            'user_id' => Filament::auth()->id(),
+            'turno_id' => Filament::auth()->user()->turnoAbierto()?->id,
+            'texto_original' => null,
+            'categorias' => [],
+            'estado' => 'sin_novedad',
+            'incidencia_destacada' => false,
+            'tipo_incidencia' => null,
+        ]);
+
+        Notification::make()
+            ->title('Sin novedad · '.$r->nombre)
+            ->success()
+            ->actions([
+                Action::make('deshacer')->label('Deshacer')->button()
+                    ->dispatch('deshacerSinNovedad', ['registro' => $registro->id])->close(),
+            ])
+            ->send();
+    }
+
+    #[On('deshacerSinNovedad')]
+    public function deshacerSinNovedad(int $registro): void
+    {
+        Registro::where('id', $registro)
+            ->where('estado', 'sin_novedad')
+            ->where('user_id', Filament::auth()->id())
+            ->delete();
     }
 
     public static function lineaEstado(Residente $r, string $estado): string

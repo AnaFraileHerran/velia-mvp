@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\Facades\Artisan;
+use App\Support\DatosDemo;
+use Throwable;
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        //
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        // Nueva versión (26/11, comentario de Pablo en EQ-01): «Quitar filtros» con texto, al final de los filtros activos. Nada de una X sola.
+        \Filament\Tables\Table::configureUsing(fn (\Filament\Tables\Table $table) => $table->filtersRemoveAllAction(
+            fn ($action) => \App\Support\VersionH::activa() ? $action->link()->icon(null)->label('Quitar filtros')->tooltip(null) : $action));
+
+        // Solo en local (demo): si hay cambios de base de datos pendientes, se aplican solos al abrir Velia.
+        // Así no hace falta ejecutar «php artisan migrate» a mano tras cada cambio.
+        if ($this->app->environment('local') && ! $this->app->runningInConsole()) {
+            try {
+                $migrator = $this->app->make('migrator');
+                if ($migrator->repositoryExists()) {
+                    $hechas = $migrator->getRepository()->getRan();
+                    $archivos = array_keys($migrator->getMigrationFiles([database_path('migrations')]));
+                    if (array_diff($archivos, $hechas)) {
+                        Artisan::call('migrate', ['--force' => true]);
+                    }
+                }
+                DatosDemo::asegurar();
+            } catch (Throwable $e) {
+                report($e);
+            }
+        }
+    }
+}

@@ -45,9 +45,12 @@
             <h2 class="mb-2 text-sm font-semibold">Por registrar · {{ $g['por_registrar']->count() }}</h2>
             <ul class="divide-y divide-gray-100 overflow-hidden rounded-xl border border-gray-200 bg-white dark:divide-white/5 dark:border-white/10 dark:bg-gray-900">
                 @forelse ($g['por_registrar'] as $r)
-                    @include('filament.turno.partials.fila-residente', ['r' => $r, 'estado' => $t->estado($r)])
+                    @include('filament.turno.partials.fila-residente', ['r' => $r, 'estado' => $t->estado($r), 'accionRapida' => true])
                 @empty
-                    <li class="px-4 py-3 text-sm text-success-700">Todo registrado en este turno.</li>
+                    <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                        <span class="text-sm font-medium text-success-700">Todo registrado en este turno.</span>
+                        <x-filament::button tag="a" :href="\App\Filament\Turno\Pages\CerrarTurno::getUrl()" icon="heroicon-o-lock-closed">Cerrar el turno</x-filament::button>
+                    </li>
                 @endforelse
             </ul>
         </section>

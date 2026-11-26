@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Filament\Facades\Filament;
 use App\Models\Ausencia;
 use App\Models\Pregunta;
 use App\Models\Registro;
@@ -20,8 +21,12 @@ class TurnoActual
 
     public static function make(): self
     {
-        $u = \Filament\Facades\Filament::auth()->user();
+        return self::para(Filament::auth()->user());
+    }
 
+    /** Para la app de la auxiliar en shadcn-vue (/auxiliar), que no pasa por Filament. */
+    public static function para(User $u): self
+    {
         return new self($u, $u->turnoAbierto());
     }
 
@@ -84,7 +89,7 @@ class TurnoActual
 
     public function preguntas(): Collection
     {
-        return Pregunta::with('residente')->whereIn('residente_id', $this->idsPlanta())->whereNull('respuesta')->latest()->get();
+        return Pregunta::with('residente')->whereIn('residente_id', $this->idsPlanta())->whereNull('respuesta')->whereNull('cerrada_at')->latest()->get();
     }
 
     public function vuelvenHoy(): Collection

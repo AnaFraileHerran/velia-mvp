@@ -21,7 +21,7 @@ class User extends Authenticatable implements FilamentUser, HasName
         'name', 'email', 'password', 'rol', 'pin', 'pin_provisional', 'codigo_invitacion',
         'planta_id', 'turno_habitual', 'responsable_turno', 'activo', 'baja_motivo',
         'pin_restablecido_at', 'pin_restablecido_por',
-        'foto', 'puesto', 'dias', 'desde', 'hasta', 'contacto',
+        'foto', 'puesto', 'dias', 'desde', 'hasta', 'contacto', 'telefono', 'area_equipo_id',
     ];
 
     protected $hidden = ['password', 'pin', 'remember_token'];
@@ -45,7 +45,7 @@ class User extends Authenticatable implements FilamentUser, HasName
         }
 
         return match ($panel->getId()) {
-            'direccion' => $this->rol === 'direccion',
+            'direccion', 'direccion-h' => $this->rol === 'direccion',
             'turno' => $this->rol === 'auxiliar',
             default => false,
         };
@@ -77,8 +77,17 @@ class User extends Authenticatable implements FilamentUser, HasName
         return $query->where('rol', 'sanitario');
     }
 
+    public function areaEquipo(): BelongsTo
+    {
+        return $this->belongsTo(AreaEquipo::class, 'area_equipo_id');
+    }
+
     public function etiquetaPuesto(): string
     {
+        if ($this->rol === 'otro') {
+            return $this->areaEquipo?->nombre ?? 'Equipo';
+        }
+
         return Residencia::PUESTOS[$this->puesto] ?? 'Equipo sanitario';
     }
 

@@ -9,9 +9,10 @@
 .fi-wi-stats-overview-stat,
 .fi-fo-repeater-item,
 .fi-in-section {
+    /* (en Filament 5 las fichas usan también .fi-section) */
     border-radius: 1.25rem;
     box-shadow: none;
-    --tw-ring-color: rgba(var(--gray-200), 1);
+    --tw-ring-color: var(--gray-200);
 }
 
 .fi-modal-window {
@@ -21,7 +22,7 @@
 /* Botones, badges y menú en píldora */
 .fi-btn,
 .fi-badge,
-.fi-sidebar-item-button,
+.fi-sidebar-item-btn,
 .fi-tabs-item,
 .fi-dropdown-list-item {
     border-radius: 9999px;
@@ -33,8 +34,8 @@
 }
 
 /* Sección activa del menú: tinte cobalto y texto cobalto */
-.fi-sidebar-item-active .fi-sidebar-item-button {
-    background-color: rgba(var(--primary-50), 1);
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn {
+    background-color: var(--primary-50);
 }
 
 /* Títulos grandes y ligeros */
@@ -42,3 +43,316 @@
     font-weight: 400;
     letter-spacing: -0.02em;
 }
+
+/* «Velia te sugiere» (23/11/2026): recuadro sobrio, borde izquierdo en el color de acción, texto legible. */
+.velia-sugiere {
+    margin-top: 0.5rem;
+    border: 1px solid #C4CFE8;
+    border-left: 3px solid #0F3D95;
+    border-radius: 0.75rem;
+    background: #F5F7FC;
+    padding: 0.625rem 0.875rem;
+}
+.velia-sugiere-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #0F3D95;
+}
+.velia-sugiere-ejemplo {
+    margin-left: 0.25rem;
+    border: 1px solid #C4CFE8;
+    border-radius: 0.375rem;
+    padding: 0 0.375rem;
+    font-weight: 500;
+    color: #4B5563;
+    background: #fff;
+}
+.velia-sugiere-texto { margin-top: 0.25rem; font-size: 0.875rem; font-weight: 600; color: #111827; }
+.velia-sugiere-porque { font-size: 0.8125rem; color: #4B5563; }
+.velia-sugiere-acciones { margin-top: 0.5rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+
+/* Paleta «Ir a…» (⌘K) */
+.velia-ir-a-boton { display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; padding: 0.375rem 0.625rem; font-size: 0.875rem; color: #374151; background: #fff; }
+.velia-ir-a-boton kbd { font-family: inherit; font-size: 0.75rem; color: #6B7280; border: 1px solid #E5E7EB; border-radius: 0.25rem; padding: 0 0.25rem; }
+.velia-ir-a-fondo { position: fixed; inset: 0; z-index: 60; background: rgba(17, 24, 39, 0.4); display: flex; align-items: flex-start; justify-content: center; padding-top: 12vh; }
+.velia-ir-a-caja { width: min(40rem, 92vw); background: #fff; border-radius: 1rem; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); overflow: hidden; }
+.velia-ir-a-caja input { width: 100%; border: 0; border-bottom: 1px solid #E5E7EB; padding: 1rem 1.25rem; font-size: 1rem; outline: none; }
+.velia-ir-a-lista { max-height: 50vh; overflow-y: auto; padding: 0.5rem; }
+.velia-ir-a-grupo { padding: 0.5rem 0.75rem 0.25rem; font-size: 0.75rem; font-weight: 600; color: #6B7280; }
+.velia-ir-a-item { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 0.75rem; border-radius: 0.5rem; padding: 0.625rem 0.75rem; text-align: left; font-size: 0.9375rem; color: #111827; min-height: 44px; }
+.velia-ir-a-item[aria-selected="true"] { background: #EEF2FA; color: #0F3D95; }
+.velia-ir-a-pie { border-top: 1px solid #E5E7EB; padding: 0.5rem 1.25rem; font-size: 0.75rem; color: #6B7280; }
+
+/* Asistente de Ayuda */
+.velia-chat-burbuja { border-radius: 1rem; padding: 0.75rem 1rem; font-size: 0.9375rem; line-height: 1.5; }
+.velia-chat-yo { background: #0F3D95; color: #fff; margin-left: auto; max-width: 80%; }
+.velia-chat-velia { background: #F3F4F6; color: #111827; max-width: 90%; }
+
+/* Versión H (25/11/2026, /direccion-h): patrones de Holded */
+.velia-h-version { display: inline-flex; align-items: center; gap: 0.5rem; margin-right: 0.25rem; border-radius: 999px; background: #FEF3C7; color: #92400E; padding: 0.25rem 0.75rem; font-size: 0.8125rem; font-weight: 600; white-space: nowrap; }
+.velia-h-version-punto { width: 0.5rem; height: 0.5rem; border-radius: 999px; background: #D97706; }
+.velia-h-version-enlace { font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
+.velia-h-crear { margin-right: 0.25rem; }
+.velia-h-libro { padding: 1rem; display: flex; flex-direction: column; gap: 0.625rem; font-size: 0.875rem; line-height: 1.5; color: #374151; }
+.velia-h-libro-titulo { font-weight: 600; font-size: 0.9375rem; color: #111827; }
+.velia-h-libro ul { list-style: disc; padding-left: 1.125rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.velia-h-libro-velia { display: flex; align-items: flex-start; gap: 0.5rem; border-radius: 0.5rem; background: #EEF2FA; color: #0F3D95; padding: 0.625rem 0.75rem; font-weight: 500; }
+.velia-h-libro-velia svg { margin-top: 0.15rem; flex-shrink: 0; }
+.velia-h-pestanas { margin-bottom: 0.25rem; }
+.velia-h-lista { display: flex; flex-direction: column; font-size: 0.875rem; }
+.velia-h-lista li { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid #F3F4F6; }
+.velia-h-lista li:last-child { border-bottom: 0; }
+@media (max-width: 767px) { .velia-h-version-enlace { display: none; } }
+
+/* Flujo nuevo del Inicio (versión H, 25/11/2026): Ahora compacto, Próximamente, valor de Velia, Velia en una línea */
+.velia-ahora { display: flex; gap: 1rem; align-items: stretch; background: #fff; border: 1px solid var(--gray-200); border-radius: 0.75rem; padding: 0.75rem; }
+.velia-ahora-titulo { flex-shrink: 0; width: 7rem; padding: 0.25rem 0.5rem; }
+.velia-ahora-rejilla { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.5rem; min-width: 0; }
+.velia-ahora-item { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; border-radius: 0.5rem; padding: 0.5rem 0.625rem; background: var(--gray-50); }
+.velia-ahora-item-aviso { background: #FFFBEB; box-shadow: inset 0 0 0 1px #FDE68A; }
+.velia-ahora-etiqueta { font-size: 0.75rem; font-weight: 600; color: var(--gray-500); }
+.velia-ahora-avatar img { width: 22px; height: 22px; border-radius: 999px; object-fit: cover; box-shadow: 0 0 0 2px #fff; }
+.velia-ahora-barra { display: inline-block; vertical-align: middle; width: 2.5rem; height: 4px; border-radius: 999px; background: var(--gray-200); margin-right: 0.25rem; overflow: hidden; }
+.velia-ahora-barra span { display: block; height: 100%; background: #16A34A; }
+@media (max-width: 767px) { .velia-ahora { flex-direction: column; } .velia-ahora-titulo { width: auto; } }
+
+.velia-segmentado { display: inline-flex; border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 2px; background: var(--gray-50); }
+.velia-segmentado button { font-size: 0.8125rem; padding: 0.25rem 0.625rem; border-radius: 0.375rem; color: var(--gray-600); }
+.velia-segmentado button[aria-pressed="true"] { background: #fff; color: var(--gray-950); font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08); }
+.velia-hito { display: flex; align-items: center; gap: 0.75rem; border-radius: 0.625rem; padding: 0.75rem; margin-bottom: 0.75rem; border: 1px solid var(--gray-200); }
+.velia-hito:hover { background: var(--gray-50); }
+.velia-hito .velia-nivel { margin-left: auto; flex-shrink: 0; font-size: 0.75rem; font-weight: 600; border-radius: 999px; padding: 0.125rem 0.5rem; }
+.velia-hito.velia-nivel-alta { border-color: #FECACA; background: #FEF2F2; } .velia-hito.velia-nivel-alta .velia-nivel { background: #FEE2E2; color: #991B1B; }
+.velia-hito.velia-nivel-media { border-color: #FDE68A; background: #FFFBEB; } .velia-hito.velia-nivel-media .velia-nivel { background: #FEF3C7; color: #92400E; }
+.velia-hito.velia-nivel-baja .velia-nivel { background: var(--gray-100); color: var(--gray-600); }
+.velia-prox { display: flex; flex-direction: column; }
+.velia-prox li { display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem 0; border-bottom: 1px solid var(--gray-100); }
+.velia-prox li:last-child { border-bottom: 0; }
+.velia-punto { width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0; background: var(--gray-300); }
+.velia-punto.velia-nivel-alta { background: #DC2626; } .velia-punto.velia-nivel-media { background: #D97706; }
+.velia-prox-preguntas { display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.5rem; margin-bottom: 0.25rem; border-bottom: 1px solid var(--gray-100); }
+
+.velia-valor { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: 1.25rem 1.5rem; }
+.velia-valor dt { font-size: 0.8125rem; color: var(--gray-500); display: flex; align-items: center; gap: 0.375rem; }
+.velia-valor-cifra { font-size: 1.5rem; font-weight: 600; color: var(--gray-950); line-height: 1.3; }
+
+.velia-sugiere-linea { margin-top: 0.5rem; border-radius: 0.5rem; background: #F5F7FC; padding: 0.375rem 0.625rem; font-size: 0.8125rem; color: #0F3D95; }
+.velia-sugiere-linea-fila { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+.velia-sugiere-linea .velia-sin-truncar { white-space: normal; }
+.velia-sugiere-linea-porque { flex-shrink: 0; font-size: 0.75rem; color: var(--gray-600); text-decoration: underline; text-underline-offset: 2px; }
+.velia-sugiere-linea-detalle { margin-top: 0.25rem; padding-left: 1.5rem; font-size: 0.75rem; color: var(--gray-600); display: flex; gap: 0.375rem; align-items: center; flex-wrap: wrap; }
+.velia-h-buscar { display: inline-flex; align-items: center; gap: 0.5rem; width: 18rem; max-width: 40vw; border: 1px solid var(--gray-300); border-radius: 0.5rem; padding: 0.375rem 0.625rem; font-size: 0.875rem; color: var(--gray-500); background: #fff; text-align: left; }
+.velia-h-buscar:hover { border-color: var(--gray-400); }
+.velia-h-buscar kbd { margin-left: auto; font-family: inherit; font-size: 0.75rem; border: 1px solid var(--gray-200); border-radius: 0.25rem; padding: 0 0.25rem; }
+.velia-ir-a-respuesta { margin: 0.5rem 0.5rem 0; border-radius: 0.625rem; background: #F5F7FC; padding: 0.75rem 0.875rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.velia-ir-a-respuesta-cabecera { font-size: 0.75rem; font-weight: 600; color: #0F3D95; display: flex; align-items: center; gap: 0.375rem; }
+@media (max-width: 767px) { .velia-h-buscar { width: auto; } .velia-h-buscar span, .velia-h-buscar kbd { display: none; } }
+
+/* Turno: botón flotante de micrófono y hoja para elegir residente (25/11/2026, comentario de Antonio en A1-02) */
+.velia-fab { position: fixed; right: 1rem; bottom: calc(5rem + env(safe-area-inset-bottom)); z-index: 31; width: 3.75rem; height: 3.75rem; border-radius: 999px; display: flex; align-items: center; justify-content: center; color: #fff; background: #0F3D95; box-shadow: 0 8px 20px rgba(15, 61, 149, 0.35); }
+.velia-fab:active { transform: scale(0.96); }
+.velia-hoja-fondo { position: fixed; inset: 0; z-index: 60; background: rgba(17, 24, 39, 0.45); display: flex; align-items: flex-end; justify-content: center; }
+.velia-hoja { width: min(36rem, 100%); max-height: 75vh; display: flex; flex-direction: column; background: #fff; border-radius: 1rem 1rem 0 0; padding-bottom: env(safe-area-inset-bottom); }
+.velia-hoja-lista { overflow-y: auto; padding: 0 0.5rem 0.75rem; }
+.velia-hoja-item { display: flex; align-items: center; gap: 0.75rem; min-height: 56px; padding: 0.5rem; border-radius: 0.75rem; }
+.velia-hoja-item:hover, .velia-hoja-item:focus-visible { background: var(--gray-50); }
+/* Cómo atender: icono junto a cada dato (comentario de Antonio en A1-04) */
+.velia-dato { display: flex; gap: 0.625rem; align-items: flex-start; }
+.velia-dato-icono { width: 2rem; height: 2rem; flex-shrink: 0; border-radius: 0.5rem; background: var(--gray-100); color: var(--gray-700); display: flex; align-items: center; justify-content: center; }
+.velia-dato-icono svg { width: 1.125rem; height: 1.125rem; }
+body:has(.velia-fab) .fi-main { padding-bottom: 10rem; }
+/* Ayuda de la pantalla junto al título (Nueva versión): título y «?» en la misma línea; migas y subtítulo, a lo ancho */
+div:has(> .velia-ayuda-titulo) { display: flex; flex-wrap: wrap; align-items: center; column-gap: 0.25rem; }
+div:has(> .velia-ayuda-titulo) > .fi-breadcrumbs, div:has(> .velia-ayuda-titulo) > .fi-header-subheading { flex-basis: 100%; }
+.velia-ayuda-titulo { display: inline-flex; }
+
+/* Inicio sin scroll a 1440 × 900 (Nueva versión, 25/11/2026) */
+.velia-avisos-h { display: flex; flex-direction: column; }
+.velia-avisos-h > li { border-bottom: 1px solid var(--gray-100); }
+.velia-avisos-h > li:last-child { border-bottom: 0; }
+.velia-aviso-h { display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem 0; min-height: 3.25rem; }
+.velia-aviso-h-acciones { display: flex; align-items: center; gap: 0.375rem; flex-shrink: 0; }
+.velia-aviso-h-acciones .fi-btn { padding: 0.25rem 0.625rem; font-size: 0.8125rem; min-height: 2rem; }
+.velia-bombilla { width: 2rem; height: 2rem; border-radius: 0.5rem; display: inline-flex; align-items: center; justify-content: center; color: #0F3D95; background: #F5F7FC; }
+.velia-bombilla[aria-expanded="true"] { background: #E1E7F4; }
+.velia-prox li { padding: 0.375rem 0; }
+.velia-hito { padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; }
+.velia-valor { grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.75rem 1.25rem; }
+.velia-valor-cifra { font-size: 1.25rem; }
+.velia-valor-nota { font-size: 0.75rem; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.velia-valor-nota .fi-link { font-size: 0.75rem; }
+.velia-ahora { padding: 0.5rem 0.75rem; }
+
+/* «Cómo va tu residencia con Velia» con más presencia (Nueva versión) */
+.velia-valor-grupos { display: grid; grid-template-columns: 2fr 4fr; gap: 0.75rem; }
+@media (max-width: 1279px) { .velia-valor-grupos { grid-template-columns: 1fr; } }
+.velia-valor-grupo { border-radius: 0.75rem; background: var(--gray-50); padding: 0.625rem 0.75rem 0.75rem; }
+.velia-valor-grupo-velia { background: linear-gradient(135deg, #F5F7FC 0%, #EEF2FA 100%); box-shadow: inset 0 0 0 1px #E1E7F4; }
+.velia-valor-titulo { display: flex; align-items: center; gap: 0.375rem; font-size: 0.75rem; font-weight: 600; color: var(--gray-600); margin-bottom: 0.5rem; }
+.velia-valor-grupo-velia .velia-valor-titulo { color: #0F3D95; }
+.velia-valor-fila { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 0.5rem; }
+.velia-kpi { display: flex; gap: 0.625rem; align-items: flex-start; background: #fff; border-radius: 0.625rem; padding: 0.625rem; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05); min-width: 0; }
+.velia-kpi-icono { width: 2.25rem; height: 2.25rem; flex-shrink: 0; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; background: #E1E7F4; color: #0F3D95; }
+.velia-kpi-icono-verde { background: #DCFCE7; color: #15803D; }
+.velia-kpi-icono-rojo { background: #FEE2E2; color: #B91C1C; }
+.velia-kpi-icono-gris { background: var(--gray-100); color: var(--gray-500); }
+.velia-kpi-etiqueta { font-size: 0.75rem; color: var(--gray-600); display: flex; align-items: center; gap: 0.375rem; }
+.velia-kpi-cifra { font-size: 1.375rem; font-weight: 700; color: var(--gray-950); line-height: 1.25; display: flex; align-items: baseline; gap: 0.375rem; }
+.velia-kpi-de { font-size: 0.875rem; font-weight: 500; color: var(--gray-500); }
+.velia-kpi-nota { font-size: 0.75rem; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.velia-kpi-nota .fi-link { font-size: 0.75rem; }
+.velia-kpi-barra { display: block; height: 4px; border-radius: 999px; background: var(--gray-200); margin: 0.25rem 0; overflow: hidden; }
+.velia-kpi-barra span { display: block; height: 100%; background: #16A34A; border-radius: 999px; }
+.velia-tendencia { font-size: 0.75rem; font-weight: 600; border-radius: 999px; padding: 0 0.375rem; background: var(--gray-100); color: var(--gray-600); }
+.velia-tendencia-mal { background: #FEE2E2; color: #B91C1C; }
+.velia-tendencia-bien { background: #DCFCE7; color: #15803D; }
+.velia-kpi-pendiente { opacity: 0.8; }
+
+/* Planta clicable en «Ahora» y su panel lateral */
+.velia-ahora-planta { display: inline-flex; align-items: center; gap: 0.125rem; font-size: 0.75rem; font-weight: 600; color: var(--gray-600); border-radius: 0.25rem; }
+.velia-ahora-planta:hover { color: #0F3D95; text-decoration: underline; text-underline-offset: 2px; }
+.velia-mini { display: flex; flex-direction: column; border-radius: 0.625rem; background: var(--gray-50); padding: 0.5rem 0.625rem; font-size: 0.75rem; color: var(--gray-600); }
+.velia-mini-cifra { font-size: 1.25rem; font-weight: 700; color: var(--gray-950); }
+.velia-mini-alerta { background: #FEF2F2; } .velia-mini-alerta .velia-mini-cifra { color: #B91C1C; }
+.velia-estado { flex-shrink: 0; font-size: 0.75rem; font-weight: 500; border-radius: 999px; padding: 0.125rem 0.5rem; }
+.velia-estado-pendiente { background: #FEF3C7; color: #92400E; }
+.velia-estado-registrado { background: #DCFCE7; color: #166534; }
+.velia-estado-fuera { background: var(--gray-100); color: var(--gray-600); }
+
+/* Nueva versión: menos aire vertical para que el Inicio quepa sin scroll a 1440 × 900 */
+.fi-panel-direccion-h .fi-page-header-main-ctn { row-gap: 1.25rem; padding-top: 1.5rem; padding-bottom: 1.5rem; }
+.fi-panel-direccion-h .fi-page-content { row-gap: 1rem; }
+.fi-panel-direccion-h .fi-page-content .fi-grid.fi-sc-has-gap { gap: 1rem; }
+/* KPI compactos: etiqueta en una línea, cifra, nota en una línea */
+.velia-valor-fila { grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); }
+.velia-kpi { padding: 0.5rem 0.625rem; gap: 0.5rem; }
+.velia-kpi-icono { width: 2rem; height: 2rem; }
+.velia-kpi-etiqueta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.velia-kpi-cifra { font-size: 1.25rem; }
+.velia-valor-grupo { padding: 0.5rem 0.625rem 0.625rem; }
+.velia-valor-titulo { margin-bottom: 0.375rem; }
+.velia-kpi-cifra { white-space: nowrap; }
+.velia-kpi-cifra .velia-sugiere-ejemplo { font-size: 0.625rem; line-height: 1.2; font-weight: 600; padding: 0.0625rem 0.375rem; }
+.velia-kpi-barra { margin: 0.125rem 0; }
+
+/* ===================== Nueva versión · 26/11/2026 ===================== */
+
+/* Tarjetas de cifras que filtran (Residentes): sustituyen a las pestañas */
+.velia-tarjetas-filtro { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .75rem; }
+.velia-tarjeta-filtro { display: flex; align-items: flex-start; gap: .75rem; padding: .875rem 1rem; text-align: left; border-radius: .75rem;
+    background: #fff; border: 1px solid rgb(229 231 235); box-shadow: 0 1px 2px rgb(0 0 0 / .04); transition: border-color .15s, box-shadow .15s; cursor: pointer; }
+.velia-tarjeta-filtro:hover { border-color: rgb(15 61 149 / .35); }
+.velia-tarjeta-filtro:focus-visible { outline: 2px solid #0F3D95; outline-offset: 2px; }
+.velia-tarjeta-filtro.is-activa { border-color: #0F3D95; box-shadow: 0 0 0 1px #0F3D95, 0 4px 12px rgb(15 61 149 / .10); }
+.velia-tarjeta-filtro-icono { display: flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; flex-shrink: 0; border-radius: .625rem; background: rgb(243 244 246); color: rgb(55 65 81); }
+.velia-tarjeta-verde .velia-tarjeta-filtro-icono { background: rgb(220 252 231); color: #15803d; }
+.velia-tarjeta-ambar .velia-tarjeta-filtro-icono { background: rgb(254 243 199); color: #b45309; }
+.velia-tarjeta-rojo .velia-tarjeta-filtro-icono { background: rgb(254 226 226); color: rgb(185 28 28); }
+.velia-tarjeta-filtro-etiqueta { display: block; font-size: .8125rem; font-weight: 500; color: rgb(75 85 99); }
+.velia-tarjeta-filtro-cifra { display: block; font-size: 1.5rem; font-weight: 600; line-height: 1.2; color: rgb(3 7 18); font-variant-numeric: tabular-nums; }
+.velia-tarjeta-filtro-de { font-size: 1rem; font-weight: 500; color: rgb(107 114 128); }
+.velia-tarjeta-filtro-nota { display: block; font-size: .75rem; color: rgb(107 114 128); }
+.velia-tarjetas-filtro-secundario { margin-top: -.25rem; text-align: right; font-size: .8125rem; }
+.velia-tarjetas-filtro-secundario button { color: rgb(75 85 99); text-decoration: underline; text-underline-offset: 3px; }
+.velia-tarjetas-filtro-secundario button.is-activa { color: #0F3D95; font-weight: 600; }
+
+/* «← Volver» encima de las migas */
+.velia-volver-ctn { margin-bottom: -.5rem; }
+.velia-volver { display: inline-flex; align-items: center; gap: .375rem; min-height: 2rem; padding: 0 .5rem 0 .25rem; border-radius: .5rem;
+    font-size: .875rem; font-weight: 600; color: #0F3D95; }
+.velia-volver:hover { background: rgb(15 61 149 / .06); }
+
+/* Fila recién creada (Equipo) */
+.velia-fila-nueva { background: rgb(15 61 149 / .06); animation: velia-resalte 2.4s ease-out 1; }
+@keyframes velia-resalte { from { background: rgb(15 61 149 / .18); } to { background: rgb(15 61 149 / .06); } }
+
+/* «Quitar filtros» con texto */
+.fi-panel-direccion-h .fi-ta-filter-indicators .fi-link { white-space: nowrap; font-size: .8125rem; }
+
+/* Chips de preguntas sugeridas (Calidad, Ayuda) */
+.velia-chip { display: inline-flex; align-items: center; min-height: 2.25rem; padding: 0 .875rem; border-radius: 9999px; border: 1px solid rgb(15 61 149 / .25);
+    background: rgb(15 61 149 / .04); color: #0F3D95; font-size: .8125rem; font-weight: 500; line-height: 1.2; }
+.velia-chip:hover { background: rgb(15 61 149 / .09); }
+
+/* Calidad: una sola lista por apartado, en acordeón */
+.velia-apartados { display: flex; flex-direction: column; border: 1px solid rgb(229 231 235); border-radius: .75rem; overflow: hidden; }
+.velia-apartado + .velia-apartado { border-top: 1px solid rgb(229 231 235); }
+.velia-apartado summary { display: flex; align-items: center; gap: .75rem; padding: .875rem 1rem; cursor: pointer; list-style: none; }
+.velia-apartado summary::-webkit-details-marker { display: none; }
+.velia-apartado summary:hover { background: rgb(249 250 251); }
+.velia-apartado-titulo { display: block; font-size: .9375rem; font-weight: 600; color: rgb(3 7 18); }
+.velia-apartado-pide { display: block; font-size: .8125rem; color: rgb(107 114 128); }
+.velia-apartado-estado { display: inline-flex; align-items: center; gap: .25rem; white-space: nowrap; font-size: .8125rem; font-weight: 600; }
+.velia-apartado-al_dia .velia-apartado-estado { color: #15803d; }
+.velia-apartado-falta .velia-apartado-estado { color: rgb(185 28 28); }
+.velia-apartado-no_mide .velia-apartado-estado, .velia-apartado-otro .velia-apartado-estado { color: rgb(94 101 114); font-weight: 500; }
+.velia-apartado-falta { background: rgb(254 242 242 / .45); }
+.velia-apartado-flecha { color: rgb(156 163 175); transition: transform .15s; }
+.velia-apartado[open] .velia-apartado-flecha { transform: rotate(180deg); }
+.velia-apartado-cuerpo { display: flex; flex-direction: column; gap: .625rem; padding: 0 1rem 1rem; }
+.velia-apartado-falta .velia-apartado-cuerpo { background: transparent; }
+.velia-apartado-cuerpo .velia-apartado-falta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; padding: .625rem .75rem;
+    border-radius: .5rem; background: #fff; border: 1px solid rgb(254 202 202); }
+
+/* Indicadores de calidad (mismos que en el Inicio) */
+.velia-indicador { padding: .875rem 1rem; border: 1px solid rgb(229 231 235); border-radius: .75rem; background: #fff; }
+.velia-indicador-ejemplo { border-style: dashed; background: rgb(249 250 251); }
+
+/* Familias: la tarea de la semana arriba */
+.velia-tarea { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; padding: 1rem 1.25rem; border-radius: .75rem;
+    background: rgb(15 61 149 / .04); border: 1px solid rgb(15 61 149 / .18); }
+.velia-tarea-icono { display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border-radius: .625rem; background: #fff; color: #0F3D95; }
+
+/* Mi residencia en modo vista */
+.velia-datos { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 1rem 1.5rem; }
+.velia-datos dt { font-size: .8125rem; color: rgb(107 114 128); }
+.velia-datos dd { font-size: .9375rem; font-weight: 500; color: rgb(3 7 18); }
+
+/* Alta de residente por pasos: lo que ha rellenado Velia */
+.velia-rellenado { display: flex; gap: .625rem; align-items: flex-start; padding: .75rem 1rem; border-radius: .75rem; background: rgb(15 61 149 / .05); color: #0F3D95; }
+
+/* Ayuda: conversación con altura máxima y burbujas de ~65 caracteres */
+.fi-panel-direccion-h .velia-chat-hilo { max-height: min(55vh, 32rem); overflow-y: auto; padding-right: .25rem; scroll-behavior: smooth; }
+.fi-panel-direccion-h .velia-chat-burbuja { max-width: 65ch; }
+.fi-panel-direccion-h .velia-chat-yo { align-self: flex-end; }
+.fi-panel-direccion-h .velia-chat-campo { min-height: 2.75rem; max-height: 9rem; overflow-y: auto; }
+
+/* Buscador: un poco más ancho para leer los grupos y el detalle de cada resultado */
+.fi-panel-direccion-h .velia-ir-a-caja { max-width: 44rem; }
+.fi-panel-direccion-h .velia-ir-a-item { align-items: flex-start; text-align: left; }
+
+/* Acciones de fila que solo aparecen al pasar el ratón o con el teclado (Registrar salida) */
+@media (hover: hover) {
+    .fi-ta-row .velia-accion-al-pasar { opacity: 0; transition: opacity .12s; }
+    .fi-ta-row:hover .velia-accion-al-pasar, .fi-ta-row:focus-within .velia-accion-al-pasar { opacity: 1; }
+}
+
+/* Inicio: «Cómo va tu residencia» con 3 indicadores (26/11) sin perder el «sin scroll» a 1440×900: 3 + 4 columnas iguales */
+@media (min-width: 1280px) {
+    .fi-panel-direccion-h .velia-valor-grupos { grid-template-columns: 3fr 4fr; }
+    .fi-panel-direccion-h .velia-valor-fila { grid-template-columns: repeat(auto-fit, minmax(7.25rem, 1fr)); }
+}
+
+/* Tablas de la Nueva versión (26/11, Ana y Pablo): título, filtros activos con «Quitar filtros» al final de los chips,
+   buscador e iconos de filtro en UNA sola línea. La cabecera pasa a ser una rejilla de 3 columnas. */
+.fi-panel-direccion-h .fi-ta-main { display: grid; grid-template-columns: max-content minmax(0, 1fr) max-content; align-items: center; }
+.fi-panel-direccion-h .fi-ta-main > * { grid-column: 1 / -1; }
+.fi-panel-direccion-h .fi-ta-header-ctn { display: contents; }
+.fi-panel-direccion-h .fi-ta-header-ctn > .fi-ta-header { grid-column: 1; grid-row: 1; border: 0; }
+.fi-panel-direccion-h .fi-ta-header-ctn > .fi-ta-header-toolbar { grid-column: 3; grid-row: 1; border: 0; justify-content: flex-end; }
+.fi-panel-direccion-h .fi-ta-main > .fi-ta-filter-indicators { grid-column: 2; grid-row: 1; border: 0; background: transparent; padding: 0 .5rem; justify-content: flex-start; gap: .5rem; min-width: 0; }
+.fi-panel-direccion-h .fi-ta-main > .fi-ta-filter-indicators .fi-ta-filter-indicators-label { display: none; }
+.fi-panel-direccion-h .fi-ta-main > .fi-ta-content-ctn { border-top: 1px solid var(--gray-200); }
+@media (max-width: 1023px) {
+    .fi-panel-direccion-h .fi-ta-main { grid-template-columns: minmax(0, 1fr) max-content; }
+    .fi-panel-direccion-h .fi-ta-main > .fi-ta-filter-indicators { grid-column: 1 / -1; grid-row: 2; padding: .5rem 1rem; }
+    .fi-panel-direccion-h .fi-ta-header-ctn > .fi-ta-header-toolbar { grid-column: 2; }
+}
+
+/* «Ver bajas» bajo las tarjetas: más grande y con aire */
+.velia-tarjetas-filtro-secundario { margin-top: .25rem; font-size: .875rem; }
+.velia-tarjetas-filtro-secundario button { display: inline-flex; align-items: center; min-height: 2.25rem; padding: 0 .5rem; border-radius: .5rem; font-weight: 500; }
+.velia-tarjetas-filtro-secundario button:hover { background: rgb(15 61 149 / .06); }

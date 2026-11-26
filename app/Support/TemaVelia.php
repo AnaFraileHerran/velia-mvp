@@ -6,21 +6,21 @@ use Filament\Support\Colors\Color;
 
 /**
  * Tokens del Design System de Velia v2 (https://claude.ai/artifact/7aHoYxDjtYRvjtwSsFfJTH) para Filament.
- * Gris claro y sencillo, con un solo color de acción: cobalto suave #3B5BA9 (6,5:1 con texto blanco).
+ * Gris claro y sencillo, con un solo color de acción: azul #0F3D95 (9,9:1 con texto blanco; hover #0B2F75). Decisión del 23/11/2026.
  */
 class TemaVelia
 {
     public const COBALTO = [
-        50 => '243, 245, 251', 100 => '233, 238, 248', 200 => '207, 216, 239', 300 => '169, 185, 225',
-        400 => '120, 145, 205', 500 => '86, 114, 187', 600 => '59, 91, 169', 700 => '48, 74, 139',
-        800 => '40, 61, 113', 900 => '33, 50, 92', 950 => '21, 31, 58',
+        50 => '240, 243, 250', 100 => '225, 231, 244', 200 => '196, 207, 232', 300 => '150, 169, 212',
+        400 => '92, 121, 184', 500 => '45, 86, 166', 600 => '15, 61, 149', 700 => '11, 47, 117',
+        800 => '10, 38, 94', 900 => '9, 31, 75', 950 => '6, 19, 46',
     ];
 
-    /** Neutros cálidos. 50 = fondo (#F5F5F2); 500 = texto secundario (6,1:1); 900 = texto (#141413). */
+    /** Neutros fríos con un toque del azul de marca (23/11/2026; antes cálidos #F4F6F9). 50 = fondo (#F7F8FB); 500 = texto secundario (5,9:1); 900 = texto (#14161B). */
     public const NEUTRO = [
-        50 => '245, 245, 242', 100 => '237, 237, 234', 200 => '228, 228, 223', 300 => '207, 207, 201',
-        400 => '138, 138, 131', 500 => '98, 98, 92', 600 => '74, 74, 69', 700 => '58, 58, 54',
-        800 => '38, 38, 36', 900 => '20, 20, 19', 950 => '11, 11, 10',
+        50 => '247, 248, 251', 100 => '236, 239, 244', 200 => '226, 230, 237', 300 => '203, 209, 219',
+        400 => '134, 141, 153', 500 => '94, 101, 114', 600 => '71, 77, 89', 700 => '55, 60, 70',
+        800 => '36, 39, 46', 900 => '20, 22, 27', 950 => '11, 12, 15',
     ];
 
     public static function colores(): array

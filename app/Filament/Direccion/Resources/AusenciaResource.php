@@ -2,14 +2,15 @@
 
 namespace App\Filament\Direccion\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\Action;
+use App\Filament\Direccion\Resources\AusenciaResource\Pages\ManageAusencias;
 use App\Filament\Direccion\Resources\AusenciaResource\Pages;
 use App\Models\Ausencia;
 use App\Models\Residente;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -28,9 +29,15 @@ class AusenciaResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
-    public static function form(Form $form): Form
+    /** Nueva versión (26/11): Ausencias sale del menú; «Fuera» es un estado de la lista de residentes. */
+    public static function shouldRegisterNavigation(): bool
     {
-        return $form->schema([
+        return ! \App\Support\VersionH::activa();
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema->components([
             Select::make('residente_id')->label('Residente')->required()->searchable()
                 ->options(Residente::activos()->orderBy('nombre')->pluck('nombre', 'id')),
             Select::make('tipo')->label('Tipo')->options(Ausencia::TIPOS)->required(),
@@ -54,7 +61,7 @@ class AusenciaResource extends Resource
             ])
             // Primero quien debía haber vuelto (sin confirmar), luego por fecha de vuelta.
             ->modifyQueryUsing(fn ($query) => $query->orderByRaw('CASE WHEN vuelve IS NULL THEN 1 ELSE 0 END')->orderBy('vuelve'))
-            ->actions([
+            ->recordActions([
                 Action::make('haVuelto')->label('Ha vuelto')->button()
                     ->visible(fn (Ausencia $a) => ! $a->ha_vuelto)
                     ->action(function (Ausencia $a) {
@@ -64,13 +71,13 @@ class AusenciaResource extends Resource
                 Action::make('cambiarFecha')->label('Cambiar fecha')->color('gray')
                     ->visible(fn (Ausencia $a) => ! $a->ha_vuelto)
                     ->fillForm(fn (Ausencia $a) => ['vuelve' => $a->vuelve])
-                    ->form([DatePicker::make('vuelve')->label('Vuelve')])
+                    ->schema([DatePicker::make('vuelve')->label('Vuelve')])
                     ->action(fn (Ausencia $a, array $data) => $a->update($data)),
             ]);
     }
 
     public static function getPages(): array
     {
-        return ['index' => Pages\ManageAusencias::route('/')];
+        return ['index' => ManageAusencias::route('/')];
     }
 }

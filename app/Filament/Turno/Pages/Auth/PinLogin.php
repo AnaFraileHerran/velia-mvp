@@ -2,12 +2,12 @@
 
 namespace App\Filament\Turno\Pages\Auth;
 
+use Filament\Auth\Pages\Login;
+use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use App\Models\Residencia;
 use App\Models\User;
 use App\Support\Dispositivo;
 use Filament\Facades\Filament;
-use Filament\Http\Responses\Auth\Contracts\LoginResponse;
-use Filament\Pages\Auth\Login;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 
@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\RateLimiter;
  */
 class PinLogin extends Login
 {
-    protected static string $view = 'filament.turno.auth.pin-login';
+    protected string $view = 'filament.turno.auth.pin-login';
 
     public string $pin = '';
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Turno\Pages;
 
+use App\Models\Aviso;
 use App\Models\Registro;
 use App\Models\Turno;
 use App\Support\TurnoActual;
@@ -19,7 +20,7 @@ class CerrarTurno extends Page
 
     protected static ?string $slug = 'cerrar-turno';
 
-    protected static string $view = 'filament.turno.pages.cerrar-turno';
+    protected string $view = 'filament.turno.pages.cerrar-turno';
 
     public ?string $motivo = null;
 
@@ -44,7 +45,7 @@ class CerrarTurno extends Page
 
     public function relevo()
     {
-        $turno = \Filament\Facades\Filament::auth()->user()->turnoAbierto();
+        $turno = Filament::auth()->user()->turnoAbierto();
 
         return Registro::with('residente')->where('turno_id', $turno?->id)->where('estado', 'confirmado')
             ->whereNotIn('id', $this->quitados)->orderByDesc('incidencia_destacada')->get();
@@ -71,7 +72,24 @@ class CerrarTurno extends Page
             $lineas[] = trim($this->nota);
         }
 
-        \Filament\Facades\Filament::auth()->user()->turnoAbierto()?->update([
+        $u = Filament::auth()->user();
+        $turno = $u->turnoAbierto();
+        if ($hayPendientes && $turno) {
+            // Aviso para «Hoy necesita tu decisión» con todo el contexto: planta, turno, fecha, cuántos, motivo y quién (decisión 23/11/2026)
+            $h = (int) $turno->inicio->format('G');
+            $franja = $h >= 7 && $h < 15 ? 'mañana' : ($h >= 15 && $h < 23 ? 'tarde' : 'noche');
+            $n = $this->pendientes()->count();
+            Aviso::create([
+                'tipo' => 'turno_con_motivo',
+                'titulo' => ($u->planta?->nombre ?? 'Todas las plantas').' · '.$franja.' del '.$turno->inicio->format('d/m').' · '.$n.' sin registrar · '
+                    .mb_strtolower(Turno::MOTIVOS_CIERRE[$this->motivo] ?? $this->motivo).' · cerrado por '.$u->name,
+                'detalle' => $this->motivo === 'otros' ? $this->motivoTexto : null,
+                'urgencia' => 2,
+                'estado' => 'pendiente',
+            ]);
+        }
+
+        $turno?->update([
             'fin' => now(),
             'motivo_cierre' => $hayPendientes ? $this->motivo : null,
             'motivo_texto' => $this->motivo === 'otros' ? $this->motivoTexto : null,

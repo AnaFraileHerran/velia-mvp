@@ -2,6 +2,7 @@
 
 namespace App\Filament\Turno\Pages;
 
+use Filament\Facades\Filament;
 use App\Models\Aviso;
 use App\Models\Registro;
 use App\Models\Residente;
@@ -19,10 +20,16 @@ class Registrar extends Page
 {
     protected static ?string $slug = 'registrar';
 
-    protected static string $view = 'filament.turno.pages.registrar';
+    protected string $view = 'filament.turno.pages.registrar';
 
     #[Url]
     public ?int $residente = null;
+
+    /** Viene del botón flotante de micrófono: la grabación empieza sola (si el navegador lo permite). */
+    #[Url]
+    public bool $grabar = false;
+
+    public bool $autoGrabar = false;
 
     /** grabar | escribir | revisar */
     public string $paso = 'grabar';
@@ -38,13 +45,21 @@ class Registrar extends Page
 
     public ?int $registroId = null;
 
+    /** Lo que propuso la IA al ordenar, para anotar al confirmar si se aceptó tal cual o se cambió. */
+    public array $propuesta = [];
+
+    /** Categorías que suelen anotarse en esta franja y la auxiliar ha decidido no añadir. */
+    public array $faltanDescartadas = [];
+
     public const TIPOS_INCIDENCIA = ['Caídas y mareos', 'Piel y úlceras', 'Alimentación e hidratación', 'Conducta', 'Otra'];
 
     public function mount(): void
     {
         abort_unless($this->residente && $this->r(), 404);
+        $this->autoGrabar = $this->grabar;
+        $this->grabar = false;
         // Si dejó un borrador en este turno, se retoma en «Revisar».
-        $b = Registro::where('residente_id', $this->residente)->where('turno_id', \Filament\Facades\Filament::auth()->user()->turnoAbierto()?->id)
+        $b = Registro::where('residente_id', $this->residente)->where('turno_id', Filament::auth()->user()->turnoAbierto()?->id)
             ->where('estado', 'borrador')->latest()->first();
         if ($b) {
             $this->registroId = $b->id;
@@ -83,7 +98,28 @@ class Registrar extends Page
         $this->categorias = $o['categorias'];
         $this->incidencia = $o['incidencia'];
         $this->tipoIncidencia = $o['tipo_incidencia'];
+        $this->propuesta = $o['categorias'];
         $this->paso = 'revisar';
+    }
+
+    /** «Velia te sugiere»: lo que suele anotarse en este turno y no se ha dicho. */
+    public function faltan(): array
+    {
+        return array_values(array_diff(\App\Support\Ia\Sugerencias::faltanEnRegistro($this->categorias), $this->faltanDescartadas));
+    }
+
+    public function anadirSinNovedad(string $cat): void
+    {
+        $this->categorias[$cat] = 'Sin novedad.';
+        \App\Models\SugerenciaIa::anotar('registrar.faltan', 'Añadir «Sin novedad» en '.$cat, 'aceptada', $this->r());
+    }
+
+    public function descartarFaltan(): void
+    {
+        foreach ($this->faltan() as $cat) {
+            \App\Models\SugerenciaIa::anotar('registrar.faltan', 'Añadir «Sin novedad» en '.$cat, 'descartada', $this->r());
+            $this->faltanDescartadas[] = $cat;
+        }
     }
 
     public function quitarCategoria(string $cat): void
@@ -108,10 +144,10 @@ class Registrar extends Page
 
     private function guardar(string $estado)
     {
-        $turno = \Filament\Facades\Filament::auth()->user()->turnoAbierto();
+        $turno = Filament::auth()->user()->turnoAbierto();
         $datos = [
             'residente_id' => $this->residente,
-            'user_id' => \Filament\Facades\Filament::auth()->id(),
+            'user_id' => Filament::auth()->id(),
             'turno_id' => $turno?->id,
             'texto_original' => $estado === 'sin_novedad' ? null : $this->texto,
             'categorias' => $estado === 'sin_novedad' ? [] : array_filter($this->categorias, fn ($v) => trim($v) !== ''),
@@ -120,6 +156,11 @@ class Registrar extends Page
             'tipo_incidencia' => $this->incidencia ? ($this->tipoIncidencia ?: 'Otra') : null,
         ];
         $registro = $this->registroId ? tap(Registro::find($this->registroId))->update($datos) : Registro::create($datos);
+
+        if ($estado === 'confirmado' && $this->propuesta) {
+            $propuesta = collect($this->propuesta)->map(fn ($v, $k) => "{$k}: {$v}")->join(' | ');
+            \App\Models\SugerenciaIa::anotar('registrar.ordenar', $propuesta, $datos['categorias'] == $this->propuesta ? 'aceptada' : 'cambiada', $registro);
+        }
 
         if ($estado === 'confirmado' && $registro->incidencia_destacada) {
             Aviso::create([
@@ -137,6 +178,7 @@ class Registrar extends Page
             default => $registro->incidencia_destacada ? 'Registrado. La dirección ha recibido el aviso.' : 'Registrado.',
         })->success()->send();
 
+        $this->js("try { localStorage.removeItem('velia-pendiente-{$this->residente}') } catch (e) {}");
         return redirect()->to(Residentes::getUrl());
     }
 
