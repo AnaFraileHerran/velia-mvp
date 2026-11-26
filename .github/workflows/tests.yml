@@ -13,6 +13,7 @@ jobs:
           php-version: '8.4'
           extensions: intl, zip, pdo_sqlite, sqlite3, mbstring
           coverage: none
+      - run: mkdir -p bootstrap/cache storage/framework/cache storage/framework/sessions storage/framework/views storage/logs
       - run: composer install --no-interaction --prefer-dist --no-progress
       - run: cp .env.example .env && php artisan key:generate
       - run: touch database/database.sqlite
